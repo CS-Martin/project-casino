@@ -1,16 +1,33 @@
 import { DiscoverCasino } from '../schema/schema';
 import { ConvexHttpClient } from 'convex/browser';
 import { api } from '../../../../convex/_generated/api';
-import { findDuplicateCasino } from '@/lib/utils';
+import { CasinoDuplicateDetector } from './casino-duplicate-detector.service';
 import { Doc } from '../../../../convex/_generated/dataModel';
 
 const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
+interface SaveResult {
+  saved: number;
+  skipped: number;
+  duplicates: Array<{
+    discovered: string;
+    existing: string;
+    reason: string;
+    score?: number;
+  }>;
+}
+
 export class CasinoDiscoveryService {
   /**
-   * Process AI-discovered casinos and save them to the database
+   * Process AI-discovered casinos and save them to the database with enhanced duplicate detection
    */
-  static async saveDiscoveredCasinos(discoveredData: DiscoverCasino[]) {
+  static async saveDiscoveredCasinos(discoveredData: DiscoverCasino[]): Promise<SaveResult> {
+    const result: SaveResult = {
+      saved: 0,
+      skipped: 0,
+      duplicates: [],
+    };
+
     for (const stateData of discoveredData) {
       try {
         // Get or create state
@@ -24,9 +41,8 @@ export class CasinoDiscoveryService {
           stateAbbreviation: stateData.state_abbreviation,
         });
 
-        // Filter out duplicates before saving
+        // Process each discovered casino
         const casinosToSave: Array<Partial<Doc<'casinos'>>> = [];
-        const skippedDuplicates: string[] = [];
 
         for (const casino of stateData.casinos) {
           const newCasino: Partial<Doc<'casinos'>> = {
@@ -38,23 +54,24 @@ export class CasinoDiscoveryService {
             is_tracked: false,
           };
 
-          // Check if this casino already exists using fuzzy matching
-          const duplicate = findDuplicateCasino(newCasino as Doc<'casinos'>, existingCasinos);
+          // Enhanced duplicate detection
+          const duplicateResult = CasinoDuplicateDetector.findDuplicateCasino(newCasino, existingCasinos);
 
-          if (duplicate) {
-            // Skip duplicate - don't save to database
-            skippedDuplicates.push(casino.casino_name);
-            console.log(`⏭️ Skipped duplicate: "${casino.casino_name}" (matches existing: "${duplicate.name}")`);
-          } else {
-            // Only save if it's not a duplicate
-            casinosToSave.push({
-              name: casino.casino_name,
-              website: casino.website,
-              license_status: casino.license_status,
-              source_url: casino.source_url,
-              state_id: stateId,
-              is_tracked: false,
+          if (duplicateResult.duplicate) {
+            result.skipped++;
+            result.duplicates.push({
+              discovered: casino.casino_name,
+              existing: duplicateResult.duplicate.name,
+              reason: duplicateResult.reason,
+              score: duplicateResult.score,
             });
+
+            console.log(
+              `⏭️ Skipped duplicate: "${casino.casino_name}" → "${duplicateResult.duplicate.name}" (${duplicateResult.reason}${duplicateResult.score ? `, score: ${duplicateResult.score}` : ''})`
+            );
+          } else {
+            casinosToSave.push(newCasino);
+            console.log(`✅ Will save: "${casino.casino_name}"`);
           }
         }
 
@@ -63,11 +80,18 @@ export class CasinoDiscoveryService {
           await convex.mutation(api.casinos.index.createMultipleCasinos, {
             casinos: casinosToSave as Array<Doc<'casinos'>>,
           });
+          result.saved += casinosToSave.length;
         }
+
+        console.log(
+          `📊 ${stateData.state_abbreviation}: Saved ${casinosToSave.length}, Skipped ${stateData.casinos.length - casinosToSave.length}`
+        );
       } catch (error) {
         console.error(`❌ Error saving casinos for ${stateData.state_abbreviation}:`, error);
       }
     }
+
+    return result;
   }
 
   /**
@@ -79,6 +103,7 @@ export class CasinoDiscoveryService {
       PA: 'Pennsylvania',
       MI: 'Michigan',
       WV: 'West Virginia',
+      // Add more states as needed
     };
     return stateNames[abbreviation] || abbreviation;
   }

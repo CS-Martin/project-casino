@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { DiscoverCasino } from '@/features/casino-discovery/ai-agent/discover-casino';
-import { CasinoDiscoveryService } from '@/features/casino-discovery/services/casino-discovery-service';
+import { CasinoDiscoveryService } from '@/features/casino-discovery/services/casino-discovery.service';
 
 export async function POST() {
   try {

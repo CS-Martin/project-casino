@@ -23,7 +23,6 @@ export async function DiscoverCasino() {
           content: DISCOVER_CASINO_USER_PROMPT,
         },
       ],
-      tool_choice: 'auto',
       text: {
         format: zodTextFormat(DiscoverCasinoSchema, 'discoverCasino'),
       },

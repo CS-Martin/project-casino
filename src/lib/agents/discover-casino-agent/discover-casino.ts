@@ -1,6 +1,7 @@
 import OpenAI from 'openai';
 import { zodTextFormat } from 'openai/helpers/zod';
 import { DiscoverCasinoSchema } from './schema';
+import { DISCOVER_CASINO_SYSTEM_PROMPT, DISCOVER_CASINO_USER_PROMPT } from './constants';
 
 const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
@@ -9,31 +10,17 @@ export async function DiscoverCasino() {
 
   try {
     const response = await client.responses.parse({
-      model: 'gpt-5-nano', // or "gpt-5-nano" if you prefer, but 4o-mini is faster + higher rate limit
+      model: 'gpt-5-nano', // "gpt-5-nano" or "gpt-4o-mini" for faster and better precision
+      reasoning: { effort: 'medium' },
       tools: [{ type: 'web_search' }],
-      reasoning: { effort: 'low' },
       input: [
         {
           role: 'system',
-          content: `
-          You are an AI research assistant specialized in U.S. gambling regulation.
-          Your task is to identify exactly 2 licensed and operational **online casinos** in each of these U.S. states:
-          - New Jersey (NJ)
-          - Pennsylvania (PA)
-          - Michigan (MI)
-          - West Virginia (WV)
-
-          Strict rules:
-          1. Use only official or authoritative sources (.gov, state gaming commissions, regulatory sites).
-          2. Do not include sports betting–only platforms.
-          3. Respond ONLY in JSON using this schema: ${JSON.stringify(DiscoverCasinoSchema.shape)}
-          4. Always include all 4 states, even if no casinos found (return empty list for that state).
-          5. Do not include any explanations or extra text outside the JSON.
-          `,
+          content: DISCOVER_CASINO_SYSTEM_PROMPT,
         },
         {
           role: 'user',
-          content: 'Find and list 2 licensed online casinos for each of the 4 states using official sources only.',
+          content: DISCOVER_CASINO_USER_PROMPT,
         },
       ],
       tool_choice: 'auto',

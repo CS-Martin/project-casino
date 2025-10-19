@@ -1,7 +1,7 @@
 import { defineTable } from 'convex/server';
 import { v } from 'convex/values';
 
-export const state = defineTable({
+export const states = defineTable({
   name: v.string(),
   abbreviation: v.string(),
 })

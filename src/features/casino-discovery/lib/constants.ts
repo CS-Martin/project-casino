@@ -1,4 +1,4 @@
-import { DiscoverCasinoSchema } from './schema';
+import { DiscoverCasinoSchema } from '../../../features/casino-discovery/schema/schema';
 
 export const DISCOVER_CASINO_SYSTEM_PROMPT = `
 You are an expert research assistant specializing in **U.S. online gambling regulation** and **state licensing authorities**.

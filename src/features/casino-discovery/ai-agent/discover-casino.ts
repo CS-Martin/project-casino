@@ -1,7 +1,7 @@
 import OpenAI from 'openai';
 import { zodTextFormat } from 'openai/helpers/zod';
-import { DiscoverCasinoSchema } from './schema';
-import { DISCOVER_CASINO_SYSTEM_PROMPT, DISCOVER_CASINO_USER_PROMPT } from './constants';
+import { DISCOVER_CASINO_SYSTEM_PROMPT, DISCOVER_CASINO_USER_PROMPT } from '../lib/constants';
+import { DiscoverCasinoSchema } from '../schema/schema';
 
 const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 

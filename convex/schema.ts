@@ -1,10 +1,10 @@
 import { defineSchema } from 'convex/server';
-import { casino } from './casino/casino.model';
-import { offer } from './offer/offer.model';
-import { state } from './state/state.model';
+import { casinos } from './casinos/casinos.model';
+import { offers } from './offers/offers.model';
+import { states } from './states/states.model';
 
 export default defineSchema({
-  casino,
-  offer,
-  state,
+  casinos,
+  offers,
+  states,
 });

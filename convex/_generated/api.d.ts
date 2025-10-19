@@ -15,6 +15,7 @@ import type * as casinos_mutations_deleteCasino from "../casinos/mutations/delet
 import type * as casinos_mutations_updateCasino from "../casinos/mutations/updateCasino.js";
 import type * as casinos_queries_getAllCasino from "../casinos/queries/getAllCasino.js";
 import type * as casinos_queries_getCasinoById from "../casinos/queries/getCasinoById.js";
+import type * as casinos_queries_getCasinosByState from "../casinos/queries/getCasinosByState.js";
 import type * as crons from "../crons.js";
 import type * as offers_index from "../offers/index.js";
 import type * as states_index from "../states/index.js";
@@ -44,6 +45,7 @@ declare const fullApi: ApiFromModules<{
   "casinos/mutations/updateCasino": typeof casinos_mutations_updateCasino;
   "casinos/queries/getAllCasino": typeof casinos_queries_getAllCasino;
   "casinos/queries/getCasinoById": typeof casinos_queries_getCasinoById;
+  "casinos/queries/getCasinosByState": typeof casinos_queries_getCasinosByState;
   crons: typeof crons;
   "offers/index": typeof offers_index;
   "states/index": typeof states_index;

@@ -2,6 +2,7 @@
 
 import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
+import { useState } from "react";
 import {
   Table,
   TableBody,
@@ -61,10 +62,30 @@ function CasinosList() {
 }
 
 export default function Home() {
+  const [isDiscovering, setIsDiscovering] = useState(false);
+
+  async function handleDiscover() {
+    try {
+      setIsDiscovering(true);
+      const res = await fetch("/api/discover-casinos", { method: "POST" });
+      if (!res.ok) throw new Error("Discovery failed");
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsDiscovering(false);
+    }
+  }
 
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-4">Casinos</h1>
+      <button
+        onClick={handleDiscover}
+        disabled={isDiscovering}
+        className="mb-4 inline-flex items-center rounded-md bg-blue-600 px-4 py-2 text-white disabled:opacity-60"
+      >
+        {isDiscovering ? "Discovering…" : "Discover Casinos"}
+      </button>
       <CasinosList />
     </div>
   );

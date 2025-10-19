@@ -26,7 +26,7 @@ export class CasinoDiscoveryService {
           license_status: casino.license_status,
           source_url: casino.source_url,
           state_id: stateId,
-          is_tracked: true, // Mark as tracked since we discovered them
+          is_tracked: false, // Mark as false because these are newly discovered and not yet in the main database
         }));
 
         // Save all casinos for this state

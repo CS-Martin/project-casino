@@ -3,12 +3,12 @@ import { createCasinoArgs, createCasinoHandler } from './mutations/createCasino'
 import { createMultipleCasinosArgs, createMultipleCasinosHandler } from './mutations/createMultipleCasinos';
 import { deleteCasinoArgs, deleteCasinoHandler } from './mutations/deleteCasino';
 import { updateCasinoArgs, updateCasinoHandler } from './mutations/updateCasino';
-import { getAllCasinoHandler } from './queries/getAllCasino';
+import { getAllCasinosHandler } from './queries/getAllCasino';
 import { getCasinoByIdArgs, getCasinoByIdHandler } from './queries/getCasinoById';
 
 // Queries
-export const getAllCasino = query({
-  handler: getAllCasinoHandler,
+export const getAllCasinos = query({
+  handler: getAllCasinosHandler,
 });
 
 export const getCasinoById = query({

@@ -4,7 +4,7 @@ import { v } from 'convex/values';
 import { Id } from './_generated/dataModel';
 
 /**
- * Fetch and sync offers from given API endpoint
+ * Fetch and sync offers from the given API endpoint
  */
 export const fetchAndSyncOffers = internalAction(async (ctx) => {
   const url = 'https://xhks-nxia-vlqr.n7c.xano.io/api:1ZwRS-f0/activeSUB';

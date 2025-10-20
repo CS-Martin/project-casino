@@ -1,13 +1,14 @@
 "use client";
 
 import * as React from "react";
-import { PieChart, Pie, Cell, ResponsiveContainer, Sector } from "recharts";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { PieChart, Pie, Cell, ResponsiveContainer, Sector, Tooltip } from "recharts";
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
     Table,
     TableBody,
     TableCell,
+    TableFooter,
     TableHead,
     TableHeader,
     TableRow,
@@ -23,27 +24,27 @@ interface PieDonutActiveProps {
 const chartConfig = {
     critical: {
         label: "Critical Opportunity",
-        color: "#ef4444",
+        color: "#7c3aed",
     },
     high: {
         label: "High Opportunity",
-        color: "#f59e0b",
+        color: "#a855f7",
     },
     medium: {
         label: "Medium Opportunity",
-        color: "#3b82f6",
+        color: "#c084fc",
     },
     low: {
         label: "Low Opportunity",
-        color: "#10b981",
+        color: "#e9d5ff",
     },
 } satisfies ChartConfig;
 
 const opportunityColors = {
-    CRITICAL: "#ef4444",
-    HIGH: "#f59e0b",
-    MEDIUM: "#3b82f6",
-    LOW: "#10b981",
+    CRITICAL: "#7c3aed",
+    HIGH: "#a855f7",
+    MEDIUM: "#c084fc",
+    LOW: "#e9d5ff",
 } as const;
 
 const opportunityVariants = {
@@ -165,20 +166,20 @@ export function PieDonutActive({ data }: PieDonutActiveProps) {
     };
 
     return (
-        <Card className="w-full h-full">
+        <Card className="relative h-full 2xl:h-[480px] flex flex-col">
             <CardHeader>
                 <CardTitle className="text-lg font-semibold">Market Coverage Analytics</CardTitle>
                 <p className="text-sm text-muted-foreground">
                     Casino market coverage by state with opportunity analysis
                 </p>
             </CardHeader>
-            <CardContent>
-                <div className="grid gap-3 lg:grid-cols-5 mt-5">
+            <CardContent className="flex-1 flex flex-col">
+                <div className="flex flex-col 2xl:flex-row gap-3 mt-5 w-full flex-1">
                     {/* Chart Section */}
-                    <div className="col-span-2 space-y-4">
-                        <div className="h-fit w-full">
-                            <ChartContainer config={chartConfig} className=" -ml-10 w-auto">
-                                <ResponsiveContainer width="100%" height="100%">
+                    <div className="w-full 2xl:w-[65%]">
+                        <div className="h-fit w-full flex justify-center">
+                            <ChartContainer config={chartConfig} className="w-full max-w-sm">
+                                <ResponsiveContainer width="100%" height={250}>
                                     <PieChart>
                                         <Pie
                                             data={chartData}
@@ -200,6 +201,53 @@ export function PieDonutActive({ data }: PieDonutActiveProps) {
                                                 />
                                             ))}
                                         </Pie>
+                                        <Tooltip
+                                            content={({ active, payload }) => {
+                                                if (active && payload && payload.length) {
+                                                    const data = payload[0].payload;
+                                                    return (
+                                                        <div className="rounded-lg border bg-background p-3 shadow-md">
+                                                            <div className="flex items-center gap-2 mb-2">
+                                                                <div
+                                                                    className="w-3 h-3 rounded-full"
+                                                                    style={{ backgroundColor: data.fill }}
+                                                                />
+                                                                <span className="font-semibold">{data.state}</span>
+                                                            </div>
+                                                            <div className="space-y-1 text-sm">
+                                                                <div className="flex justify-between gap-4">
+                                                                    <span className="text-muted-foreground">Coverage:</span>
+                                                                    <span className="font-medium text-green-600 dark:text-green-400">
+                                                                        {data.coverage.toFixed(1)}%
+                                                                    </span>
+                                                                </div>
+                                                                <div className="flex justify-between gap-4">
+                                                                    <span className="text-muted-foreground">Gap:</span>
+                                                                    <span className="font-medium text-red-600 dark:text-red-400">
+                                                                        {data.gap.toFixed(1)}%
+                                                                    </span>
+                                                                </div>
+                                                                <div className="flex justify-between gap-4">
+                                                                    <span className="text-muted-foreground">Opportunity:</span>
+                                                                    <span className={cn(
+                                                                        "px-1.5 py-1 rounded-md lowercase text-xs text-white",
+                                                                        data.opportunity === "CRITICAL" && "bg-purple-600",
+                                                                        data.opportunity === "HIGH" && "bg-purple-500",
+                                                                        data.opportunity === "MEDIUM" && "bg-purple-400",
+                                                                        data.opportunity === "LOW" && "bg-purple-300"
+                                                                    )}>{data.opportunity}</span>
+                                                                </div>
+                                                                <div className="flex justify-between gap-4">
+                                                                    <span className="text-muted-foreground">Total Casinos:</span>
+                                                                    <span className="font-medium">{data.total}</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                }
+                                                return null;
+                                            }}
+                                        />
                                     </PieChart>
                                 </ResponsiveContainer>
                             </ChartContainer>
@@ -222,85 +270,82 @@ export function PieDonutActive({ data }: PieDonutActiveProps) {
                     </div>
 
                     {/* Table Section */}
-                    <div className="col-span-3 space-y-4">
-                        <div className="rounded-lg border overflow-hidden">
-                            <div className="overflow-x-auto">
-                                <Table>
-                                    <TableHeader>
-                                        <TableRow>
-                                            <TableHead className="min-w-[120px]">State</TableHead>
-                                            <TableHead className="min-w-[80px] text-center">Coverage</TableHead>
-                                            <TableHead className="min-w-[80px] text-center">Gap</TableHead>
-                                            <TableHead className="min-w-[100px] text-center">Opportunity</TableHead>
-                                            <TableHead className="min-w-[60px] text-center">Total</TableHead>
-                                        </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                        {data.map((item, index) => (
-                                            <TableRow
-                                                key={item.state}
-                                                className={cn(
-                                                    "transition-colors",
-                                                    criticalIndices.includes(index) && "bg-red-50 dark:bg-red-950/20"
-                                                )}
-                                            >
-                                                <TableCell className="font-medium">
-                                                    <div className="flex items-center gap-2">
-                                                        <div
-                                                            className="w-2 h-2 rounded-full flex-shrink-0"
-                                                            style={{ backgroundColor: opportunityColors[item.opportunity] }}
-                                                        />
-                                                        <span className="text-sm truncate">{item.state}</span>
-                                                    </div>
-                                                </TableCell>
-                                                <TableCell className="text-center">
-                                                    <span className="text-sm font-medium text-green-600 dark:text-green-400">
-                                                        {item.coverage.toFixed(1)}%
-                                                    </span>
-                                                </TableCell>
-                                                <TableCell className="text-center">
-                                                    <span className="text-sm font-medium text-red-600 dark:text-red-400">
-                                                        {item.gap.toFixed(1)}%
-                                                    </span>
-                                                </TableCell>
-                                                <TableCell className="text-center">
-                                                    <Badge
-                                                        variant={getOpportunityBadgeVariant(item.opportunity)}
-                                                        className="text-xs"
-                                                    >
-                                                        {item.opportunity}
-                                                    </Badge>
-                                                </TableCell>
-                                                <TableCell className="text-center">
-                                                    <span className="text-sm font-medium">
-                                                        {item.total}
-                                                    </span>
-                                                </TableCell>
-                                            </TableRow>
-                                        ))}
-                                    </TableBody>
-                                </Table>
-                            </div>
-                        </div>
+                    <Table className="mt-5 2xl:mt-0">
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>State</TableHead>
+                                <TableHead>Coverage</TableHead>
+                                <TableHead>Gap</TableHead>
+                                <TableHead className="text-center">Opportunity</TableHead>
+                                <TableHead className="text-right">Total</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {data.map((item, index) => (
+                                <TableRow
+                                    key={item.state}
+                                    className={cn(
+                                        "transition-colors",
+                                        criticalIndices.includes(index) && "bg-red-50 dark:bg-red-950/20"
+                                    )}
+                                >
+                                    <TableCell className="font-medium">
+                                        <div className="flex items-center gap-2">
+                                            <div
+                                                className="w-2 h-2 rounded-full flex-shrink-0"
+                                                style={{ backgroundColor: opportunityColors[item.opportunity] }}
+                                            />
+                                            <span className="text-sm truncate">{item.state}</span>
+                                        </div>
+                                    </TableCell>
+                                    <TableCell >
+                                        <span className="text-sm font-medium text-green-600 dark:text-green-400">
+                                            {item.coverage.toFixed(1)}%
+                                        </span>
+                                    </TableCell>
+                                    <TableCell>
+                                        <span className="text-sm font-medium text-red-600 dark:text-red-400">
+                                            {item.gap.toFixed(1)}%
+                                        </span>
+                                    </TableCell>
+                                    <TableCell className="text-center">
+                                        <span className={cn(
+                                            "px-1.5 py-1 rounded-md lowercase text-xs font-medium text-white",
+                                            item.opportunity === "CRITICAL" && "bg-red-500",
+                                            item.opportunity === "HIGH" && "bg-orange-500",
+                                            item.opportunity === "MEDIUM" && "bg-blue-500",
+                                            item.opportunity === "LOW" && "bg-green-500"
+                                        )}>{item.opportunity}</span>
+                                    </TableCell>
+                                    <TableCell className="text-right">
+                                        <span className="text-sm font-medium">
+                                            {item.total}
+                                        </span>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                            <TableFooter>
+                                <TableRow>
+                                    <TableCell className="font-semibold">Critical States: </TableCell>
+                                    <TableCell className="text-center font-semibold text-red-500">
+                                        {data.filter(item => item.opportunity === "CRITICAL").length}
+                                    </TableCell>
 
-                        {/* Summary Stats */}
-                        <div className="grid grid-cols-2 gap-4 text-sm">
-                            <div className="space-y-1">
-                                <div className="text-muted-foreground">Critical States</div>
-                                <div className="font-semibold text-red-600 dark:text-red-400">
-                                    {data.filter(item => item.opportunity === "CRITICAL").length}
-                                </div>
-                            </div>
-                            <div className="space-y-1">
-                                <div className="text-muted-foreground">Avg Coverage</div>
-                                <div className="font-semibold">
-                                    {(data.reduce((sum, item) => sum + item.coverage, 0) / data.length).toFixed(1)}%
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                                </TableRow>
+                            </TableFooter>
+                        </TableBody>
+                    </Table>
                 </div>
+
             </CardContent>
-        </Card>
+            <CardFooter className="flex-col items-start gap-2 text-sm">
+                <div className="flex gap-2 leading-none font-medium">
+                    {data.filter(item => item.opportunity === "CRITICAL").length} critical states need immediate attention
+                </div>
+                <div className="text-muted-foreground leading-none">
+                    Average coverage: {(data.reduce((sum, item) => sum + item.coverage, 0) / data.length).toFixed(1)}% across all states
+                </div>
+            </CardFooter>
+        </Card >
     );
 }

@@ -3,19 +3,19 @@ import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLe
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
 import { useQuery } from "convex/react";
 import { api } from "@convex/_generated/api";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 
 export default function StateChart() {
     const stateStats = useQuery(api.casinos.index.getCasinosByStateStats);
 
     if (stateStats === undefined) {
         return (
-            <Card>
+            <Card className="h-[480px] flex flex-col">
                 <CardHeader>
                     <CardTitle>State-by-State Market Analysis</CardTitle>
                 </CardHeader>
-                <CardContent>
-                    <div className="h-[400px] flex items-center justify-center">
+                <CardContent className="flex-1">
+                    <div className="h-full flex items-center justify-center">
                         <Skeleton className="h-[350px] w-full" />
                     </div>
                 </CardContent>
@@ -25,12 +25,12 @@ export default function StateChart() {
 
     if (!stateStats || stateStats.length === 0) {
         return (
-            <Card>
+            <Card className="h-[480px] flex flex-col">
                 <CardHeader>
                     <CardTitle>State-by-State Market Analysis</CardTitle>
                 </CardHeader>
-                <CardContent>
-                    <div className="h-[400px] flex items-center justify-center text-muted-foreground">
+                <CardContent className="flex-1">
+                    <div className="h-full flex items-center justify-center text-muted-foreground">
                         No data available
                     </div>
                 </CardContent>
@@ -54,18 +54,18 @@ export default function StateChart() {
     };
 
     return (
-        <Card className="w-full h-full">
+        <Card className="h-full 2xl:h-[480px] flex flex-col gap-0">
             <CardHeader>
                 <CardTitle>State-by-State Market Analysis</CardTitle>
                 <CardDescription>Showing tracked and untracked casinos for each state.</CardDescription>
             </CardHeader>
-            <CardContent>
-                <ChartContainer config={chartConfig} className="mt-5 -ml-10">
-                    <BarChart data={stateStats} margin={{ top: 10, right: 0, left: 0, bottom: 0 }}>
-                        <CartesianGrid strokeDasharray="3 3" />
+            <CardContent className="flex-1">
+                <ChartContainer config={chartConfig} className="-ml-10">
+                    <BarChart data={stateStats} accessibilityLayer margin={{ top: 20, right: 20, left: 20, bottom: 20 }}>
+                        <CartesianGrid />
                         <XAxis
                             dataKey="state"
-                            height={100}
+                            height={40}
                             fontSize={12}
                             interval={0}
                         />
@@ -93,6 +93,14 @@ export default function StateChart() {
                     </BarChart>
                 </ChartContainer>
             </CardContent>
-        </Card>
+            <CardFooter className="flex-col items-start gap-2 text-sm">
+                <div className="flex gap-2 leading-none font-medium">
+                    {((stateStats.reduce((sum, state) => sum + state.tracked, 0) / stateStats.reduce((sum, state) => sum + state.total, 0)) * 100).toFixed(1)}% tracking rate across all states
+                </div>
+                <div className="text-muted-foreground leading-none">
+                    {stateStats.reduce((sum, state) => sum + state.tracked, 0)} tracked, {stateStats.reduce((sum, state) => sum + state.untracked, 0)} untracked casinos
+                </div>
+            </CardFooter>
+        </Card >
     );
 }

@@ -1,6 +1,5 @@
 import { Doc } from '@convex/_generated/dataModel';
 import { CasinoDuplicateDetector } from '../services/casino-duplicate-detector.service';
-import { redis } from '@/lib/redis';
 
 /**
  * Enhanced normalization with more comprehensive word removal

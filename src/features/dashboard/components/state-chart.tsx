@@ -54,14 +54,14 @@ export default function StateChart() {
     };
 
     return (
-        <Card>
+        <Card className="w-full h-full">
             <CardHeader>
                 <CardTitle>State-by-State Market Analysis</CardTitle>
                 <CardDescription>Showing tracked and untracked casinos for each state.</CardDescription>
             </CardHeader>
             <CardContent>
-                <ChartContainer config={chartConfig} className="h-[400px] w-full">
-                    <BarChart data={stateStats} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                <ChartContainer config={chartConfig} className="mt-5 -ml-10">
+                    <BarChart data={stateStats} margin={{ top: 10, right: 0, left: 0, bottom: 0 }}>
                         <CartesianGrid strokeDasharray="3 3" />
                         <XAxis
                             dataKey="state"
@@ -71,7 +71,7 @@ export default function StateChart() {
                         />
                         <YAxis />
                         <ChartTooltip content={<ChartTooltipContent />} />
-                        <ChartLegend content={<ChartLegendContent />} />
+                        <ChartLegend content={<ChartLegendContent payload={[]} />} />
                         <Bar
                             dataKey="total"
                             fill="var(--color-total)"

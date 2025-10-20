@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useQuery } from "convex/react";
 import { api } from "@convex/_generated/api";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,16 +8,28 @@ import { Building2, CheckCircle, XCircle, AlertTriangle } from "lucide-react";
 import KPICard from "@/features/dashboard/components/kpi-card";
 import StateChart from "@/features/dashboard/components/state-chart";
 
-import { Redis } from '@upstash/redis';
-
-const redis = Redis.fromEnv();
-
-
 // Main Analytics Page
-export default async function DashboardPage() {
+export default function DashboardPage() {
     const casinoStats = useQuery(api.casinos.index.getCasinoStats);
     const isLoading = casinoStats === undefined;
-    const count = await redis.get<number>("counter");
+    // const [count, setCount] = useState<number>(0);
+
+    // useEffect(() => {
+    //     let isMounted = true;
+    //     (async () => {
+    //         try {
+    //             const res = await fetch('/api/redis/counter', { method: 'GET' });
+    //             if (!res.ok) return;
+    //             const data = await res.json();
+    //             if (isMounted) setCount(data.count ?? 0);
+    //         } catch (_) {
+    //             // ignore
+    //         }
+    //     })();
+    //     return () => {
+    //         isMounted = false;
+    //     };
+    // }, []);
 
 
 
@@ -30,7 +43,7 @@ export default async function DashboardPage() {
                 </p>
             </div>
 
-            <p>Count: {count}</p>
+            {/* <p>Count: {count}</p> */}
 
             {/* KPI Cards Grid */}
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

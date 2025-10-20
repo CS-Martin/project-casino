@@ -23,6 +23,7 @@ import type * as offers_index from "../offers/index.js";
 import type * as states_index from "../states/index.js";
 import type * as states_mutations_createState from "../states/mutations/createState.js";
 import type * as states_mutations_getOrCreateState from "../states/mutations/getOrCreateState.js";
+import type * as states_queries_getStateById from "../states/queries/getStateById.js";
 import type * as xanoAPISync from "../xanoAPISync.js";
 
 import type {
@@ -55,6 +56,7 @@ declare const fullApi: ApiFromModules<{
   "states/index": typeof states_index;
   "states/mutations/createState": typeof states_mutations_createState;
   "states/mutations/getOrCreateState": typeof states_mutations_getOrCreateState;
+  "states/queries/getStateById": typeof states_queries_getStateById;
   xanoAPISync: typeof xanoAPISync;
 }>;
 declare const fullApiWithMounts: typeof fullApi;

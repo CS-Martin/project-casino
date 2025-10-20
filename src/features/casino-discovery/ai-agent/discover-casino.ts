@@ -10,8 +10,7 @@ export async function DiscoverCasino() {
 
   try {
     const response = await client.responses.parse({
-      model: 'gpt-4o-mini', // "gpt-5-nano" or "gpt-4o-mini" for faster and better precision
-      // reasoning: { effort: 'medium' },
+      model: 'gpt-4o-mini',
       tools: [{ type: 'web_search' }],
       input: [
         {

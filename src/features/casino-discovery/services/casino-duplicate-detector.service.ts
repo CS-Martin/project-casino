@@ -1,6 +1,6 @@
-import { normalizeCasinoName } from '@/lib/utils';
 import stringSimilarity from 'string-similarity';
 import { Doc } from '@convex/_generated/dataModel';
+import { normalizeCasinoName } from '../lib/utils';
 
 /**
  * CASINO DUPLICATE DETECTOR

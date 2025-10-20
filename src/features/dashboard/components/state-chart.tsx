@@ -54,14 +54,14 @@ export default function StateChart() {
     };
 
     return (
-        <Card className="h-full 2xl:h-[480px] flex flex-col gap-0">
+        <Card className="h-full 2xl:h-[100%] flex flex-col gap-0">
             <CardHeader>
                 <CardTitle>State-by-State Market Analysis</CardTitle>
                 <CardDescription>Showing tracked and untracked casinos for each state.</CardDescription>
             </CardHeader>
             <CardContent className="flex-1">
                 <ChartContainer config={chartConfig} className="-ml-10">
-                    <BarChart data={stateStats} accessibilityLayer margin={{ top: 20, right: 20, left: 20, bottom: 20 }}>
+                    <BarChart data={stateStats} accessibilityLayer margin={{ top: 20, right: 20, left: 20, bottom: 40 }}>
                         <CartesianGrid />
                         <XAxis
                             dataKey="state"

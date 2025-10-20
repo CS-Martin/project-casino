@@ -1,9 +1,11 @@
 "use client";
 
 import * as React from "react";
-import { PieChart, Pie, Cell, ResponsiveContainer, Sector, Tooltip } from "recharts";
+import { PieChart, Pie, Cell, ResponsiveContainer, Sector, Tooltip as RechartsTooltip } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Info } from "lucide-react";
 import {
     Table,
     TableBody,
@@ -166,20 +168,20 @@ export function PieDonutActive({ data }: PieDonutActiveProps) {
     };
 
     return (
-        <Card className="relative h-full 2xl:h-[480px] flex flex-col">
+        <Card className="relative h-full 2xl:h-[100%] flex flex-col">
             <CardHeader>
-                <CardTitle className="text-lg font-semibold">Market Coverage Analytics</CardTitle>
+                <CardTitle className="textfont-semibold">Market Coverage Overview</CardTitle>
                 <p className="text-sm text-muted-foreground">
-                    Casino market coverage by state with opportunity analysis
+                    Track casino coverage gaps and expansion opportunities by state
                 </p>
             </CardHeader>
             <CardContent className="flex-1 flex flex-col">
-                <div className="flex flex-col 2xl:flex-row gap-3 mt-5 w-full flex-1">
+                <div className="flex flex-col lg:flex-row gap-3 mt-5 w-full flex-1">
                     {/* Chart Section */}
-                    <div className="w-full 2xl:w-[65%]">
+                    <div className="w-full 2xl:w-[60%]">
                         <div className="h-fit w-full flex justify-center">
-                            <ChartContainer config={chartConfig} className="w-full max-w-sm">
-                                <ResponsiveContainer width="100%" height={250}>
+                            <ChartContainer config={chartConfig} className="w-full">
+                                <ResponsiveContainer>
                                     <PieChart>
                                         <Pie
                                             data={chartData}
@@ -187,7 +189,7 @@ export function PieDonutActive({ data }: PieDonutActiveProps) {
                                             cy="50%"
                                             innerRadius={40}
                                             outerRadius={80}
-                                            paddingAngle={2}
+                                            paddingAngle={3}
                                             dataKey="value"
                                             onMouseEnter={handleMouseEnter}
                                             onMouseLeave={handleMouseLeave}
@@ -201,7 +203,7 @@ export function PieDonutActive({ data }: PieDonutActiveProps) {
                                                 />
                                             ))}
                                         </Pie>
-                                        <Tooltip
+                                        <RechartsTooltip
                                             content={({ active, payload }) => {
                                                 if (active && payload && payload.length) {
                                                     const data = payload[0].payload;
@@ -274,10 +276,52 @@ export function PieDonutActive({ data }: PieDonutActiveProps) {
                         <TableHeader>
                             <TableRow>
                                 <TableHead>State</TableHead>
-                                <TableHead>Coverage</TableHead>
-                                <TableHead>Gap</TableHead>
-                                <TableHead className="text-center">Opportunity</TableHead>
-                                <TableHead className="text-right">Total</TableHead>
+                                <TableHead>
+                                    <div className="flex items-center gap-1">
+                                        Coverage
+                                        <TooltipProvider>
+                                            <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                    <Info className="h-3 w-3 text-muted-foreground cursor-help" />
+                                                </TooltipTrigger>
+                                                <TooltipContent>
+                                                    <p className="text-xs">Percentage of casinos we're currently tracking in this state</p>
+                                                </TooltipContent>
+                                            </Tooltip>
+                                        </TooltipProvider>
+                                    </div>
+                                </TableHead>
+                                <TableHead>
+                                    <div className="flex items-center gap-1">
+                                        Gap
+                                        <TooltipProvider>
+                                            <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                    <Info className="h-3 w-3 text-muted-foreground cursor-help" />
+                                                </TooltipTrigger>
+                                                <TooltipContent>
+                                                    <p className="text-xs">Percentage of casinos we're missing or not tracking yet</p>
+                                                </TooltipContent>
+                                            </Tooltip>
+                                        </TooltipProvider>
+                                    </div>
+                                </TableHead>
+                                <TableHead className="text-center">
+                                    <div className="flex items-center justify-center gap-1">
+                                        Opportunity
+                                        <TooltipProvider>
+                                            <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                    <Info className="h-3 w-3 text-muted-foreground cursor-help" />
+                                                </TooltipTrigger>
+                                                <TooltipContent>
+                                                    <p className="text-xs">Priority level for expanding our tracking in this state</p>
+                                                </TooltipContent>
+                                            </Tooltip>
+                                        </TooltipProvider>
+                                    </div>
+                                </TableHead>
+                                {/* <TableHead className="text-right">Total</TableHead> */}
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -317,20 +361,23 @@ export function PieDonutActive({ data }: PieDonutActiveProps) {
                                             item.opportunity === "LOW" && "bg-green-500"
                                         )}>{item.opportunity}</span>
                                     </TableCell>
-                                    <TableCell className="text-right">
+                                    {/* <TableCell className="text-right">
                                         <span className="text-sm font-medium">
                                             {item.total}
                                         </span>
-                                    </TableCell>
+                                    </TableCell> */}
                                 </TableRow>
                             ))}
                             <TableFooter>
                                 <TableRow>
-                                    <TableCell className="font-semibold">Critical States: </TableCell>
-                                    <TableCell className="text-center font-semibold text-red-500">
+                                    <TableCell colSpan={4} className="font-semibold">
+                                        <div className="flex items-center gap-1">
+                                            States needing immediate attention:
+                                        </div>
+                                    </TableCell>
+                                    <TableCell className="flex flex-row items-center gap-2 text-center font-semibold text-red-500">
                                         {data.filter(item => item.opportunity === "CRITICAL").length}
                                     </TableCell>
-
                                 </TableRow>
                             </TableFooter>
                         </TableBody>
@@ -340,7 +387,17 @@ export function PieDonutActive({ data }: PieDonutActiveProps) {
             </CardContent>
             <CardFooter className="flex-col items-start gap-2 text-sm">
                 <div className="flex gap-2 leading-none font-medium">
-                    {data.filter(item => item.opportunity === "CRITICAL").length} critical states need immediate attention
+                    {data.filter(item => item.opportunity === "CRITICAL").length} states need immediate attention
+                    <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p className="text-xs max-w-[260px]">These states have the biggest coverage gaps and represent the most urgent opportunities to improve our presence.</p>
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
                 </div>
                 <div className="text-muted-foreground leading-none">
                     Average coverage: {(data.reduce((sum, item) => sum + item.coverage, 0) / data.length).toFixed(1)}% across all states

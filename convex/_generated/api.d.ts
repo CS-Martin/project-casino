@@ -18,6 +18,7 @@ import type * as casinos_queries_getCasinoById from "../casinos/queries/getCasin
 import type * as casinos_queries_getCasinoStats from "../casinos/queries/getCasinoStats.js";
 import type * as casinos_queries_getCasinosByState from "../casinos/queries/getCasinosByState.js";
 import type * as casinos_queries_getCasinosByStateStats from "../casinos/queries/getCasinosByStateStats.js";
+import type * as casinos_queries_getCasinosPaginated from "../casinos/queries/getCasinosPaginated.js";
 import type * as crons from "../crons.js";
 import type * as offers_index from "../offers/index.js";
 import type * as states_index from "../states/index.js";
@@ -51,6 +52,7 @@ declare const fullApi: ApiFromModules<{
   "casinos/queries/getCasinoStats": typeof casinos_queries_getCasinoStats;
   "casinos/queries/getCasinosByState": typeof casinos_queries_getCasinosByState;
   "casinos/queries/getCasinosByStateStats": typeof casinos_queries_getCasinosByStateStats;
+  "casinos/queries/getCasinosPaginated": typeof casinos_queries_getCasinosPaginated;
   crons: typeof crons;
   "offers/index": typeof offers_index;
   "states/index": typeof states_index;

@@ -4,10 +4,10 @@ export function middleware(request: NextRequest) {
   const url = request.nextUrl.clone();
 
   // If url '/', redirect to /dashboard
-  // if (url.pathname === '/') {
-  //   url.pathname = '/dashboard';
-  //   return NextResponse.redirect(url);
-  // }
+  if (url.pathname === '/') {
+    url.pathname = '/dashboard';
+    return NextResponse.redirect(url);
+  }
 }
 
 export const config = {

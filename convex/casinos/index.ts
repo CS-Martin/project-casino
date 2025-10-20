@@ -8,6 +8,7 @@ import { getCasinoByIdArgs, getCasinoByIdHandler } from './queries/getCasinoById
 import { getCasinosByStateArgs, getCasinosByStateHandler } from './queries/getCasinosByState';
 import { getCasinoStatsHandler } from './queries/getCasinoStats';
 import { getCasinosByStateStatsHandler } from './queries/getCasinosByStateStats';
+import { getCasinosPaginatedArgs, getCasinosPaginatedHandler } from './queries/getCasinosPaginated';
 
 // Queries
 export const getAllCasinos = query({
@@ -30,6 +31,11 @@ export const getCasinoStats = query({
 
 export const getCasinosByStateStats = query({
   handler: getCasinosByStateStatsHandler,
+});
+
+export const getCasinosPaginated = query({
+  args: getCasinosPaginatedArgs,
+  handler: getCasinosPaginatedHandler,
 });
 
 // Mutations

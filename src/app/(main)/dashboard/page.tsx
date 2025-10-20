@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { KPICardsSkeleton, MarketCoverageSkeleton, StateChartSkeleton, SummarySkeleton } from "@/features/dashboard/components/skeletons";
 import { useDashboardStats } from "@/features/dashboard/hooks/use-dashboard-stats";
 import { SearchCasinosBtn } from "@/features/dashboard/components/search-casinos-btn";
+import { CasinoListTable } from "@/features/dashboard/components/casino-list-table";
 
 export default function DashboardPage() {
     const { casinoStats, casinoStateStats, isLoading } = useDashboardStats();
@@ -71,6 +72,12 @@ export default function DashboardPage() {
                 <div className="w-full 2xl:w-[40%]">
                     <StateChart />
                 </div>
+            </div>
+
+            {/* Casino List */}
+            <div>
+                <h2 className="text-base font-semibold">Casinos</h2>
+                <CasinoListTable />
             </div>
         </div>
     );

@@ -50,7 +50,7 @@ export function CasinoListTable() {
                     // Show skeleton while loading more data
                     <TableSkeleton
                         rows={pageSize}
-                        columns={10}
+                        columns={5}
                         columnWidths={["w-32", "w-24", "w-20", "w-16", "w-12"]}
                     />
                 ) : (

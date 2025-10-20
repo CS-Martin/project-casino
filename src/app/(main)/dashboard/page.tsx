@@ -76,7 +76,6 @@ export default function DashboardPage() {
 
             {/* Casino List */}
             <div>
-                <h2 className="text-base font-semibold">Casinos</h2>
                 <CasinoListTable />
             </div>
         </div>

@@ -27,18 +27,18 @@ export function usePaginatedData<T>({ data, pageSize, hasMore = false, onLoadMor
     if (neededIndex >= totalLoaded && hasMore && onLoadMore) {
       setIsLoadingMore(true);
       const itemsNeeded = neededIndex - totalLoaded + 1;
-      await onLoadMore(itemsNeeded);
+      onLoadMore(itemsNeeded);
       setIsLoadingMore(false);
     }
   };
 
   const handleNextPage = async () => {
-    // ✅ Make it async
+    // Make it async
     if (currentPage < totalPages) {
       await handlePageChange(currentPage + 1);
     } else if (hasMore && onLoadMore) {
       setIsLoadingMore(true);
-      await onLoadMore(pageSize);
+      onLoadMore(pageSize);
       setCurrentPage(currentPage + 1);
       setIsLoadingMore(false);
     }

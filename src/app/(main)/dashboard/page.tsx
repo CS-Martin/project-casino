@@ -7,11 +7,18 @@ import { Building2, CheckCircle, XCircle, AlertTriangle } from "lucide-react";
 import KPICard from "@/features/dashboard/components/kpi-card";
 import StateChart from "@/features/dashboard/components/state-chart";
 
+import { Redis } from '@upstash/redis';
+
+const redis = Redis.fromEnv();
+
 
 // Main Analytics Page
-export default function DashboardPage() {
+export default async function DashboardPage() {
     const casinoStats = useQuery(api.casinos.index.getCasinoStats);
     const isLoading = casinoStats === undefined;
+    const count = await redis.get<number>("counter");
+
+
 
     return (
         <div className="space-y-6">
@@ -22,6 +29,8 @@ export default function DashboardPage() {
                     Comprehensive overview of casino tracking metrics and market analysis
                 </p>
             </div>
+
+            <p>Count: {count}</p>
 
             {/* KPI Cards Grid */}
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

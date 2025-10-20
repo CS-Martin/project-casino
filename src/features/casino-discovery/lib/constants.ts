@@ -41,6 +41,7 @@ Respond **only in JSON** matching this schema exactly: ${JSON.stringify(Discover
 
 ### QUALITY REQUIREMENTS
 
+- Each result must be real, reliable, and authoritative.
 - Use **web_search** to verify each result from authoritative sources.
 - Prefer **completeness and factual accuracy** over brevity.
 - Confirm that every listed casino’s license is **current as of today**.

@@ -20,6 +20,6 @@ const crons = cronJobs();
 // { minutes: 30 } → every 30 minutes
 // { hours: 6 } → every 6 hours
 // { days: 1 } → once a day
-crons.interval('Sync Xano API data hourly', { minutes: 1 }, internal.xanoAPISync.fetchAndSyncOffers);
+crons.interval('Sync Xano API data hourly', { hours: 3 }, internal.xanoAPISync.fetchAndSyncOffers);
 
 export default crons;

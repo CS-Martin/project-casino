@@ -8,44 +8,47 @@ import { cn } from "@/lib/utils";
 import { useTheme } from "next-themes";
 
 type Props = {
-    className?: string;
+  className?: string;
 };
 
 export const AnimatedThemeToggler = ({ className }: Props) => {
-    const { theme, setTheme } = useTheme();
-    const buttonRef = useRef<HTMLButtonElement | null>(null);
-    const iconRef = useRef<HTMLSpanElement | null>(null);
+  const { theme, setTheme } = useTheme();
+  const buttonRef = useRef<HTMLButtonElement | null>(null);
+  const iconRef = useRef<HTMLSpanElement | null>(null);
 
-    const changeTheme = async () => {
-        if (!buttonRef.current || !iconRef.current) return;
+  const changeTheme = async () => {
+    if (!buttonRef.current || !iconRef.current) return;
 
-        const nextTheme = theme === "light" ? "dark" : "light";
+    const nextTheme = theme === "light" ? "dark" : "light";
 
-        // GSAP animate icon out
-        await new Promise<void>((resolve) => {
-            gsap.fromTo(
-                iconRef.current,
-                { rotate: 0, scale: 1 },
-                {
-                    rotate: 180,
-                    scale: 0,
-                    duration: 0.3,
-                    ease: "power2.inOut",
-                    onComplete: () => resolve(),
-                }
-            );
-        });
+    try {
+      // GSAP animate icon out
+      await new Promise<void>((resolve) => {
+        gsap.fromTo(
+          iconRef.current,
+          { rotate: 0, scale: 1 },
+          {
+            rotate: 180,
+            scale: 0,
+            duration: 0.3,
+            ease: "power2.inOut",
+            onComplete: () => resolve(),
+          }
+        );
+      });
 
+      // Check if view transitions are supported
+      if (typeof document.startViewTransition === 'function') {
         // Trigger view transition + theme change via next-themes
         await document.startViewTransition(() => {
-            flushSync(() => {
-                setTheme(nextTheme);
-            });
+          flushSync(() => {
+            setTheme(nextTheme);
+          });
         }).ready;
 
         // Circle reveal animation
         const { top, left, width, height } =
-            buttonRef.current.getBoundingClientRect();
+          buttonRef.current.getBoundingClientRect();
         const y = top + height / 2;
         const x = left + width / 2;
 
@@ -54,39 +57,50 @@ export const AnimatedThemeToggler = ({ className }: Props) => {
         const maxRad = Math.hypot(Math.max(left, right), Math.max(top, bottom));
 
         document.documentElement.animate(
-            {
-                clipPath: [
-                    `circle(0px at ${x}px ${y}px)`,
-                    `circle(${maxRad}px at ${x}px ${y}px)`,
-                ],
-            },
-            {
-                duration: 700,
-                easing: "ease-in-out",
-                pseudoElement: "::view-transition-new(root)",
-            }
+          {
+            clipPath: [
+              `circle(0px at ${x}px ${y}px)`,
+              `circle(${maxRad}px at ${x}px ${y}px)`,
+            ],
+          },
+          {
+            duration: 700,
+            easing: "ease-in-out",
+            pseudoElement: "::view-transition-new(root)",
+          }
         );
+      } else {
+        // Fallback for browsers without view transitions
+        flushSync(() => {
+          setTheme(nextTheme);
+        });
+      }
 
-        // GSAP animate new icon in
-        gsap.fromTo(
-            iconRef.current,
-            { rotate: -180, scale: 0 },
-            { rotate: 0, scale: 1, duration: 0.3, ease: "power2.inOut" }
-        );
-    };
+      // GSAP animate new icon in
+      gsap.fromTo(
+        iconRef.current,
+        { rotate: -180, scale: 0 },
+        { rotate: 0, scale: 1, duration: 0.3, ease: "power2.inOut" }
+      );
+    } catch (error) {
+      console.error('Error changing theme:', error);
+      // Fallback: just change the theme without animation
+      setTheme(nextTheme);
+    }
+  };
 
-    return (
-        <button ref={buttonRef} onClick={changeTheme} className={cn(className)}>
-            <span
-                ref={iconRef}
-                className="flex border p-1.5 rounded-md cursor-pointer border-neutral-200"
-            >
-                {theme === "dark" ? (
-                    <Sun className="w-5 h-5" />
-                ) : (
-                    <Moon className="w-5 h-5" />
-                )}
-            </span>
-        </button>
-    );
+  return (
+    <button ref={buttonRef} onClick={changeTheme} className={cn(className)}>
+      <span
+        ref={iconRef}
+        className="flex border p-1.5 rounded-md cursor-pointer border-neutral-200"
+      >
+        {theme === "dark" ? (
+          <Sun className="w-5 h-5" />
+        ) : (
+          <Moon className="w-5 h-5" />
+        )}
+      </span>
+    </button>
+  );
 };

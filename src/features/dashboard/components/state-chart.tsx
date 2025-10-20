@@ -39,6 +39,10 @@ export default function StateChart() {
     }
 
     const chartConfig = {
+        total: {
+            label: "Total Casinos",
+            color: "#6b21a8",
+        },
         tracked: {
             label: "Tracked",
             color: "#9911fa",
@@ -68,6 +72,12 @@ export default function StateChart() {
                         <YAxis />
                         <ChartTooltip content={<ChartTooltipContent />} />
                         <ChartLegend content={<ChartLegendContent />} />
+                        <Bar
+                            dataKey="total"
+                            fill="var(--color-total)"
+                            name="Total"
+                            radius={[4, 4, 0, 0]}
+                        />
                         <Bar
                             dataKey="tracked"
                             fill="var(--color-tracked)"

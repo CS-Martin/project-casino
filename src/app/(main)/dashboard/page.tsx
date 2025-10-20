@@ -3,11 +3,9 @@
 import { useQuery } from "convex/react";
 import { api } from "@convex/_generated/api";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
+import { Building2, CheckCircle, XCircle, AlertTriangle } from "lucide-react";
 import KPICard from "@/features/dashboard/components/kpi-card";
 import StateChart from "@/features/dashboard/components/state-chart";
-
-// State Chart Component
 
 
 // Main Analytics Page
@@ -19,7 +17,7 @@ export default function DashboardPage() {
         <div className="space-y-6">
             {/* Page Header */}
             <div>
-                <h1 className="text-xl font-bold tracking-tight">Dashboard</h1>
+                <h1 className="text-lg font-bold tracking-tight">Dashboard</h1>
                 <p className="text-muted-foreground">
                     Comprehensive overview of casino tracking metrics and market analysis
                 </p>
@@ -32,24 +30,29 @@ export default function DashboardPage() {
                     value={casinoStats?.total || 0}
                     isLoading={isLoading}
                     variant="default"
+
+                    icon={Building2}
                 />
                 <KPICard
                     title="Tracked Casinos"
                     value={casinoStats?.tracked || 0}
                     isLoading={isLoading}
                     variant="positive"
+                    icon={CheckCircle}
                 />
                 <KPICard
                     title="Untracked Casinos"
                     value={casinoStats?.untracked || 0}
                     isLoading={isLoading}
                     variant="negative"
+                    icon={XCircle}
                 />
                 <KPICard
                     title="Coverage Gap"
                     value={`${casinoStats?.coverageGapPercentage || 0}%`}
                     isLoading={isLoading}
                     variant="negative"
+                    icon={AlertTriangle}
                 />
             </div>
 

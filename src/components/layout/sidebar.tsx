@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useEffect, useState } from "react"
 import {
     Sidebar,
     SidebarContent,
@@ -44,6 +45,11 @@ const data = {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     const { theme } = useTheme()
+    const [mounted, setMounted] = useState(false)
+
+    useEffect(() => {
+        setMounted(true)
+    }, [])
 
     return (
         <Sidebar collapsible="icon" {...props}>
@@ -54,7 +60,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                             asChild
                             className="data-[slot=sidebar-menu-button]:!p-1.5"
                         >
-                            {theme === "dark" ? (
+                            {!mounted ? (
+                                // Show a placeholder during hydration to prevent mismatch
+                                <div className="!h-12 !w-auto bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                            ) : theme === "dark" ? (
                                 <Image src={'/sophons-logo-light.png'} alt="Sophons logo" height={500} width={500} className="!h-12 !w-auto" />
                             ) : (
                                 <Image src={'/sophons-logo-dark.png'} alt="Sophons logo" height={500} width={500} className="!h-12 !w-auto" />

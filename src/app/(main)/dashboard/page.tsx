@@ -1,7 +1,5 @@
 "use client";
 
-import { useQuery } from "convex/react";
-import { api } from "@convex/_generated/api";
 import { Building2, CheckCircle, XCircle, AlertTriangle, SearchCheck } from "lucide-react";
 import KPICard from "@/features/dashboard/components/kpi-card";
 import StateChart from "@/features/dashboard/components/state-chart";
@@ -9,11 +7,10 @@ import { PieDonutActive } from "@/features/dashboard/components/pie-donut-active
 import { transformCasinoData } from "@/features/dashboard/lib/market-coverage-utils";
 import { Button } from "@/components/ui/button";
 import { KPICardsSkeleton, MarketCoverageSkeleton, StateChartSkeleton, SummarySkeleton } from "@/features/dashboard/components/skeletons";
+import { useDashboardStats } from "@/features/dashboard/hooks/use-dashboard-stats";
 
 export default function DashboardPage() {
-    const casinoStats = useQuery(api.casinos.index.getCasinoStats);
-    const casinoStateStats = useQuery(api.casinos.index.getCasinosByStateStats);
-    const isLoading = casinoStats === undefined || casinoStateStats === undefined;
+    const { casinoStats, casinoStateStats, isLoading } = useDashboardStats();
 
     return (
         <div className="space-y-6">

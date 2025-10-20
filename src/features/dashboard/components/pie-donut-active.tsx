@@ -368,19 +368,19 @@ export function PieDonutActive({ data }: PieDonutActiveProps) {
                                     </TableCell> */}
                                 </TableRow>
                             ))}
-                            <TableFooter>
-                                <TableRow>
-                                    <TableCell colSpan={4} className="font-semibold">
-                                        <div className="flex items-center gap-1">
-                                            States needing immediate attention:
-                                        </div>
-                                    </TableCell>
-                                    <TableCell className="flex flex-row items-center gap-2 text-center font-semibold text-red-500">
-                                        {data.filter(item => item.opportunity === "CRITICAL").length}
-                                    </TableCell>
-                                </TableRow>
-                            </TableFooter>
                         </TableBody>
+                        <TableFooter>
+                            <TableRow>
+                                <TableCell colSpan={4} className="font-semibold">
+                                    <div className="flex items-center gap-1">
+                                        States needing immediate attention:
+                                    </div>
+                                </TableCell>
+                                <TableCell className="flex flex-row items-center gap-2 text-center font-semibold text-red-500">
+                                    {data.filter(item => item.opportunity === "CRITICAL").length}
+                                </TableCell>
+                            </TableRow>
+                        </TableFooter>
                     </Table>
                 </div>
 

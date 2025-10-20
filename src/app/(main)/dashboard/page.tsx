@@ -8,6 +8,7 @@ import { transformCasinoData } from "@/features/dashboard/lib/market-coverage-ut
 import { Button } from "@/components/ui/button";
 import { KPICardsSkeleton, MarketCoverageSkeleton, StateChartSkeleton, SummarySkeleton } from "@/features/dashboard/components/skeletons";
 import { useDashboardStats } from "@/features/dashboard/hooks/use-dashboard-stats";
+import { SearchCasinosBtn } from "@/features/dashboard/components/search-casinos-btn";
 
 export default function DashboardPage() {
     const { casinoStats, casinoStateStats, isLoading } = useDashboardStats();
@@ -22,6 +23,7 @@ export default function DashboardPage() {
                     </p>
                 </div>
                 <div>
+                    <SearchCasinosBtn />
                 </div>
             </div>
 
@@ -63,21 +65,11 @@ export default function DashboardPage() {
 
             <div className="flex flex-col 2xl:flex-row gap-4">
                 <div className="w-full 2xl:w-[60%]">
-                    {/* Market Coverage Analytics */}
-                    {isLoading ? (
-                        <MarketCoverageSkeleton />
-                    ) : casinoStateStats ? (
-                        <PieDonutActive data={transformCasinoData(casinoStateStats)} />
-                    ) : null}
+                    <PieDonutActive />
                 </div>
 
                 <div className="w-full 2xl:w-[40%]">
-                    {/* State Chart */}
-                    {isLoading ? (
-                        <StateChartSkeleton />
-                    ) : (
-                        <StateChart />
-                    )}
+                    <StateChart />
                 </div>
             </div>
         </div>

@@ -17,11 +17,11 @@ import {
 } from "@/components/ui/table";
 import { ChartContainer, ChartConfig } from "@/components/ui/chart";
 import { cn } from "@/lib/utils";
-import { TransformedCasinoData } from "../lib/market-coverage-utils";
+import { TransformedCasinoData, transformCasinoData } from "../lib/market-coverage-utils";
+import { useDashboardStats } from "../hooks/use-dashboard-stats";
+import { MarketCoverageSkeleton } from "./skeletons";
 
-interface PieDonutActiveProps {
-    data: TransformedCasinoData[];
-}
+// Component no longer accepts props; it reads data from the dashboard stats hook
 
 const chartConfig = {
     critical: {
@@ -137,8 +137,11 @@ const ActiveShape = (props: any) => {
     );
 };
 
-export function PieDonutActive({ data }: PieDonutActiveProps) {
+export function PieDonutActive() {
+    const { casinoStateStats, isLoading } = useDashboardStats();
     const [activeIndex, setActiveIndex] = React.useState<number | null>(null);
+
+    const data = React.useMemo(() => transformCasinoData(casinoStateStats ?? []), [casinoStateStats]);
 
     // Transform data for the pie chart
     const chartData = React.useMemo(() => {
@@ -163,9 +166,11 @@ export function PieDonutActive({ data }: PieDonutActiveProps) {
         setActiveIndex(null);
     };
 
-    const getOpportunityBadgeVariant = (opportunity: TransformedCasinoData["opportunity"]) => {
-        return opportunityVariants[opportunity] as "default" | "secondary" | "destructive" | "outline";
-    };
+    if (isLoading) {
+        return (
+            <MarketCoverageSkeleton />
+        )
+    }
 
     return (
         <Card className="relative h-full 2xl:h-[100%] flex flex-col">

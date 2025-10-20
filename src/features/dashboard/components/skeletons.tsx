@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export function KPICardSkeleton() {
@@ -29,25 +29,17 @@ export function MarketCoverageSkeleton() {
     return (
         <Card>
             <CardHeader>
-                <CardTitle className="text-lg font-semibold">Market Coverage Analytics</CardTitle>
+                <CardTitle className="textfont-semibold">Market Coverage Overview</CardTitle>
                 <p className="text-sm text-muted-foreground">
-                    Casino market coverage by state with opportunity analysis
+                    Track casino coverage gaps and expansion opportunities by state
                 </p>
             </CardHeader>
             <CardContent>
-                <div className="grid gap-6 lg:grid-cols-2">
+                <div className="grid gap-3 lg:grid-cols-2">
                     {/* Chart Section */}
                     <div className="space-y-4">
-                        <div className="h-[300px] sm:h-[350px] lg:h-[400px] w-full">
+                        <div className="h-full lg:h-[400px] w-full">
                             <Skeleton className="h-full w-full rounded-lg" />
-                        </div>
-                        <div className="flex flex-wrap gap-2 justify-center">
-                            {Array.from({ length: 4 }).map((_, i) => (
-                                <div key={i} className="flex items-center gap-2">
-                                    <Skeleton className="w-3 h-3 rounded-full" />
-                                    <Skeleton className="h-3 w-16" />
-                                </div>
-                            ))}
                         </div>
                     </div>
 
@@ -103,10 +95,11 @@ export function StateChartSkeleton() {
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Casino Distribution by State</CardTitle>
+                <CardTitle>State-by-State Market Analysis</CardTitle>
+                <CardDescription>Showing tracked and untracked casinos for each state.</CardDescription>
             </CardHeader>
             <CardContent>
-                <div className="h-[300px] w-full">
+                <div className="h-[400px] ">
                     <Skeleton className="h-full w-full rounded-lg" />
                 </div>
             </CardContent>

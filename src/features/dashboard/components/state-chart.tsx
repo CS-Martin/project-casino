@@ -4,28 +4,20 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
 import { useQuery } from "convex/react";
 import { api } from "@convex/_generated/api";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
+import { StateChartSkeleton } from "./skeletons";
 
 export default function StateChart() {
     const stateStats = useQuery(api.casinos.index.getCasinosByStateStats);
 
     if (stateStats === undefined) {
         return (
-            <Card className="h-[480px] flex flex-col">
-                <CardHeader>
-                    <CardTitle>State-by-State Market Analysis</CardTitle>
-                </CardHeader>
-                <CardContent className="flex-1">
-                    <div className="h-full flex items-center justify-center">
-                        <Skeleton className="h-[350px] w-full" />
-                    </div>
-                </CardContent>
-            </Card>
+            <StateChartSkeleton />
         );
     }
 
     if (!stateStats || stateStats.length === 0) {
         return (
-            <Card className="h-[480px] flex flex-col">
+            <Card className="h-full 2xl:h-[100%] flex flex-col">
                 <CardHeader>
                     <CardTitle>State-by-State Market Analysis</CardTitle>
                 </CardHeader>

@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@/components/ui/button"
 import { SearchCheck, Loader2 } from "lucide-react"
 import { useDiscoverCasinos } from "../hooks/use-discover-casinos"
@@ -7,9 +9,12 @@ export const SearchCasinosBtn = () => {
 
     return (
         <Button
-            className="bg-purple-600 hover:bg-purple-700"
-            onClick={discoverCasinos}
+            className="bg-purple-600 hover:bg-purple-700 disabled:bg-muted"
+            type="button"
+            onClick={() => { if (!isLoading) { void discoverCasinos(); } }}
             disabled={isLoading}
+            aria-disabled={isLoading}
+            aria-busy={isLoading}
         >
             {isLoading ? (
                 <Loader2 className="size-4 animate-spin" />

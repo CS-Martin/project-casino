@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { useProgress } from '@bprogress/next';
+import { toast } from 'sonner';
 
 interface SaveResult {
   saved: number;
@@ -33,42 +34,48 @@ export const useDiscoverCasinos = (): UseDiscoverCasinosReturn => {
   const { start, stop } = useProgress();
 
   const discoverCasinos = useCallback(async () => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      start();
+    setIsLoading(true);
+    setError(null);
+    start();
 
-      const response = await fetch('/api/discover-casinos', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+    try {
+      const promise = (async () => {
+        const response = await fetch('/api/discover-casinos', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`Error: ${response.status} ${response.statusText}`);
+        }
+
+        const data: DiscoverCasinosResponse = await response.json();
+        if (!data.ok) {
+          throw new Error(data.error || 'Unknown error occurred');
+        }
+
+        if (data.result) {
+          setLastResult(data.result);
+        }
+
+        return data.result;
+      })();
+
+      toast.promise(promise, {
+        loading: 'Discovering casinos…',
+        success: (result: SaveResult | undefined) =>
+          result
+            ? `Saved ${result.saved}, skipped ${result.skipped}${result.duplicates.length ? ` • ${result.duplicates.length} duplicates` : ''}`
+            : 'Discovery complete',
+        error: (err: any) => (err?.message ? err.message : 'Failed to discover casinos'),
       });
 
-      if (!response.ok) {
-        throw new Error(`Error: ${response.status} ${response.statusText}`);
-      }
-
-      const data: DiscoverCasinosResponse = await response.json();
-
-      if (!data.ok) {
-        throw new Error(data.error || 'Unknown error occurred');
-      }
-
-      if (data.result) {
-        setLastResult(data.result);
-        console.log('Casinos discovered successfully:', data.result);
-
-        // Log summary
-        console.log(`📊 Discovery Summary: ${data.result.saved} saved, ${data.result.skipped} skipped`);
-        if (data.result.duplicates.length > 0) {
-          console.log('🔄 Duplicates found:', data.result.duplicates);
-        }
-      }
+      await promise;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to discover casinos';
       setError(errorMessage);
-      console.error('Failed to discover casinos:', err);
     } finally {
       setIsLoading(false);
       stop();

@@ -1,6 +1,7 @@
 import OfferKpis from "@/features/offer-dashboard/components/offer-kpis";
 import OfferTimelineChart from "@/features/offer-dashboard/components/offer-timeline-chart";
 import OfferTypeBreakdownChart from "@/features/offer-dashboard/components/offer-type-breakdown-chart";
+import CasinoResearchStatusTable from "@/features/offer-dashboard/components/casino-research-status-table";
 
 export default function OfferDashboardPage() {
     return (
@@ -29,6 +30,11 @@ export default function OfferDashboardPage() {
                     <div className="md:col-span-2">
                         <OfferTypeBreakdownChart />
                     </div>
+                </div>
+
+                {/* Casino Research Status Table */}
+                <div>
+                    <CasinoResearchStatusTable />
                 </div>
             </div>
         </div>

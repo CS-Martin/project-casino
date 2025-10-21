@@ -16,6 +16,8 @@ import {
   getCasinosForOfferResearchArgs,
   getCasinosForOfferResearchHandler,
 } from './queries/getCasinosForOfferResearch';
+import { getCasinosWithOfferStatsArgs, getCasinosWithOfferStatsHandler } from './queries/getCasinosWithOfferStats';
+import { getCasinoDetailWithOffersArgs, getCasinoDetailWithOffersHandler } from './queries/getCasinoDetailWithOffers';
 import { updateOfferCheckTimestampArgs, updateOfferCheckTimestampHandler } from './mutations/updateOfferCheckTimestamp';
 
 // Queries
@@ -54,6 +56,16 @@ export const getCasinosSearchable = query({
 export const getCasinosForOfferResearch = query({
   args: getCasinosForOfferResearchArgs,
   handler: getCasinosForOfferResearchHandler,
+});
+
+export const getCasinosWithOfferStats = query({
+  args: getCasinosWithOfferStatsArgs,
+  handler: getCasinosWithOfferStatsHandler,
+});
+
+export const getCasinoDetailWithOffers = query({
+  args: getCasinoDetailWithOffersArgs,
+  handler: getCasinoDetailWithOffersHandler,
 });
 
 // Mutations

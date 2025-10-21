@@ -25,6 +25,10 @@ import {
     XCircle,
     Eye,
     GitCompare,
+    Sparkles,
+    Award,
+    CheckCircle,
+    Info,
 } from 'lucide-react';
 import { OfferWithChanges } from '@convex/casinos/queries/getCasinoDetailWithOffers';
 import OfferDetailModal from './offer-detail-modal';
@@ -48,6 +52,10 @@ export default function CasinoDetailModal({
     const [selectedOfferRight, setSelectedOfferRight] = React.useState<OfferWithChanges | null>(null);
     const [comparisonModalOpen, setComparisonModalOpen] = React.useState(false);
     const [comparisonMode, setComparisonMode] = React.useState(false);
+    const [aiAnalysis, setAiAnalysis] = React.useState<any | null>(null);
+    const [isAnalyzing, setIsAnalyzing] = React.useState(false);
+    const [showAiAnalysis, setShowAiAnalysis] = React.useState(false);
+    const [isCached, setIsCached] = React.useState(false);
 
     const handleOfferClick = (offer: OfferWithChanges) => {
         if (comparisonMode) {
@@ -81,6 +89,59 @@ export default function CasinoDetailModal({
         setComparisonMode(!comparisonMode);
         setSelectedOfferLeft(null);
         setSelectedOfferRight(null);
+    };
+
+    const handleAiAnalysis = async () => {
+        if (!casinoDetail || activeOffers.length === 0) return;
+
+        setIsAnalyzing(true);
+        try {
+            const response = await fetch('/api/determine-best-offer', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    casinoName: casinoDetail.casino.name,
+                    casinoId: casinoDetail.casino._id,
+                    offers: activeOffers.map(offer => ({
+                        _id: offer._id,
+                        offer_name: offer.offer_name,
+                        offer_type: offer.offer_type,
+                        description: offer.description,
+                        expected_bonus: offer.expected_bonus,
+                        expected_deposit: offer.expected_deposit,
+                        wagering_requirement: offer.wagering_requirement,
+                        max_bonus: offer.max_bonus,
+                        min_deposit: offer.min_deposit,
+                        valid_until: offer.valid_until,
+                        terms: offer.terms,
+                        valueScore: offer.valueScore,
+                    })),
+                }),
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                setAiAnalysis(data.data);
+                setShowAiAnalysis(true);
+                setIsCached(data.cached || false);
+
+                // Log cache status
+                if (data.cached) {
+                    console.log('✅ Loaded best offer from cache');
+                } else {
+                    console.log('🤖 Generated new best offer analysis with AI');
+                }
+            } else {
+                console.error('AI analysis failed:', data.error);
+            }
+        } catch (error) {
+            console.error('Error calling AI analysis:', error);
+        } finally {
+            setIsAnalyzing(false);
+        }
     };
 
     const getTimeAgo = (timestamp: number) => {
@@ -297,16 +358,39 @@ export default function CasinoDetailModal({
                                 <Gift className="h-5 w-5 text-green-600" />
                                 Active Offers ({activeOffers.length})
                             </h3>
-                            <Button
-                                variant={comparisonMode ? "default" : "outline"}
-                                size="sm"
-                                onClick={toggleComparisonMode}
-                                className="flex items-center gap-2 w-full sm:w-auto"
-                            >
-                                <GitCompare className="h-4 w-4" />
-                                <span className="hidden sm:inline">{comparisonMode ? 'Cancel Compare' : 'Compare Offers'}</span>
-                                <span className="sm:hidden">{comparisonMode ? 'Cancel' : 'Compare'}</span>
-                            </Button>
+                            <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={handleAiAnalysis}
+                                    disabled={isAnalyzing || activeOffers.length < 2}
+                                    className="flex items-center gap-2 w-full sm:w-auto bg-linear-to-r from-purple-50 to-blue-50 dark:from-purple-950/30 dark:to-blue-950/30 hover:from-purple-100 hover:to-blue-100 dark:hover:from-purple-900/40 dark:hover:to-blue-900/40 border-purple-200 dark:border-purple-800"
+                                >
+                                    {isAnalyzing ? (
+                                        <>
+                                            <Sparkles className="h-4 w-4 animate-spin" />
+                                            <span className="hidden sm:inline">Analyzing...</span>
+                                            <span className="sm:hidden">AI...</span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Sparkles className="h-4 w-4" />
+                                            <span className="hidden sm:inline">AI Best Offer</span>
+                                            <span className="sm:hidden">AI Best</span>
+                                        </>
+                                    )}
+                                </Button>
+                                <Button
+                                    variant={comparisonMode ? "default" : "outline"}
+                                    size="sm"
+                                    onClick={toggleComparisonMode}
+                                    className="flex items-center gap-2 w-full sm:w-auto"
+                                >
+                                    <GitCompare className="h-4 w-4" />
+                                    <span className="hidden sm:inline">{comparisonMode ? 'Cancel Compare' : 'Compare Offers'}</span>
+                                    <span className="sm:hidden">{comparisonMode ? 'Cancel' : 'Compare'}</span>
+                                </Button>
+                            </div>
                         </div>
                         {comparisonMode && (
                             <div className="bg-purple-50 dark:bg-purple-950 border border-purple-200 dark:border-purple-800 rounded-lg p-2 md:p-3 text-xs md:text-sm">
@@ -319,6 +403,151 @@ export default function CasinoDetailModal({
                                 </p>
                             </div>
                         )}
+
+                        {/* AI Analysis Results */}
+                        {showAiAnalysis && aiAnalysis && (
+                            <div className="bg-linear-to-r from-purple-50 via-blue-50 to-purple-50 dark:from-purple-950/50 dark:via-blue-950/50 dark:to-purple-950/50 rounded-lg p-4 md:p-6 border-2 border-purple-200 dark:border-purple-800 animate-in fade-in slide-in-from-top-2 duration-300">
+                                <div className="flex items-start justify-between mb-4">
+                                    <div className="flex items-center gap-2 flex-wrap">
+                                        <Award className="h-6 w-6 text-purple-600" />
+                                        <h4 className="font-bold text-lg">AI Recommended Best Offer</h4>
+                                        {isCached && (
+                                            <Badge variant="secondary" className="text-xs bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 border-green-300 dark:border-green-700">
+                                                ⚡ Cached
+                                            </Badge>
+                                        )}
+                                    </div>
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => setShowAiAnalysis(false)}
+                                        className="h-6 w-6 p-0"
+                                    >
+                                        ×
+                                    </Button>
+                                </div>
+
+                                <div className="space-y-4">
+                                    {/* Best Offer Highlight */}
+                                    <div className="bg-white dark:bg-gray-900 rounded-lg p-4 border-2 border-purple-300 dark:border-purple-700">
+                                        <div className="flex items-center justify-between mb-2">
+                                            <span className="text-sm font-medium text-purple-600">Best Offer</span>
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-2xl font-bold text-purple-600">{aiAnalysis.score}/100</span>
+                                            </div>
+                                        </div>
+                                        <p className="font-semibold text-lg">
+                                            {activeOffers.find(o => o._id === aiAnalysis.bestOfferId)?.offer_name}
+                                        </p>
+                                    </div>
+
+                                    {/* Reasoning */}
+                                    <div>
+                                        <h5 className="font-semibold mb-2 flex items-center gap-2">
+                                            <Info className="h-4 w-4" />
+                                            Why This Offer?
+                                        </h5>
+                                        <p className="text-sm text-muted-foreground leading-relaxed">
+                                            {aiAnalysis.reasoning}
+                                        </p>
+                                    </div>
+
+                                    {/* Strengths */}
+                                    <div>
+                                        <h5 className="font-semibold mb-2 flex items-center gap-2">
+                                            <CheckCircle className="h-4 w-4 text-green-600" />
+                                            Strengths
+                                        </h5>
+                                        <ul className="space-y-1">
+                                            {aiAnalysis.strengths.map((strength: string, idx: number) => (
+                                                <li key={idx} className="text-sm flex items-start gap-2">
+                                                    <span className="text-green-600 mt-0.5">✓</span>
+                                                    <span>{strength}</span>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+
+                                    {/* Considerations */}
+                                    <div>
+                                        <h5 className="font-semibold mb-2 flex items-center gap-2">
+                                            <AlertTriangle className="h-4 w-4 text-orange-600" />
+                                            Important Considerations
+                                        </h5>
+                                        <ul className="space-y-1">
+                                            {aiAnalysis.considerations.map((consideration: string, idx: number) => (
+                                                <li key={idx} className="text-sm flex items-start gap-2">
+                                                    <span className="text-orange-600 mt-0.5">!</span>
+                                                    <span>{consideration}</span>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+
+                                    {/* Ranking Factors */}
+                                    <div>
+                                        <h5 className="font-semibold mb-3">Ranking Factors</h5>
+                                        <div className="grid grid-cols-2 gap-3">
+                                            <div className="space-y-1">
+                                                <div className="flex items-center justify-between text-sm">
+                                                    <span>Value Score</span>
+                                                    <span className="font-semibold">{aiAnalysis.rankingFactors.valueScore}/10</span>
+                                                </div>
+                                                <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                                                    <div
+                                                        className="h-full bg-purple-600"
+                                                        style={{ width: `${aiAnalysis.rankingFactors.valueScore * 10}%` }}
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="space-y-1">
+                                                <div className="flex items-center justify-between text-sm">
+                                                    <span>Bonus Amount</span>
+                                                    <span className="font-semibold">{aiAnalysis.rankingFactors.bonusAmount}/10</span>
+                                                </div>
+                                                <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                                                    <div
+                                                        className="h-full bg-green-600"
+                                                        style={{ width: `${aiAnalysis.rankingFactors.bonusAmount * 10}%` }}
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="space-y-1">
+                                                <div className="flex items-center justify-between text-sm">
+                                                    <span>Wagering</span>
+                                                    <span className="font-semibold">{aiAnalysis.rankingFactors.wageringRequirement}/10</span>
+                                                </div>
+                                                <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                                                    <div
+                                                        className="h-full bg-blue-600"
+                                                        style={{ width: `${aiAnalysis.rankingFactors.wageringRequirement * 10}%` }}
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="space-y-1">
+                                                <div className="flex items-center justify-between text-sm">
+                                                    <span>Ease of Use</span>
+                                                    <span className="font-semibold">{aiAnalysis.rankingFactors.easeOfUse}/10</span>
+                                                </div>
+                                                <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                                                    <div
+                                                        className="h-full bg-orange-600"
+                                                        style={{ width: `${aiAnalysis.rankingFactors.easeOfUse * 10}%` }}
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="pt-2 border-t">
+                                        <p className="text-xs text-muted-foreground italic">
+                                            ✨ Analysis powered by AI. Always review full offer terms before claiming.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
                         <div className="space-y-3 max-h-96 overflow-y-auto">
                             {activeOffers.map(renderOfferCard)}
                         </div>

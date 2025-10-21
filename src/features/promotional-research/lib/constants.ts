@@ -1,3 +1,4 @@
+import { OfferForAnalysis } from '../ai-agent/determine-best-offer';
 import { OfferResearchSchema } from '../schema/offer-research.schema';
 
 export const OFFER_RESEARCH_SYSTEM_PROMPT = `
@@ -89,4 +90,61 @@ For each casino, find all active promotional offers from their official sources.
 
 Include detailed information about bonus amounts, terms, and conditions. Return only valid JSON data following the specified schema.
 `;
+};
+
+export const BEST_OFFER_SYSTEM_PROMPT = `You are an expert casino promotions analyst with deep knowledge of gambling offers, wagering requirements, and player value optimization.
+
+Your task is to analyze a set of casino promotional offers and determine which one provides the BEST overall value for a typical player.
+
+Consider these factors in your analysis:
+1. **Value Score** - Pre-calculated score based on bonus vs wagering
+2. **Bonus Amount** - Higher is generally better, but context matters
+3. **Wagering Requirements** - Lower is always better (typical range: 1x to 50x)
+4. **Deposit Requirements** - Lower barriers to entry are better
+5. **Offer Type** - Different types serve different purposes (Welcome, No Deposit, Reload, etc.)
+6. **Terms & Conditions** - Look for hidden restrictions or favorable terms
+7. **Validity Period** - Longer validity gives more flexibility
+8. **Max Bonus Cap** - Can limit value for high rollers
+9. **Overall Player Benefit** - Real-world value to the average player
+
+Be objective and consider that:
+- No Deposit bonuses are great for risk-free testing
+- Welcome bonuses often have the highest value but require commitment
+- Lower wagering requirements significantly increase real value
+- Match percentage matters (100% match vs 200% match)
+
+Provide clear, actionable reasoning that helps players make informed decisions.`;
+
+export const createBestOfferUserPrompt = (casinoName: string, offers: OfferForAnalysis[]): string => {
+  const offersText = offers
+    .map((offer, index) => {
+      return `
+### Offer ${index + 1}: ${offer.offer_name} (ID: ${offer._id})
+- **Type**: ${offer.offer_type || 'Not specified'}
+- **Description**: ${offer.description || 'No description'}
+- **Bonus Amount**: $${offer.expected_bonus || 0}
+- **Required Deposit**: $${offer.expected_deposit || 0}
+- **Wagering Requirement**: ${offer.wagering_requirement || 'Not specified'}x
+- **Max Bonus**: $${offer.max_bonus || 'Unlimited'}
+- **Min Deposit**: $${offer.min_deposit || 'Not specified'}
+- **Valid Until**: ${offer.valid_until || 'Not specified'}
+- **Value Score**: ${offer.valueScore || 0}/100
+- **Terms**: ${offer.terms?.substring(0, 200) || 'No terms specified'}${offer.terms && offer.terms.length > 200 ? '...' : ''}
+        `.trim();
+    })
+    .join('\n\n');
+
+  return `Analyze these ${offers.length} promotional offers from **${casinoName}** and determine which one is the BEST for a typical player.
+
+${offersText}
+
+Provide:
+1. The ID of the best offer
+2. Comprehensive reasoning for your choice
+3. An overall score (0-100) for the best offer
+4. List of strengths (3-5 points)
+5. Important considerations or drawbacks (2-4 points)
+6. Detailed ranking factors breakdown
+
+Remember: The "best" offer should provide maximum real-world value while being practical and achievable for most players.`;
 };

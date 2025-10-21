@@ -9,13 +9,6 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -23,6 +16,8 @@ import { TableContainer } from '@/components/custom/table/table-container';
 import { TableSkeleton } from '@/components/custom/table/table-skeleton';
 import { CustomPagination } from '@/components/custom/table/custom-pagination';
 import { PageSizeSelector } from '@/components/ui/page-size-selector';
+import { CasinoResearchSearchFilters } from './casino-research-search-filters';
+import { CasinoResearchActiveFilters } from './casino-research-active-filters';
 import { useCasinosWithOfferStats } from '../hooks/use-casinos-with-offer-stats';
 import { usePaginatedData } from '@/hooks/use-paginated-data';
 import { CasinoWithOfferStats } from '@convex/casinos/queries/getCasinosWithOfferStats';
@@ -35,15 +30,26 @@ type SortDirection = 'asc' | 'desc';
 
 export default function CasinoResearchStatusTable() {
     const [pageSize, setPageSize] = React.useState(10);
-    const [statusFilter, setStatusFilter] = React.useState<'all' | 'current' | 'stale' | 'missing'>('all');
+    const [filters, setFilters] = React.useState({
+        searchTerm: "",
+        statusFilter: "all"
+    });
     const [sortField, setSortField] = React.useState<SortField>('lastCheck');
     const [sortDirection, setSortDirection] = React.useState<SortDirection>('desc');
     const [selectedCasinoId, setSelectedCasinoId] = React.useState<Id<'casinos'> | null>(null);
     const [modalOpen, setModalOpen] = React.useState(false);
 
-    // Fetch data from server
+    // Debounced search to reduce re-fetches
+    const [debouncedSearch, setDebouncedSearch] = React.useState("");
+    React.useEffect(() => {
+        const timer = setTimeout(() => setDebouncedSearch(filters.searchTerm), 300);
+        return () => clearTimeout(timer);
+    }, [filters.searchTerm]);
+
+    // Fetch data from server with status filter
+    const statusFilterValue = filters.statusFilter !== "all" ? filters.statusFilter as 'current' | 'stale' | 'missing' : undefined;
     const { casinos, isLoading: isLoadingInitial, loadMore, status: paginationStatus } = useCasinosWithOfferStats({
-        status: statusFilter,
+        status: statusFilterValue || 'all',
         pageSize
     });
 
@@ -58,9 +64,25 @@ export default function CasinoResearchStatusTable() {
         setTimeout(() => setSelectedCasinoId(null), 200);
     };
 
-    // Sort casinos (client-side sorting)
-    const sortedCasinos = React.useMemo(() => {
-        const sorted = [...casinos].sort((a, b) => {
+    // Filter and sort casinos (client-side)
+    const filteredAndSortedCasinos = React.useMemo(() => {
+        // First, apply search filter
+        let filtered = [...casinos];
+
+        if (debouncedSearch) {
+            const searchLower = debouncedSearch.toLowerCase();
+            filtered = filtered.filter((casino) => {
+                return (
+                    casino.name.toLowerCase().includes(searchLower) ||
+                    casino.state.name.toLowerCase().includes(searchLower) ||
+                    casino.state.abbreviation.toLowerCase().includes(searchLower) ||
+                    casino.status.toLowerCase().includes(searchLower)
+                );
+            });
+        }
+
+        // Then, sort
+        const sorted = filtered.sort((a, b) => {
             let comparison = 0;
 
             switch (sortField) {
@@ -88,7 +110,7 @@ export default function CasinoResearchStatusTable() {
         });
 
         return sorted;
-    }, [casinos, sortField, sortDirection]);
+    }, [casinos, debouncedSearch, sortField, sortDirection]);
 
     // Client-side pagination using the same hook as casino-list-table
     const hasMore = paginationStatus === 'CanLoadMore';
@@ -103,7 +125,7 @@ export default function CasinoResearchStatusTable() {
         handlePreviousPage,
         resetPagination
     } = usePaginatedData({
-        data: sortedCasinos,
+        data: filteredAndSortedCasinos,
         pageSize,
         hasMore,
         onLoadMore: loadMore
@@ -124,9 +146,23 @@ export default function CasinoResearchStatusTable() {
         resetPagination(); // Reset to page 1 when changing page size
     };
 
-    const handleStatusFilterChange = (value: any) => {
-        setStatusFilter(value);
-        resetPagination(); // Reset to page 1 when filtering
+    // Filter handlers
+    const updateFilter = (key: string, value: string) => {
+        setFilters((prev) => ({ ...prev, [key]: value }));
+        resetPagination(); // Reset to page 1 when any filter changes
+    };
+
+    const clearFilters = () => {
+        setFilters({
+            searchTerm: "",
+            statusFilter: "all"
+        });
+        resetPagination(); // Reset to page 1 when clearing filters
+    };
+
+    const clearFilter = (key: string) => {
+        setFilters((prev) => ({ ...prev, [key]: key === "searchTerm" ? "" : "all" }));
+        resetPagination(); // Reset to page 1 when clearing individual filters
     };
 
     const getStatusBadge = (status: CasinoWithOfferStats['status']) => {
@@ -168,20 +204,18 @@ export default function CasinoResearchStatusTable() {
                 )
             }
         >
-            {/* Status Filter */}
-            <div className="flex items-center justify-end mb-4">
-                <Select value={statusFilter} onValueChange={handleStatusFilterChange}>
-                    <SelectTrigger className="w-[140px]">
-                        <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="all">All Status</SelectItem>
-                        <SelectItem value="current">Current</SelectItem>
-                        <SelectItem value="stale">Stale</SelectItem>
-                        <SelectItem value="missing">Missing</SelectItem>
-                    </SelectContent>
-                </Select>
-            </div>
+            {/* Search Filters */}
+            <CasinoResearchSearchFilters
+                filters={filters}
+                onFilterChange={updateFilter}
+                onClearFilters={clearFilters}
+            />
+
+            {/* Active Filters */}
+            <CasinoResearchActiveFilters
+                filters={filters}
+                onClearFilter={clearFilter}
+            />
 
             {/* Table area */}
             <div className="rounded-md border">

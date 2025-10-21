@@ -8,25 +8,39 @@ export const getCasinosForOfferResearchArgs = {
 export const getCasinosForOfferResearchHandler = async (ctx: QueryCtx, args: { batchSize?: number }) => {
   const batchSize = args.batchSize || 30;
 
-  // First, try to get tracked casinos that need offer research
-  const trackedCasinos = await ctx.db
+  // PRIORITY 1: Get tracked casinos that have NEVER been searched (last_offer_check is null)
+  const trackedCasinosNeverSearched = await ctx.db
     .query('casinos')
     .withIndex('tracked_by_offer_check', (q) => q.eq('is_tracked', true))
-    .order('asc') // null values first, then oldest timestamps
+    .filter((q) => q.eq(q.field('last_offer_check'), undefined))
     .take(batchSize);
 
-  // If we have enough tracked casinos, return them
-  if (trackedCasinos.length >= batchSize) {
-    return trackedCasinos;
+  // If we have enough tracked casinos that were never searched, return them
+  if (trackedCasinosNeverSearched.length >= batchSize) {
+    return trackedCasinosNeverSearched;
   }
 
-  // If we need more casinos, get untracked ones
-  const remainingSlots = batchSize - trackedCasinos.length;
-  const untrackedCasinos = await ctx.db
+  // PRIORITY 2: If not enough tracked casinos never searched, get untracked casinos that were never searched
+  const remainingSlots = batchSize - trackedCasinosNeverSearched.length;
+  const untrackedCasinosNeverSearched = await ctx.db
     .query('casinos')
     .withIndex('tracked_by_offer_check', (q) => q.eq('is_tracked', false))
-    .order('asc') // null values first, then oldest timestamps
+    .filter((q) => q.eq(q.field('last_offer_check'), undefined))
     .take(remainingSlots);
 
-  return [...trackedCasinos, ...untrackedCasinos];
+  // If we have enough casinos that were never searched, return them
+  if (trackedCasinosNeverSearched.length + untrackedCasinosNeverSearched.length >= batchSize) {
+    return [...trackedCasinosNeverSearched, ...untrackedCasinosNeverSearched];
+  }
+
+  // PRIORITY 3: If still not enough, get tracked casinos with oldest timestamps
+  const stillNeeded = batchSize - trackedCasinosNeverSearched.length - untrackedCasinosNeverSearched.length;
+  const trackedCasinosOldest = await ctx.db
+    .query('casinos')
+    .withIndex('tracked_by_offer_check', (q) => q.eq('is_tracked', true))
+    .filter((q) => q.neq(q.field('last_offer_check'), undefined))
+    .order('asc') // oldest timestamps first
+    .take(stillNeeded);
+
+  return [...trackedCasinosNeverSearched, ...untrackedCasinosNeverSearched, ...trackedCasinosOldest];
 };

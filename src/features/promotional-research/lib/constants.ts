@@ -40,7 +40,9 @@ Your task is to research and identify **current promotional offers** for the pro
    - Verify information from official sources
    - Be precise with bonus amounts and percentages
    - Include relevant terms and conditions
-   - If no offers are found, return an empty offers array
+   - **IMPORTANT**: Most online casinos have promotional offers. If you don't find any, search more thoroughly using different search terms
+   - Look for welcome bonuses, deposit bonuses, free spins, and other common promotional offers
+   - If still no offers found, return an empty offers array
 
 ---
 

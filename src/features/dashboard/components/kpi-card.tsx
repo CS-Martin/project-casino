@@ -1,4 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { NumberTicker } from "@/components/ui/number-ticker";
 import { Skeleton } from "@/components/ui/skeleton";
 import { LucideIcon } from "lucide-react";
 
@@ -48,6 +49,32 @@ export default function KPICard({
         }
     };
 
+    // Parse the value to extract number and any suffix
+    const parseValue = (val: string | number) => {
+        if (typeof val === 'number') {
+            return { numericValue: val, suffix: '' };
+        }
+
+        // Match numbers with optional decimal points and any trailing characters
+        const match = val.toString().match(/^([0-9]+\.?[0-9]*)(.*)$/);
+
+        if (match) {
+            return {
+                numericValue: parseFloat(match[1]),
+                suffix: match[2].trim()
+            };
+        }
+
+        // Fallback: try to parse the whole string as number
+        const numericValue = parseFloat(val.toString());
+        return {
+            numericValue: isNaN(numericValue) ? 0 : numericValue,
+            suffix: isNaN(numericValue) ? val.toString() : ''
+        };
+    };
+
+    const { numericValue, suffix } = parseValue(value);
+
     return (
         <Card className={`transition-all duration-200 hover:shadow-md`}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -60,8 +87,14 @@ export default function KPICard({
                 {isLoading ? (
                     <Skeleton className="h-8 w-24" />
                 ) : (
-                    <div className={`text-2xl font-bold ${getValueColor()}`}>
-                        {value}
+                    <div className="flex items-baseline">
+                        <NumberTicker
+                            value={numericValue}
+                            className={`text-xl font-bold ${getValueColor()}`}
+                        />
+                        {suffix && (
+                            <span className={`text-xl font-bold ${getValueColor()}`}>{suffix}</span>
+                        )}
                     </div>
                 )}
             </CardContent>

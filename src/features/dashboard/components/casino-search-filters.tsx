@@ -28,77 +28,87 @@ export function CasinoSearchFilters({
         filters.trackedStatus !== "all";
 
     return (
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-6">
-            {/* Search Bar */}
-            <div className="relative lg:w-1/3">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                    placeholder="Search casinos by name, website, license, or state..."
-                    value={filters.searchTerm}
-                    onChange={(e) => onFilterChange('searchTerm', e.target.value)}
-                    className="pl-10"
-                />
+        <div className="flex flex-col xl:flex-row items-center justify-between gap-4 mb-6">
+            {/* Top Row: Search Bar */}
+            <div className="w-full 2xl:w-1/3">
+                <div className="relative">
+                    <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                    <Input
+                        placeholder="Search casinos by name, website, license, or state..."
+                        value={filters.searchTerm}
+                        onChange={(e) => onFilterChange('searchTerm', e.target.value)}
+                        className="pl-10 w-full"
+                    />
+                </div>
             </div>
 
-            {/* Filter Controls */}
-            <div className="flex flex-wrap gap-4 items-center">
-                <div className="flex items-center gap-2">
-                    <Filter className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm font-medium">Filters:</span>
+            {/* Bottom Row: Filter Controls */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 w-full 2xl:w-auto">
+                {/* Filter Label and Controls */}
+                <div className="flex flex-col lg:flex-row items-center gap-4 w-full">
+                    {/* Filter Label */}
+                    <div className="flex items-center gap-2 shrink-0 mr-auto">
+                        <Filter className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-sm font-medium whitespace-nowrap">Filters:</span>
+                    </div>
+
+                    {/* Filter Dropdowns */}
+                    <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-3 xl:flex xl:flex-row gap-3 w-full">
+                        {/* State Filter */}
+                        <Select value={filters.stateId} onValueChange={(value) => onFilterChange('stateId', value)}>
+                            <SelectTrigger className="w-full min-w-[140px]">
+                                <SelectValue placeholder="All States" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">All States</SelectItem>
+                                {states.map((state) => (
+                                    <SelectItem key={state._id} value={state._id}>
+                                        {state.name} ({state.abbreviation})
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+
+                        {/* License Status Filter */}
+                        <Select value={filters.licenseStatus} onValueChange={(value) => onFilterChange('licenseStatus', value)}>
+                            <SelectTrigger className="w-full min-w-[140px]">
+                                <SelectValue placeholder="All Licenses" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">All Licenses</SelectItem>
+                                <SelectItem value="active">Active</SelectItem>
+                                <SelectItem value="pending">Pending</SelectItem>
+                                <SelectItem value="unknown">Unknown</SelectItem>
+                            </SelectContent>
+                        </Select>
+
+                        {/* Tracked Status Filter */}
+                        <Select value={filters.trackedStatus} onValueChange={(value) => onFilterChange('trackedStatus', value)}>
+                            <SelectTrigger className="w-full min-w-[140px]">
+                                <SelectValue placeholder="All Status" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">All Status</SelectItem>
+                                <SelectItem value="true">Tracked</SelectItem>
+                                <SelectItem value="false">Untracked</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
                 </div>
 
-                {/* State Filter */}
-                <Select value={filters.stateId} onValueChange={(value) => onFilterChange('stateId', value)}>
-                    <SelectTrigger className="w-[180px]">
-                        <SelectValue placeholder="All States" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="all">All States</SelectItem>
-                        {states.map((state) => (
-                            <SelectItem key={state._id} value={state._id}>
-                                {state.name} ({state.abbreviation})
-                            </SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
-
-                {/* License Status Filter */}
-                <Select value={filters.licenseStatus} onValueChange={(value) => onFilterChange('licenseStatus', value)}>
-                    <SelectTrigger className="w-[180px]">
-                        <SelectValue placeholder="All Licenses" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="all">All Licenses</SelectItem>
-                        <SelectItem value="Active">Active</SelectItem>
-                        <SelectItem value="Pending">Pending</SelectItem>
-                        <SelectItem value="Suspended">Suspended</SelectItem>
-                        <SelectItem value="Revoked">Revoked</SelectItem>
-                    </SelectContent>
-                </Select>
-
-                {/* Tracked Status Filter */}
-                <Select value={filters.trackedStatus} onValueChange={(value) => onFilterChange('trackedStatus', value)}>
-                    <SelectTrigger className="w-[140px]">
-                        <SelectValue placeholder="All Status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="all">All Status</SelectItem>
-                        <SelectItem value="true">Tracked</SelectItem>
-                        <SelectItem value="false">Untracked</SelectItem>
-                    </SelectContent>
-                </Select>
-
-                {/* Clear Filters Button */}
+                {/* Clear Filters Button - Right aligned on larger screens */}
                 {hasActiveFilters && (
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={onClearFilters}
-                        className="flex items-center gap-2"
-                    >
-                        <X className="h-4 w-4" />
-                        Clear Filters
-                    </Button>
+                    <div className="w-full sm:w-auto flex justify-start sm:justify-end">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={onClearFilters}
+                            className="flex items-center gap-2 w-full sm:w-auto"
+                        >
+                            <X className="h-4 w-4" />
+                            Clear Filters
+                        </Button>
+                    </div>
                 )}
             </div>
         </div>

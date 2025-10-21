@@ -50,6 +50,10 @@ export function usePaginatedData<T>({ data, pageSize, hasMore = false, onLoadMor
     }
   };
 
+  const resetPagination = () => {
+    setCurrentPage(1);
+  };
+
   return {
     currentPage,
     totalPages,
@@ -59,5 +63,6 @@ export function usePaginatedData<T>({ data, pageSize, hasMore = false, onLoadMor
     handlePageChange,
     handleNextPage,
     handlePreviousPage,
+    resetPagination,
   };
 }

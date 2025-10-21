@@ -52,7 +52,8 @@ export function CasinoListTable() {
         isLoadingMore,
         handlePageChange,
         handleNextPage,
-        handlePreviousPage
+        handlePreviousPage,
+        resetPagination
     } = usePaginatedData({
         data: casinos,
         pageSize,
@@ -61,19 +62,25 @@ export function CasinoListTable() {
     });
 
     // --- Filter handlers ---
-    const updateFilter = (key: string, value: string) =>
+    const updateFilter = (key: string, value: string) => {
         setFilters((prev) => ({ ...prev, [key]: value }));
+        resetPagination(); // Reset to page 1 when any filter changes
+    };
 
-    const clearFilters = () =>
+    const clearFilters = () => {
         setFilters({
             searchTerm: "",
             stateId: "all",
             licenseStatus: "all",
             trackedStatus: "all"
         });
+        resetPagination(); // Reset to page 1 when clearing filters
+    };
 
-    const clearFilter = (key: string) =>
+    const clearFilter = (key: string) => {
         setFilters((prev) => ({ ...prev, [key]: key === "searchTerm" ? "" : "all" }));
+        resetPagination(); // Reset to page 1 when clearing individual filters
+    };
 
     // --- Always render filters, even while loading ---
     return (
@@ -121,6 +128,7 @@ export function CasinoListTable() {
                             <TableRow>
                                 <TableHead>Name</TableHead>
                                 <TableHead>Website</TableHead>
+                                <TableHead>Source URL</TableHead>
                                 <TableHead>License</TableHead>
                                 <TableHead>State</TableHead>
                                 <TableHead className="text-right">Tracked</TableHead>
@@ -150,6 +158,20 @@ export function CasinoListTable() {
                                             </a>
                                         ) : (
                                             <span className="text-muted-foreground text-sm">No website</span>
+                                        )}
+                                    </TableCell>
+                                    <TableCell>
+                                        {c.source_url ? (
+                                            <a
+                                                href={c.source_url}
+                                                target="_blank"
+                                                rel="noreferrer"
+                                                className="text-blue-600 hover:underline text-sm"
+                                            >
+                                                Visit Source
+                                            </a>
+                                        ) : (
+                                            <span className="text-muted-foreground text-sm">No source URL</span>
                                         )}
                                     </TableCell>
                                     <TableCell>

@@ -12,7 +12,7 @@ interface CasinoListFilters {
 
 export const useCasinoList = (numItems: number = 10, filters?: CasinoListFilters) => {
   const { results, status, loadMore } = usePaginatedQuery(
-    api.casinos.index.getCasinosSearchable,
+    api.casinos.index.getCasinosSearchable as any,
     {
       searchTerm: filters?.searchTerm,
       stateId: filters?.stateId as Id<'states'>,

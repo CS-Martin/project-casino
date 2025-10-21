@@ -1,17 +1,14 @@
 import { Id } from '../../_generated/dataModel';
 import { query, QueryCtx } from '../../_generated/server';
 import { v } from 'convex/values';
+import { paginationOptsValidator } from 'convex/server';
 
 export const getCasinosSearchableArgs = {
   searchTerm: v.optional(v.string()),
   stateId: v.optional(v.id('states')),
   licenseStatus: v.optional(v.string()),
   isTracked: v.optional(v.boolean()),
-  paginationOpts: v.object({
-    numItems: v.number(),
-    cursor: v.union(v.string(), v.null()),
-    id: v.optional(v.number()),
-  }),
+  paginationOpts: paginationOptsValidator,
 };
 
 export const getCasinosSearchableHandler = async (
@@ -24,24 +21,99 @@ export const getCasinosSearchableHandler = async (
     paginationOpts: { numItems: number; cursor: string | null };
   }
 ) => {
-  // Apply indexed filters and get paginated results
+  // If there's a search term, we need to get ALL data first, then filter and paginate
+  if (args.searchTerm) {
+    console.log('Search term detected, fetching all data first...');
+
+    // Get all casinos (we'll need to implement proper pagination later)
+    const allCasinos = await ctx.db.query('casinos').order('desc').collect();
+
+    // Enrich with state data
+    const enriched = await Promise.all(
+      allCasinos.map(async (casino) => {
+        const state = casino.state_id ? await ctx.db.get(casino.state_id) : null;
+        return { ...casino, state } as typeof casino & { state: any | null };
+      })
+    );
+
+    // Apply all filters
+    let filteredResults = enriched;
+
+    // Apply search filter
+    const searchLower = args.searchTerm.toLowerCase();
+    console.log('Searching for:', searchLower);
+    console.log('Total casinos before search:', filteredResults.length);
+
+    filteredResults = filteredResults.filter((casino) => {
+      const nameMatch = casino.name.toLowerCase().includes(searchLower);
+      const websiteMatch = casino.website?.toLowerCase().includes(searchLower);
+      const licenseMatch = casino.license_status?.toLowerCase().includes(searchLower);
+      const stateNameMatch = casino.state?.name.toLowerCase().includes(searchLower);
+      const stateAbbrMatch = casino.state?.abbreviation.toLowerCase().includes(searchLower);
+
+      const matches = nameMatch || websiteMatch || licenseMatch || stateNameMatch || stateAbbrMatch;
+
+      if (casino.name.toLowerCase().includes('betmgm') || casino.name.toLowerCase().includes('mgm')) {
+        console.log('BetMGM casino found:', casino.name, 'matches:', matches);
+      }
+
+      return matches;
+    });
+
+    console.log('Total casinos after search:', filteredResults.length);
+
+    // Apply other filters
+    if (args.stateId && args.stateId !== 'all') {
+      filteredResults = filteredResults.filter((casino) => casino.state_id === args.stateId);
+    }
+
+    if (args.licenseStatus && args.licenseStatus !== 'all') {
+      if (args.licenseStatus === 'unknown') {
+        filteredResults = filteredResults.filter((casino) => !casino.license_status);
+      } else {
+        filteredResults = filteredResults.filter((casino) => casino.license_status === args.licenseStatus);
+      }
+    }
+
+    if (args.isTracked !== undefined) {
+      filteredResults = filteredResults.filter((casino) => casino.is_tracked === args.isTracked);
+    }
+
+    // Simple pagination for search results
+    const startIndex = 0;
+    const endIndex = Math.min(args.paginationOpts.numItems, filteredResults.length);
+    const paginatedResults = filteredResults.slice(startIndex, endIndex);
+
+    return {
+      page: paginatedResults,
+      isDone: endIndex >= filteredResults.length,
+      continueCursor: endIndex >= filteredResults.length ? null : 'search_cursor',
+    };
+  }
+
+  // Original logic for non-search queries
   let pageResult;
   let usedIndex = '';
 
-  if (args.stateId) {
+  if (args.stateId && args.stateId !== 'all') {
     pageResult = await ctx.db
       .query('casinos')
       .withIndex('by_state', (q) => q.eq('state_id', args.stateId as Id<'states'>))
       .order('desc')
       .paginate(args.paginationOpts);
     usedIndex = 'state';
-  } else if (args.licenseStatus) {
-    pageResult = await ctx.db
-      .query('casinos')
-      .withIndex('by_license_status', (q) => q.eq('license_status', args.licenseStatus))
-      .order('desc')
-      .paginate(args.paginationOpts);
-    usedIndex = 'license';
+  } else if (args.licenseStatus && args.licenseStatus !== 'all') {
+    if (args.licenseStatus === 'unknown') {
+      pageResult = await ctx.db.query('casinos').order('desc').paginate(args.paginationOpts);
+      usedIndex = 'license';
+    } else {
+      pageResult = await ctx.db
+        .query('casinos')
+        .withIndex('by_license_status', (q) => q.eq('license_status', args.licenseStatus))
+        .order('desc')
+        .paginate(args.paginationOpts);
+      usedIndex = 'license';
+    }
   } else if (args.isTracked !== undefined) {
     pageResult = await ctx.db
       .query('casinos')
@@ -64,23 +136,17 @@ export const getCasinosSearchableHandler = async (
   // Apply additional filters that weren't used as indexes
   let filteredResults = enriched;
 
-  // Apply search filter if provided
-  if (args.searchTerm) {
-    const searchLower = args.searchTerm.toLowerCase();
-    filteredResults = filteredResults.filter((casino) => {
-      return (
-        casino.name.toLowerCase().includes(searchLower) ||
-        casino.website?.toLowerCase().includes(searchLower) ||
-        casino.license_status?.toLowerCase().includes(searchLower) ||
-        casino.state?.name.toLowerCase().includes(searchLower) ||
-        casino.state?.abbreviation.toLowerCase().includes(searchLower)
-      );
-    });
-  }
-
-  // Apply license status filter if not used as index
-  if (args.licenseStatus && usedIndex !== 'license') {
-    filteredResults = filteredResults.filter((casino) => casino.license_status === args.licenseStatus);
+  // Apply license status filter if not used as index, or if "unknown" was used as index
+  if (
+    args.licenseStatus &&
+    args.licenseStatus !== 'all' &&
+    (usedIndex !== 'license' || args.licenseStatus === 'unknown')
+  ) {
+    if (args.licenseStatus === 'unknown') {
+      filteredResults = filteredResults.filter((casino) => !casino.license_status);
+    } else {
+      filteredResults = filteredResults.filter((casino) => casino.license_status === args.licenseStatus);
+    }
   }
 
   // Apply tracked status filter if not used as index
@@ -89,7 +155,7 @@ export const getCasinosSearchableHandler = async (
   }
 
   // Apply state filter if not used as index
-  if (args.stateId && usedIndex !== 'state') {
+  if (args.stateId && args.stateId !== 'all' && usedIndex !== 'state') {
     filteredResults = filteredResults.filter((casino) => casino.state_id === args.stateId);
   }
 

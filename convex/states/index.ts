@@ -2,6 +2,7 @@ import { mutation, query } from '../_generated/server';
 import { createStateArgs, createStateHandler } from './mutations/createState';
 import { getOrCreateStateArgs, getOrCreateStateHandler } from './mutations/getOrCreateState';
 import { getStateByIdArgs, getStateByIdHandler } from './queries/getStateById';
+import { getAllStatesHandler } from './queries/getAllStates';
 
 // Mutations
 export const createState = mutation({
@@ -18,4 +19,8 @@ export const getOrCreateState = mutation({
 export const getStateById = query({
   args: getStateByIdArgs,
   handler: getStateByIdHandler,
+});
+
+export const getAllStates = query({
+  handler: getAllStatesHandler,
 });

@@ -186,77 +186,75 @@ export function PieDonutActive() {
                     <div className="w-full 2xl:w-[60%]">
                         <div className="h-fit w-full flex justify-center">
                             <ChartContainer config={chartConfig} className="w-full">
-                                <ResponsiveContainer>
-                                    <PieChart>
-                                        <Pie
-                                            data={chartData}
-                                            cx="50%"
-                                            cy="50%"
-                                            innerRadius={40}
-                                            outerRadius={80}
-                                            paddingAngle={3}
-                                            dataKey="value"
-                                            onMouseEnter={handleMouseEnter}
-                                            onMouseLeave={handleMouseLeave}
-                                        >
-                                            {chartData.map((entry, index) => (
-                                                <Cell
-                                                    key={`cell-${index}`}
-                                                    fill={opportunityColors[entry.opportunity]}
-                                                    stroke={opportunityColors[entry.opportunity]}
-                                                    strokeWidth={criticalIndices.includes(index) ? 3 : 1}
-                                                />
-                                            ))}
-                                        </Pie>
-                                        <RechartsTooltip
-                                            content={({ active, payload }) => {
-                                                if (active && payload && payload.length) {
-                                                    const data = payload[0].payload;
-                                                    return (
-                                                        <div className="rounded-lg border bg-background p-3 shadow-md">
-                                                            <div className="flex items-center gap-2 mb-2">
-                                                                <div
-                                                                    className="w-3 h-3 rounded-full"
-                                                                    style={{ backgroundColor: data.fill }}
-                                                                />
-                                                                <span className="font-semibold">{data.state}</span>
+                                <PieChart>
+                                    <Pie
+                                        data={chartData}
+                                        cx="50%"
+                                        cy="50%"
+                                        innerRadius={40}
+                                        outerRadius={80}
+                                        paddingAngle={3}
+                                        dataKey="value"
+                                        onMouseEnter={handleMouseEnter}
+                                        onMouseLeave={handleMouseLeave}
+                                    >
+                                        {chartData.map((entry, index) => (
+                                            <Cell
+                                                key={`cell-${index}`}
+                                                fill={opportunityColors[entry.opportunity]}
+                                                stroke={opportunityColors[entry.opportunity]}
+                                                strokeWidth={criticalIndices.includes(index) ? 3 : 1}
+                                            />
+                                        ))}
+                                    </Pie>
+                                    <RechartsTooltip
+                                        content={({ active, payload }) => {
+                                            if (active && payload && payload.length) {
+                                                const data = payload[0].payload;
+                                                return (
+                                                    <div className="rounded-lg border bg-background p-3 shadow-md">
+                                                        <div className="flex items-center gap-2 mb-2">
+                                                            <div
+                                                                className="w-3 h-3 rounded-full"
+                                                                style={{ backgroundColor: data.fill }}
+                                                            />
+                                                            <span className="font-semibold">{data.state}</span>
+                                                        </div>
+                                                        <div className="space-y-1 text-sm">
+                                                            <div className="flex justify-between gap-4">
+                                                                <span className="text-muted-foreground">Coverage:</span>
+                                                                <span className="font-medium text-green-600 dark:text-green-400">
+                                                                    {data.coverage.toFixed(1)}%
+                                                                </span>
                                                             </div>
-                                                            <div className="space-y-1 text-sm">
-                                                                <div className="flex justify-between gap-4">
-                                                                    <span className="text-muted-foreground">Coverage:</span>
-                                                                    <span className="font-medium text-green-600 dark:text-green-400">
-                                                                        {data.coverage.toFixed(1)}%
-                                                                    </span>
-                                                                </div>
-                                                                <div className="flex justify-between gap-4">
-                                                                    <span className="text-muted-foreground">Gap:</span>
-                                                                    <span className="font-medium text-red-600 dark:text-red-400">
-                                                                        {data.gap.toFixed(1)}%
-                                                                    </span>
-                                                                </div>
-                                                                <div className="flex justify-between gap-4">
-                                                                    <span className="text-muted-foreground">Opportunity:</span>
-                                                                    <span className={cn(
-                                                                        "px-1.5 py-1 rounded-md lowercase text-xs text-white",
-                                                                        data.opportunity === "CRITICAL" && "bg-purple-600",
-                                                                        data.opportunity === "HIGH" && "bg-purple-500",
-                                                                        data.opportunity === "MEDIUM" && "bg-purple-400",
-                                                                        data.opportunity === "LOW" && "bg-purple-300"
-                                                                    )}>{data.opportunity}</span>
-                                                                </div>
-                                                                <div className="flex justify-between gap-4">
-                                                                    <span className="text-muted-foreground">Total Casinos:</span>
-                                                                    <span className="font-medium">{data.total}</span>
-                                                                </div>
+                                                            <div className="flex justify-between gap-4">
+                                                                <span className="text-muted-foreground">Gap:</span>
+                                                                <span className="font-medium text-red-600 dark:text-red-400">
+                                                                    {data.gap.toFixed(1)}%
+                                                                </span>
+                                                            </div>
+                                                            <div className="flex justify-between gap-4">
+                                                                <span className="text-muted-foreground">Opportunity:</span>
+                                                                <span className={cn(
+                                                                    "px-1.5 py-1 rounded-md lowercase text-xs text-white",
+                                                                    data.opportunity === "CRITICAL" && "bg-purple-600",
+                                                                    data.opportunity === "HIGH" && "bg-purple-500",
+                                                                    data.opportunity === "MEDIUM" && "bg-purple-400",
+                                                                    data.opportunity === "LOW" && "bg-purple-300"
+                                                                )}>{data.opportunity}</span>
+                                                            </div>
+                                                            <div className="flex justify-between gap-4">
+                                                                <span className="text-muted-foreground">Total Casinos:</span>
+                                                                <span className="font-medium">{data.total}</span>
                                                             </div>
                                                         </div>
-                                                    );
-                                                }
-                                                return null;
-                                            }}
-                                        />
-                                    </PieChart>
-                                </ResponsiveContainer>
+                                                    </div>
+                                                );
+                                            }
+                                            return null;
+                                        }}
+                                    />
+                                </PieChart>
                             </ChartContainer>
                         </div>
 

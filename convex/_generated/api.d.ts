@@ -19,11 +19,13 @@ import type * as casinos_queries_getCasinoStats from "../casinos/queries/getCasi
 import type * as casinos_queries_getCasinosByState from "../casinos/queries/getCasinosByState.js";
 import type * as casinos_queries_getCasinosByStateStats from "../casinos/queries/getCasinosByStateStats.js";
 import type * as casinos_queries_getCasinosPaginated from "../casinos/queries/getCasinosPaginated.js";
+import type * as casinos_queries_getCasinosSearchable from "../casinos/queries/getCasinosSearchable.js";
 import type * as crons from "../crons.js";
 import type * as offers_index from "../offers/index.js";
 import type * as states_index from "../states/index.js";
 import type * as states_mutations_createState from "../states/mutations/createState.js";
 import type * as states_mutations_getOrCreateState from "../states/mutations/getOrCreateState.js";
+import type * as states_queries_getAllStates from "../states/queries/getAllStates.js";
 import type * as states_queries_getStateById from "../states/queries/getStateById.js";
 import type * as xanoAPISync from "../xanoAPISync.js";
 
@@ -53,11 +55,13 @@ declare const fullApi: ApiFromModules<{
   "casinos/queries/getCasinosByState": typeof casinos_queries_getCasinosByState;
   "casinos/queries/getCasinosByStateStats": typeof casinos_queries_getCasinosByStateStats;
   "casinos/queries/getCasinosPaginated": typeof casinos_queries_getCasinosPaginated;
+  "casinos/queries/getCasinosSearchable": typeof casinos_queries_getCasinosSearchable;
   crons: typeof crons;
   "offers/index": typeof offers_index;
   "states/index": typeof states_index;
   "states/mutations/createState": typeof states_mutations_createState;
   "states/mutations/getOrCreateState": typeof states_mutations_getOrCreateState;
+  "states/queries/getAllStates": typeof states_queries_getAllStates;
   "states/queries/getStateById": typeof states_queries_getStateById;
   xanoAPISync: typeof xanoAPISync;
 }>;

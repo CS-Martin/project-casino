@@ -1,16 +1,49 @@
+import { useState, useMemo, useEffect } from "react";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { useCasinoList } from "../hooks/use-casino-list";
-import { usePaginatedData } from "@/hooks/use-paginated-data";
-import { CasinoListTableSkeleton } from "./skeletons";
-import { Skeleton } from "@/components/ui/skeleton";
+import { CasinoSearchFilters } from "./casino-search-filters";
+import { CasinoActiveFilters } from "./casino-active-filters";
 import { TableContainer } from "@/components/custom/table/table-container";
 import { TableSkeleton } from "@/components/custom/table/table-skeleton";
 import { CustomPagination } from "@/components/custom/table/custom-pagination";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useStates } from "../hooks/use-states";
+import { useCasinoList } from "../hooks/use-casino-list";
+import { usePaginatedData } from "@/hooks/use-paginated-data";
 
 export function CasinoListTable() {
     const pageSize = 10;
-    const { casinos, isLoadingInitial, hasMore, loadMore } = useCasinoList();
+    const { states } = useStates();
 
+    // --- Filters stay stable across data fetches ---
+    const [filters, setFilters] = useState({
+        searchTerm: "",
+        stateId: "all",
+        licenseStatus: "all",
+        trackedStatus: "all"
+    });
+
+
+    // --- Debounced search to reduce re-fetches ---
+    const [debouncedSearch, setDebouncedSearch] = useState("");
+    useEffect(() => {
+        const timer = setTimeout(() => setDebouncedSearch(filters.searchTerm), 300);
+        return () => clearTimeout(timer);
+    }, [filters.searchTerm]);
+
+    const apiFilters = useMemo(() => ({
+        searchTerm: debouncedSearch || undefined,
+        stateId: filters.stateId !== "all" ? filters.stateId : undefined,
+        licenseStatus: filters.licenseStatus !== "all" ? filters.licenseStatus : undefined,
+        isTracked:
+            filters.trackedStatus === "true"
+                ? true
+                : filters.trackedStatus === "false"
+                    ? false
+                    : undefined,
+    }), [debouncedSearch, filters.stateId, filters.licenseStatus, filters.trackedStatus]);
+
+    // --- Data fetching ---
+    const { casinos, isLoadingInitial, hasMore, loadMore } = useCasinoList(pageSize, apiFilters);
     const {
         currentPage,
         totalPages,
@@ -27,10 +60,22 @@ export function CasinoListTable() {
         onLoadMore: loadMore
     });
 
-    if (isLoadingInitial) {
-        return <CasinoListTableSkeleton />;
-    }
+    // --- Filter handlers ---
+    const updateFilter = (key: string, value: string) =>
+        setFilters((prev) => ({ ...prev, [key]: value }));
 
+    const clearFilters = () =>
+        setFilters({
+            searchTerm: "",
+            stateId: "all",
+            licenseStatus: "all",
+            trackedStatus: "all"
+        });
+
+    const clearFilter = (key: string) =>
+        setFilters((prev) => ({ ...prev, [key]: key === "searchTerm" ? "" : "all" }));
+
+    // --- Always render filters, even while loading ---
     return (
         <TableContainer
             title="Casino List"
@@ -45,16 +90,29 @@ export function CasinoListTable() {
                 )
             }
         >
-            <div className='rounded-md border'>
-                {isLoadingMore ? (
-                    // Show skeleton while loading more data
+            {/* Filters always visible */}
+            <CasinoSearchFilters
+                filters={filters}
+                onFilterChange={updateFilter}
+                onClearFilters={clearFilters}
+                states={states}
+            />
+
+            <CasinoActiveFilters
+                filters={filters}
+                states={states}
+                onClearFilter={clearFilter}
+            />
+
+            {/* Table area */}
+            <div className="rounded-md border">
+                {isLoadingInitial ? (
                     <TableSkeleton
                         rows={pageSize}
                         columns={5}
                         columnWidths={["w-32", "w-24", "w-20", "w-16", "w-12"]}
                     />
                 ) : (
-                    // Show actual data when not loading
                     <Table>
                         <TableCaption className="sr-only">
                             All casinos. Untracked casinos are highlighted in red.
@@ -75,11 +133,9 @@ export function CasinoListTable() {
                                     className={!c.is_tracked ? "bg-red-50 dark:bg-red-500/15" : undefined}
                                 >
                                     <TableCell className="flex flex-col">
-                                        <div className="font-medium">
-                                            {c.name}
-                                        </div>
+                                        <div className="font-medium">{c.name}</div>
                                         <span className="text-[11px] text-muted-foreground">
-                                            {c.state?.name ?? '—'}
+                                            {c.state?.name ?? "—"}
                                         </span>
                                     </TableCell>
                                     <TableCell>

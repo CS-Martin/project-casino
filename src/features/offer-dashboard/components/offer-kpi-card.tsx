@@ -79,6 +79,11 @@ export default function OfferKpiCard({
 
     // Parse the value to extract number and any suffix
     const parseValue = (val: string | number) => {
+        // Handle undefined/null values
+        if (val === undefined || val === null) {
+            return { numericValue: 0, suffix: '' };
+        }
+
         if (typeof val === 'number') {
             return { numericValue: val, suffix: '' };
         }

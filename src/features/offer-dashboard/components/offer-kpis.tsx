@@ -8,6 +8,8 @@ import {
     Building2,
     AlertTriangle,
     CheckCircle,
+    Star,
+    BarChart3,
 } from 'lucide-react';
 
 export default function OfferKpis() {
@@ -15,8 +17,8 @@ export default function OfferKpis() {
 
     if (isLoading) {
         return (
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                {Array.from({ length: 5 }).map((_, i) => (
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                {Array.from({ length: 4 }).map((_, i) => (
                     <div key={i} className="h-24 bg-muted animate-pulse rounded-lg" />
                 ))}
             </div>
@@ -31,66 +33,50 @@ export default function OfferKpis() {
         );
     }
 
-    // Calculate percentages for context
-    const activeOffersPercentage = kpis.totalOffers > 0 ? (kpis.totalActiveOffers / kpis.totalOffers) * 100 : 0;
-    const expiredOffersPercentage = kpis.totalOffers > 0 ? (kpis.totalExpiredOffers / kpis.totalOffers) * 100 : 0;
-    const casinosUpdatedPercentage = kpis.totalCasinosWithOffers > 0 ? (kpis.totalCasinosWithUpdatedOffers / kpis.totalCasinosWithOffers) * 100 : 0;
-
     return (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {/* Total Active Offers */}
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            {/* Total Offers (All Time) */}
             <OfferKpiCard
-                title="Active Offers"
-                value={kpis.totalActiveOffers}
+                title="Total Offers (All Time)"
+                value={kpis.totalOffers}
                 isLoading={isLoading}
                 variant="default"
-                icon={CheckCircle}
-                tooltip="Latest offers per casino with recent checks and not expired"
-                subtitle={`${Math.round(activeOffersPercentage)}% of total offers`}
+                icon={BarChart3}
+                tooltip="Total number of offers ever created in the system"
+                subtitle="All time"
             />
 
-            {/* Total New Offers */}
+            {/* Casinos with Offers */}
             <OfferKpiCard
-                title="Total Offers"
-                value={kpis.totalNewOffers}
-                isLoading={isLoading}
-                variant="default"
-                icon={Gift}
-                tooltip="Total number of offers in the system"
-                subtitle={`${kpis.totalCasinosWithOffers} casinos`}
-            />
-
-            {/* Total Expired Offers */}
-            <OfferKpiCard
-                title="Expired Offers"
-                value={kpis.totalExpiredOffers}
-                isLoading={isLoading}
-                variant="default"
-                icon={AlertTriangle}
-                tooltip="Total offers that have expired or been deprecated"
-                subtitle={`${Math.round(expiredOffersPercentage)}% of total offers`}
-            />
-
-            {/* Average Offer Lifetime */}
-            <OfferKpiCard
-                title="Avg Lifetime"
-                value={`${kpis.averageOfferLifetime} days`}
-                isLoading={isLoading}
-                variant="default"
-                icon={Clock}
-                tooltip="Average duration from offer creation to expiration or current date for active offers"
-                subtitle={`${kpis.totalOffers} total offers`}
-            />
-
-            {/* Casinos with Updated Offers */}
-            <OfferKpiCard
-                title="Casinos Updated"
-                value={kpis.totalCasinosWithUpdatedOffers}
+                title="Casinos with Offers"
+                value={`${kpis.casinosWithOffers}/${kpis.totalCasinos}`}
                 isLoading={isLoading}
                 variant="default"
                 icon={Building2}
-                tooltip="Number of casinos that have had offers updated"
-                subtitle={`${Math.round(casinosUpdatedPercentage)}% of casinos`}
+                tooltip="Number of casinos that have offers"
+                subtitle={`${kpis.casinosWithOffersPercentage}% of total casinos`}
+            />
+
+            {/* Active Offers (Current) */}
+            <OfferKpiCard
+                title="Active Offers (Current)"
+                value={kpis.activeOffers}
+                isLoading={isLoading}
+                variant="default"
+                icon={CheckCircle}
+                tooltip="Offers that are currently active and not expired"
+                subtitle="Currently valid"
+            />
+
+            {/* Offers Researched Today */}
+            <OfferKpiCard
+                title="Offers Researched Today"
+                value={kpis.offersResearchedToday}
+                isLoading={isLoading}
+                variant="default"
+                icon={Clock}
+                tooltip="Number of offers researched and added today"
+                subtitle="Today"
             />
         </div>
     );

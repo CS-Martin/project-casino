@@ -10,11 +10,10 @@ Main component that displays a grid of KPI cards for offer metrics.
 
 **Features:**
 
-- Total active offers (latest offers per casino with recent checks)
-- Total offers in the system
-- Total expired/deprecated offers
-- Average offer lifetime
-- Number of casinos with updated offers
+- Total offers (all time) - Complete count of all offers ever created
+- Casinos with offers - Count and percentage of casinos that have offers
+- Active offers (current) - Currently valid offers that are not expired
+- Superior offers found - High-value offers with bonus >= $100 or 100%+ match
 - Percentage indicators for context
 - Tooltips with detailed explanations
 - Responsive grid layout
@@ -49,12 +48,12 @@ Custom hook for fetching offer KPI data from Convex.
 
 The KPI data includes:
 
-- `totalActiveOffers`: Latest offers per casino with recent checks
-- `totalNewOffers`: Total offers in the system
-- `totalExpiredOffers`: Total expired/deprecated offers
-- `averageOfferLifetime`: Average duration in days
-- `totalCasinosWithUpdatedOffers`: Casinos with updated offers
-- Additional context metrics
+- `totalOffers`: Total offers ever created (all time)
+- `casinosWithOffers`: Number of casinos that have offers
+- `totalCasinos`: Total number of casinos in the system
+- `casinosWithOffersPercentage`: Percentage of casinos with offers
+- `activeOffers`: Currently active offers (not expired)
+- `superiorOffers`: High-value offers (bonus >= $100 or 100%+ match)
 
 ## Usage
 

@@ -32,6 +32,8 @@ import type * as offers_mutations_triggerOfferResearch from "../offers/mutations
 import type * as offers_queries_getOfferKpis from "../offers/queries/getOfferKpis.js";
 import type * as offers_queries_getOfferResearchLogs from "../offers/queries/getOfferResearchLogs.js";
 import type * as offers_queries_getOfferResearchStatus from "../offers/queries/getOfferResearchStatus.js";
+import type * as offers_queries_getOfferTimeline from "../offers/queries/getOfferTimeline.js";
+import type * as offers_queries_getOfferTypeBreakdown from "../offers/queries/getOfferTypeBreakdown.js";
 import type * as states_index from "../states/index.js";
 import type * as states_mutations_createState from "../states/mutations/createState.js";
 import type * as states_mutations_getOrCreateState from "../states/mutations/getOrCreateState.js";
@@ -78,6 +80,8 @@ declare const fullApi: ApiFromModules<{
   "offers/queries/getOfferKpis": typeof offers_queries_getOfferKpis;
   "offers/queries/getOfferResearchLogs": typeof offers_queries_getOfferResearchLogs;
   "offers/queries/getOfferResearchStatus": typeof offers_queries_getOfferResearchStatus;
+  "offers/queries/getOfferTimeline": typeof offers_queries_getOfferTimeline;
+  "offers/queries/getOfferTypeBreakdown": typeof offers_queries_getOfferTypeBreakdown;
   "states/index": typeof states_index;
   "states/mutations/createState": typeof states_mutations_createState;
   "states/mutations/getOrCreateState": typeof states_mutations_getOrCreateState;

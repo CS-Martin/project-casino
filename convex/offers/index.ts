@@ -6,6 +6,8 @@ import { triggerOfferResearchArgs, triggerOfferResearchHandler } from './mutatio
 import { getOfferResearchStatusArgs, getOfferResearchStatusHandler } from './queries/getOfferResearchStatus';
 import { getOfferResearchLogsArgs, getOfferResearchLogsHandler } from './queries/getOfferResearchLogs';
 import { getOfferKpisArgs, getOfferKpisHandler } from './queries/getOfferKpis';
+import { getOfferTimelineArgs, getOfferTimelineHandler } from './queries/getOfferTimeline';
+import { getOfferTypeBreakdownArgs, getOfferTypeBreakdownHandler } from './queries/getOfferTypeBreakdown';
 
 // Mutations
 export const createOffers = mutation({
@@ -37,4 +39,14 @@ export const getOfferResearchLogs = query({
 export const getOfferKpis = query({
   args: getOfferKpisArgs,
   handler: getOfferKpisHandler,
+});
+
+export const getOfferTimeline = query({
+  args: getOfferTimelineArgs,
+  handler: getOfferTimelineHandler,
+});
+
+export const getOfferTypeBreakdown = query({
+  args: getOfferTypeBreakdownArgs,
+  handler: getOfferTypeBreakdownHandler,
 });

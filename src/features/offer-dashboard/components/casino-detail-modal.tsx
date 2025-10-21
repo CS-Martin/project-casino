@@ -53,9 +53,8 @@ export default function CasinoDetailModal({
     const [comparisonModalOpen, setComparisonModalOpen] = React.useState(false);
     const [comparisonMode, setComparisonMode] = React.useState(false);
     const [aiAnalysis, setAiAnalysis] = React.useState<any | null>(null);
+    const [isLoadingCache, setIsLoadingCache] = React.useState(false);
     const [isAnalyzing, setIsAnalyzing] = React.useState(false);
-    const [showAiAnalysis, setShowAiAnalysis] = React.useState(false);
-    const [isCached, setIsCached] = React.useState(false);
 
     const handleOfferClick = (offer: OfferWithChanges) => {
         if (comparisonMode) {
@@ -84,6 +83,37 @@ export default function CasinoDetailModal({
             setSelectedOfferRight(null);
         }, 200);
     };
+
+    // Load cached AI analysis when modal opens
+    React.useEffect(() => {
+        const loadCachedAnalysis = async () => {
+            if (!casinoId || !open) {
+                setAiAnalysis(null);
+                return;
+            }
+
+            setIsLoadingCache(true);
+            try {
+                const response = await fetch(`/api/get-cached-best-offer?casinoId=${casinoId}`);
+                const data = await response.json();
+
+                if (data.success && data.data) {
+                    setAiAnalysis(data.data);
+                    console.log('✅ Loaded best offer recommendation from cache');
+                } else {
+                    setAiAnalysis(null);
+                    console.log('ℹ️  No cached best offer recommendation found');
+                }
+            } catch (error) {
+                console.error('Error loading cached analysis:', error);
+                setAiAnalysis(null);
+            } finally {
+                setIsLoadingCache(false);
+            }
+        };
+
+        loadCachedAnalysis();
+    }, [casinoId, open]);
 
     const toggleComparisonMode = () => {
         setComparisonMode(!comparisonMode);
@@ -125,8 +155,6 @@ export default function CasinoDetailModal({
 
             if (data.success) {
                 setAiAnalysis(data.data);
-                setShowAiAnalysis(true);
-                setIsCached(data.cached || false);
 
                 // Log cache status
                 if (data.cached) {
@@ -405,22 +433,17 @@ export default function CasinoDetailModal({
                         )}
 
                         {/* AI Analysis Results */}
-                        {showAiAnalysis && aiAnalysis && (
+                        {aiAnalysis && !isLoadingCache && (
                             <div className="bg-linear-to-r from-purple-50 via-blue-50 to-purple-50 dark:from-purple-950/50 dark:via-blue-950/50 dark:to-purple-950/50 rounded-lg p-4 md:p-6 border-2 border-purple-200 dark:border-purple-800 animate-in fade-in slide-in-from-top-2 duration-300">
                                 <div className="flex items-start justify-between mb-4">
                                     <div className="flex items-center gap-2 flex-wrap">
                                         <Award className="h-6 w-6 text-purple-600" />
                                         <h4 className="font-bold text-lg">AI Recommended Best Offer</h4>
-                                        {isCached && (
-                                            <Badge variant="secondary" className="text-xs bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 border-green-300 dark:border-green-700">
-                                                ⚡ Cached
-                                            </Badge>
-                                        )}
                                     </div>
                                     <Button
                                         variant="ghost"
                                         size="sm"
-                                        onClick={() => setShowAiAnalysis(false)}
+                                        onClick={() => setAiAnalysis(null)}
                                         className="h-6 w-6 p-0"
                                     >
                                         ×

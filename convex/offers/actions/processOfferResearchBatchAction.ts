@@ -87,9 +87,9 @@ export const processOfferResearchBatchAction = action({
             continue; // Skip this casino and continue with the next one
           }
 
-          // STEP 7: Upsert offers for this casino
-          // This function handles fuzzy matching, change detection, and database updates
-          const upsertResult = await ctx.runMutation(api.offers.index.upsertOffers, {
+          // STEP 7: Create new offers for this casino
+          // This function creates new offers without upserting to preserve historical data
+          const createResult = await ctx.runMutation(api.offers.index.createOffers, {
             casinoId: casino._id,
             offers: casinoResearch.offers, // Array of offers found by AI
             source: 'ai_research', // Tag all offers with this source
@@ -97,12 +97,12 @@ export const processOfferResearchBatchAction = action({
 
           // Update counters with results from this casino
           processingResults.totalProcessed++;
-          processingResults.totalCreated += upsertResult.created;
-          processingResults.totalUpdated += upsertResult.updated;
-          processingResults.totalSkipped += upsertResult.skipped;
+          processingResults.totalCreated += createResult.created;
+          processingResults.totalUpdated += createResult.updated;
+          processingResults.totalSkipped += createResult.skipped;
 
           console.log(
-            `✅ Processed ${casinoResearch.casino_name}: ${upsertResult.created} created, ${upsertResult.updated} updated, ${upsertResult.skipped} skipped`
+            `✅ Processed ${casinoResearch.casino_name}: ${createResult.created} created, ${createResult.updated} updated, ${createResult.skipped} skipped`
           );
         } catch (error: any) {
           // Handle individual casino processing errors

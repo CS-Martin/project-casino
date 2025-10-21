@@ -65,13 +65,8 @@ export class CasinoDiscoveryService {
               reason: duplicateResult.reason,
               score: duplicateResult.score,
             });
-
-            console.log(
-              `⏭️ Skipped duplicate: "${casino.casino_name}" → "${duplicateResult.duplicate.name}" (${duplicateResult.reason}${duplicateResult.score ? `, score: ${duplicateResult.score}` : ''})`
-            );
           } else {
             casinosToSave.push(newCasino);
-            console.log(`✅ Will save: "${casino.casino_name}"`);
           }
         }
 
@@ -82,10 +77,6 @@ export class CasinoDiscoveryService {
           });
           result.saved += casinosToSave.length;
         }
-
-        console.log(
-          `📊 ${stateData.state_abbreviation}: Saved ${casinosToSave.length}, Skipped ${stateData.casinos.length - casinosToSave.length}`
-        );
       } catch (error) {
         console.error(`❌ Error saving casinos for ${stateData.state_abbreviation}:`, error);
       }

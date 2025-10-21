@@ -26,6 +26,7 @@ import type * as casinos_queries_getCasinosSearchable from "../casinos/queries/g
 import type * as crons from "../crons.js";
 import type * as offers_actions_processOfferResearchBatchAction from "../offers/actions/processOfferResearchBatchAction.js";
 import type * as offers_index from "../offers/index.js";
+import type * as offers_mutations_createOffers from "../offers/mutations/createOffers.js";
 import type * as offers_mutations_processOfferResearchBatch from "../offers/mutations/processOfferResearchBatch.js";
 import type * as offers_mutations_triggerOfferResearch from "../offers/mutations/triggerOfferResearch.js";
 import type * as offers_mutations_upsertOffers from "../offers/mutations/upsertOffers.js";
@@ -71,6 +72,7 @@ declare const fullApi: ApiFromModules<{
   crons: typeof crons;
   "offers/actions/processOfferResearchBatchAction": typeof offers_actions_processOfferResearchBatchAction;
   "offers/index": typeof offers_index;
+  "offers/mutations/createOffers": typeof offers_mutations_createOffers;
   "offers/mutations/processOfferResearchBatch": typeof offers_mutations_processOfferResearchBatch;
   "offers/mutations/triggerOfferResearch": typeof offers_mutations_triggerOfferResearch;
   "offers/mutations/upsertOffers": typeof offers_mutations_upsertOffers;

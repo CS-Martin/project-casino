@@ -15,8 +15,6 @@ export const triggerOfferResearchHandler = async (
   const batchSize = args.batchSize || 30;
   const startTime = Date.now();
 
-  console.log(`🚀 Manual trigger: Starting offer research (batch size: ${batchSize})`);
-
   try {
     let casinos;
 
@@ -24,14 +22,11 @@ export const triggerOfferResearchHandler = async (
       // Research specific casinos
       casinos = await Promise.all(args.casinoIds.map((id) => ctx.runQuery(api.casinos.index.getCasinoById, { id })));
       casinos = casinos.filter(Boolean); // Remove any null results
-      console.log(`📋 Processing ${casinos.length} specific casinos for offer research`);
     } else {
       // Research casinos that need updates (same logic as batch processing)
       casinos = await ctx.runQuery(api.casinos.index.getCasinosForOfferResearch, {
         batchSize,
       });
-
-      console.log(`📋 Processing ${casinos.length} casinos for offer research`);
     }
 
     if (casinos.length === 0) {
@@ -59,7 +54,6 @@ export const triggerOfferResearchHandler = async (
     const researchResult = await researchCasinoOffers(casinosForResearch);
 
     if (!researchResult.success || !researchResult.data) {
-      console.error('❌ AI research failed:', researchResult.error);
       return {
         success: false,
         error: researchResult.error || 'AI research failed',
@@ -86,21 +80,17 @@ export const triggerOfferResearchHandler = async (
           continue;
         }
 
-        // Upsert offers for this casino
-        const upsertResult = await ctx.runMutation(api.offers.index.upsertOffers, {
+        // Create new offers for this casino (preserves historical data)
+        const createResult = await ctx.runMutation(api.offers.index.createOffers, {
           casinoId: casino._id as Id<'casinos'>,
           offers: casinoResearch.offers,
           source: 'ai_research',
         });
 
         processingResults.totalProcessed++;
-        processingResults.totalCreated += upsertResult.created;
-        processingResults.totalUpdated += upsertResult.updated;
-        processingResults.totalSkipped += upsertResult.skipped;
-
-        console.log(
-          `✅ Processed ${casinoResearch.casino_name}: ${upsertResult.created} created, ${upsertResult.updated} updated, ${upsertResult.skipped} skipped`
-        );
+        processingResults.totalCreated += createResult.created;
+        processingResults.totalUpdated += createResult.updated;
+        processingResults.totalSkipped += createResult.skipped;
       } catch (error: any) {
         const errorMsg = `Failed to process offers for ${casinoResearch.casino_name}: ${error.message}`;
         console.error(`❌ ${errorMsg}`);
@@ -116,10 +106,6 @@ export const triggerOfferResearchHandler = async (
     });
 
     const duration = Date.now() - startTime;
-    console.log(`🎉 Manual trigger completed in ${duration}ms`);
-    console.log(
-      `📊 Results: ${processingResults.totalProcessed} casinos processed, ${processingResults.totalCreated} offers created, ${processingResults.totalUpdated} offers updated`
-    );
 
     return {
       success: true,

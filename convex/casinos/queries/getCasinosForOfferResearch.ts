@@ -5,6 +5,13 @@ export const getCasinosForOfferResearchArgs = {
   batchSize: v.optional(v.number()),
 };
 
+/**
+ * Get casinos for offer research
+ * @param ctx - The query context
+ * @param args - The arguments for the query
+ * @param args.batchSize - The batch size for the query
+ * @returns The casinos for offer research
+ */
 export const getCasinosForOfferResearchHandler = async (ctx: QueryCtx, args: { batchSize?: number }) => {
   const batchSize = args.batchSize || 30;
 

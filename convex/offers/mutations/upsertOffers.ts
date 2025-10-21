@@ -61,7 +61,9 @@ export const upsertOffersHandler = async (
 
     if (matchingOffer) {
       // Check if the offer has meaningful changes
-      if (hasSignificantChanges(matchingOffer, newOffer)) {
+      const hasChanges = hasSignificantChanges(matchingOffer, newOffer);
+
+      if (hasChanges) {
         await ctx.db.patch(matchingOffer._id, {
           offer_name: newOffer.offer_name,
           offer_type: newOffer.offer_type,

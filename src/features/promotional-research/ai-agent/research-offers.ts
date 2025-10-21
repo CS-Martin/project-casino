@@ -20,11 +20,6 @@ export interface OfferResearchResult {
 }
 
 export async function researchCasinoOffers(casinos: CasinoForResearch[]): Promise<OfferResearchResult> {
-  logger.info('Starting promotional offer research', {
-    casinoCount: casinos.length,
-    casinoNames: casinos.map((c) => c.name),
-  });
-
   try {
     const startTime = Date.now();
 
@@ -55,24 +50,6 @@ export async function researchCasinoOffers(casinos: CasinoForResearch[]): Promis
       });
       throw new Error('No offer research results generated');
     }
-
-    const resultCount = response.output_parsed.researchResults.length;
-    const casinosWithOffers = response.output_parsed.researchResults.filter((r) => r.offers.length > 0);
-    const totalOffers = response.output_parsed.researchResults.reduce((sum, r) => sum + r.offers.length, 0);
-
-    logger.info('Offer research completed successfully', {
-      duration,
-      casinoCount: casinos.length,
-      resultCount,
-      resultsPerCasino: resultCount / casinos.length,
-      casinosWithOffers: casinosWithOffers.length,
-      totalOffers,
-      casinoResults: response.output_parsed.researchResults.map((r) => ({
-        casino: r.casino_name,
-        offerCount: r.offers.length,
-        offers: r.offers.map((o) => o.offer_name),
-      })),
-    });
 
     return {
       success: true,

@@ -20,7 +20,7 @@ const crons = cronJobs();
 // { minutes: 30 } → every 30 minutes
 // { hours: 6 } → every 6 hours
 // { days: 1 } → once a day
-crons.interval('Sync Xano API data every 3 hours', { hours: 3 }, internal.xanoAPISync.fetchAndSyncOffers);
+crons.interval('Sync Xano API data every 24 hours', { hours: 24 }, internal.xanoAPISync.fetchAndSyncOffers);
 
 // 🔍 Schedule: AI-powered offer research daily
 // ------------------------------------------

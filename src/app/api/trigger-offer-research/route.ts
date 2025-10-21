@@ -9,8 +9,6 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { casinoIds, batchSize } = body;
 
-    console.log('🚀 API: Manual offer research trigger requested', { casinoIds, batchSize });
-
     const result = await convex.action(api.offers.index.triggerOfferResearch, {
       casinoIds,
       batchSize,

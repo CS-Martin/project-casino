@@ -29,7 +29,7 @@ import type * as offers_index from "../offers/index.js";
 import type * as offers_mutations_createOffers from "../offers/mutations/createOffers.js";
 import type * as offers_mutations_processOfferResearchBatch from "../offers/mutations/processOfferResearchBatch.js";
 import type * as offers_mutations_triggerOfferResearch from "../offers/mutations/triggerOfferResearch.js";
-import type * as offers_mutations_upsertOffers from "../offers/mutations/upsertOffers.js";
+import type * as offers_queries_getOfferKpis from "../offers/queries/getOfferKpis.js";
 import type * as offers_queries_getOfferResearchLogs from "../offers/queries/getOfferResearchLogs.js";
 import type * as offers_queries_getOfferResearchStatus from "../offers/queries/getOfferResearchStatus.js";
 import type * as states_index from "../states/index.js";
@@ -75,7 +75,7 @@ declare const fullApi: ApiFromModules<{
   "offers/mutations/createOffers": typeof offers_mutations_createOffers;
   "offers/mutations/processOfferResearchBatch": typeof offers_mutations_processOfferResearchBatch;
   "offers/mutations/triggerOfferResearch": typeof offers_mutations_triggerOfferResearch;
-  "offers/mutations/upsertOffers": typeof offers_mutations_upsertOffers;
+  "offers/queries/getOfferKpis": typeof offers_queries_getOfferKpis;
   "offers/queries/getOfferResearchLogs": typeof offers_queries_getOfferResearchLogs;
   "offers/queries/getOfferResearchStatus": typeof offers_queries_getOfferResearchStatus;
   "states/index": typeof states_index;

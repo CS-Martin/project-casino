@@ -2,7 +2,7 @@
 
 import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
-import { useDiscoverCasinos } from "@/features/dashboard/hooks/use-discover-casinos";
+import { useDiscoverCasinos } from "@/features/casino-dashboard/hooks/use-discover-casinos";
 import {
   Table,
   TableBody,

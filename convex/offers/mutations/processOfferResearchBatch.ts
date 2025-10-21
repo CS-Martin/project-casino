@@ -74,20 +74,20 @@ export const processOfferResearchBatchHandler = async (ctx: MutationCtx, args: {
           continue;
         }
 
-        // Upsert offers for this casino
-        const upsertResult = await ctx.runMutation(api.offers.index.upsertOffers, {
+        // Create new offers for this casino
+        const createResult = await ctx.runMutation(api.offers.index.createOffers, {
           casinoId: casino._id,
           offers: casinoResearch.offers,
           source: 'ai_research',
         });
 
         processingResults.totalProcessed++;
-        processingResults.totalCreated += upsertResult.created;
-        processingResults.totalUpdated += upsertResult.updated;
-        processingResults.totalSkipped += upsertResult.skipped;
+        processingResults.totalCreated += createResult.created;
+        processingResults.totalUpdated += createResult.updated;
+        processingResults.totalSkipped += createResult.skipped;
 
         console.log(
-          `✅ Processed ${casinoResearch.casino_name}: ${upsertResult.created} created, ${upsertResult.updated} updated, ${upsertResult.skipped} skipped`
+          `✅ Processed ${casinoResearch.casino_name}: ${createResult.created} created, ${createResult.updated} updated, ${createResult.skipped} skipped`
         );
       } catch (error: any) {
         const errorMsg = `Failed to process offers for ${casinoResearch.casino_name}: ${error.message}`;

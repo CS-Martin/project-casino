@@ -22,4 +22,6 @@ export const offers = defineTable({
   .index('by_casino', ['casino_id'])
   .index('by_source', ['source'])
   .index('by_casino_source', ['casino_id', 'source'])
-  .index('by_deprecated', ['is_deprecated']);
+  .index('by_deprecated', ['is_deprecated'])
+  .index('by_updated_at', ['updated_at'])
+  .index('by_deprecated_updated', ['is_deprecated', 'updated_at']);

@@ -1,24 +1,22 @@
 "use client";
 
-import { Building2, CheckCircle, XCircle, AlertTriangle, SearchCheck } from "lucide-react";
-import KPICard from "@/features/dashboard/components/kpi-card";
-import StateChart from "@/features/dashboard/components/state-chart";
-import { PieDonutActive } from "@/features/dashboard/components/pie-donut-active";
-import { transformCasinoData } from "@/features/dashboard/lib/market-coverage-utils";
-import { Button } from "@/components/ui/button";
-import { KPICardsSkeleton, MarketCoverageSkeleton, StateChartSkeleton, SummarySkeleton } from "@/features/dashboard/components/skeletons";
-import { useDashboardStats } from "@/features/dashboard/hooks/use-dashboard-stats";
-import { SearchCasinosBtn } from "@/features/dashboard/components/search-casinos-btn";
-import { CasinoListTable } from "@/features/dashboard/components/casino-list-table";
+import { Building2, CheckCircle, XCircle, AlertTriangle } from "lucide-react";
+import KPICard from "@/features/casino-dashboard/components/kpi-card";
+import StateChart from "@/features/casino-dashboard/components/state-chart";
+import { PieDonutActive } from "@/features/casino-dashboard/components/pie-donut-active";
+import { KPICardsSkeleton } from "@/features/casino-dashboard/components/skeletons";
+import { useDashboardStats } from "@/features/casino-dashboard/hooks/use-dashboard-stats";
+import { SearchCasinosBtn } from "@/features/casino-dashboard/components/search-casinos-btn";
+import { CasinoListTable } from "@/features/casino-dashboard/components/casino-list-table";
 
 export default function DashboardPage() {
-    const { casinoStats, casinoStateStats, isLoading } = useDashboardStats();
+    const { casinoStats, isLoading } = useDashboardStats();
 
     return (
         <div className="space-y-6">
             <div className="flex justify-between items-center">
                 <div>
-                    <h1 className="text-lg font-bold tracking-tight">Dashboard</h1>
+                    <h1 className="text-lg font-bold tracking-tight">Casino Dashboard</h1>
                     <p className="text-muted-foreground">
                         Comprehensive overview of casino tracking metrics and market analysis
                     </p>

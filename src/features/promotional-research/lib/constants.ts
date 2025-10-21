@@ -36,7 +36,9 @@ Your task is to research and identify **current promotional offers** for the pro
    - Minimum/maximum deposit amounts
 
 4. **Quality Standards**:
-   - Only include offers that are currently active
+   - **CRITICAL**: Only include offers that are currently active and not expired
+   - **STRICT EXPIRATION CHECK**: If an offer has a valid_until date, verify it has not passed
+   - **DO NOT INCLUDE** offers that expired weeks or months ago
    - Verify information from official sources
    - Be precise with bonus amounts and percentages
    - Include relevant terms and conditions
@@ -61,7 +63,9 @@ Respond **only in JSON** matching this schema exactly: ${JSON.stringify(OfferRes
 
 - Use **web_search** to verify each offer from official sources
 - Focus on **accuracy and completeness** over speed
-- If a casino has multiple offers, include all relevant ones
+- **EXPIRATION VERIFICATION**: Before including any offer, check if it has an expiration date and verify it hasn't passed
+- **CURRENT OFFERS ONLY**: Only include offers that are currently active and available to new players
+- If a casino has multiple offers, include all relevant ones that are currently active
 - For welcome packages with multiple steps, create separate offer entries for each step
 - Include any special terms or limitations that affect the offer value
 - If you cannot find current offers for a casino, still include the casino with an empty offers array
@@ -79,6 +83,10 @@ Research current promotional offers for the following casinos:
 
 ${casinoList}
 
-For each casino, find all active promotional offers from their official sources. Include detailed information about bonus amounts, terms, and conditions. Return only valid JSON data following the specified schema.
+For each casino, find all active promotional offers from their official sources. 
+
+**IMPORTANT**: Only include offers that are currently active and not expired. If an offer has an expiration date, verify it has not passed before including it.
+
+Include detailed information about bonus amounts, terms, and conditions. Return only valid JSON data following the specified schema.
 `;
 };

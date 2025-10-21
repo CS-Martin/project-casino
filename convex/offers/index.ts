@@ -1,18 +1,13 @@
 import { action, internalAction, mutation, query } from '../_generated/server';
 import { v } from 'convex/values';
-import { upsertOffersArgs, upsertOffersHandler } from './mutations/upsertOffers';
 import { createOffersArgs, createOffersHandler } from './mutations/createOffers';
 import { processOfferResearchBatchArgs, processOfferResearchBatchHandler } from './mutations/processOfferResearchBatch';
 import { triggerOfferResearchArgs, triggerOfferResearchHandler } from './mutations/triggerOfferResearch';
 import { getOfferResearchStatusArgs, getOfferResearchStatusHandler } from './queries/getOfferResearchStatus';
 import { getOfferResearchLogsArgs, getOfferResearchLogsHandler } from './queries/getOfferResearchLogs';
+import { getOfferKpisArgs, getOfferKpisHandler } from './queries/getOfferKpis';
 
 // Mutations
-export const upsertOffers = mutation({
-  args: upsertOffersArgs,
-  handler: upsertOffersHandler,
-});
-
 export const createOffers = mutation({
   args: createOffersArgs,
   handler: createOffersHandler,
@@ -37,4 +32,9 @@ export const getOfferResearchStatus = query({
 export const getOfferResearchLogs = query({
   args: getOfferResearchLogsArgs,
   handler: getOfferResearchLogsHandler,
+});
+
+export const getOfferKpis = query({
+  args: getOfferKpisArgs,
+  handler: getOfferKpisHandler,
 });

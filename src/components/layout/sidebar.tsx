@@ -14,30 +14,21 @@ import {
 import { NavMain } from "./nav-main"
 import Image from "next/image"
 import { useTheme } from "next-themes"
-import { FolderKanban, LayoutDashboard, BarChart3 } from "lucide-react"
+import { LayoutDashboard, BarChart3 } from "lucide-react"
 import { Label } from "../ui/label"
 
 const data = {
-    user: {
-        name: "shadcn",
-        email: "m@example.com",
-        avatar: "/avatars/shadcn.jpg",
-    },
+
     navMain: [
         {
-            title: "Dashboard",
-            url: "/dashboard",
+            title: "Casino Dashboard",
+            url: "/dashboard/casino",
             icon: <LayoutDashboard className="h-5 w-5" />,
         },
         {
-            title: "Analytics",
-            url: "/dashboard/analytics",
+            title: "Offer Dashboard",
+            url: "/dashboard/offer",
             icon: <BarChart3 className="h-5 w-5" />,
-        },
-        {
-            title: "Transactions",
-            url: "/transaction",
-            icon: <FolderKanban className="h-5 w-5" />,
         },
     ],
 }

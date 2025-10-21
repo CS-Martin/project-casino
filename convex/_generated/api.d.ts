@@ -12,6 +12,7 @@ import type * as casinos_index from "../casinos/index.js";
 import type * as casinos_mutations_createCasino from "../casinos/mutations/createCasino.js";
 import type * as casinos_mutations_createMultipleCasinos from "../casinos/mutations/createMultipleCasinos.js";
 import type * as casinos_mutations_deleteCasino from "../casinos/mutations/deleteCasino.js";
+import type * as casinos_mutations_toggleTrackCasino from "../casinos/mutations/toggleTrackCasino.js";
 import type * as casinos_mutations_updateCasino from "../casinos/mutations/updateCasino.js";
 import type * as casinos_queries_getAllCasino from "../casinos/queries/getAllCasino.js";
 import type * as casinos_queries_getCasinoById from "../casinos/queries/getCasinoById.js";
@@ -48,6 +49,7 @@ declare const fullApi: ApiFromModules<{
   "casinos/mutations/createCasino": typeof casinos_mutations_createCasino;
   "casinos/mutations/createMultipleCasinos": typeof casinos_mutations_createMultipleCasinos;
   "casinos/mutations/deleteCasino": typeof casinos_mutations_deleteCasino;
+  "casinos/mutations/toggleTrackCasino": typeof casinos_mutations_toggleTrackCasino;
   "casinos/mutations/updateCasino": typeof casinos_mutations_updateCasino;
   "casinos/queries/getAllCasino": typeof casinos_queries_getAllCasino;
   "casinos/queries/getCasinoById": typeof casinos_queries_getCasinoById;

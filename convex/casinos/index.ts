@@ -2,6 +2,7 @@ import { mutation, query } from '../_generated/server';
 import { createCasinoArgs, createCasinoHandler } from './mutations/createCasino';
 import { createMultipleCasinosArgs, createMultipleCasinosHandler } from './mutations/createMultipleCasinos';
 import { deleteCasinoArgs, deleteCasinoHandler } from './mutations/deleteCasino';
+import { toggleTrackCasinoArgs, toggleTrackCasinoHandler } from './mutations/toggleTrackCasino';
 import { updateCasinoArgs, updateCasinoHandler } from './mutations/updateCasino';
 import { getAllCasinosHandler } from './queries/getAllCasino';
 import { getCasinoByIdArgs, getCasinoByIdHandler } from './queries/getCasinoById';
@@ -63,4 +64,9 @@ export const deleteCasino = mutation({
 export const updateCasino = mutation({
   args: updateCasinoArgs,
   handler: updateCasinoHandler,
+});
+
+export const toggleTrackCasino = mutation({
+  args: toggleTrackCasinoArgs,
+  handler: toggleTrackCasinoHandler,
 });

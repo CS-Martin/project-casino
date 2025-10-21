@@ -6,13 +6,23 @@ import { TableContainer } from "@/components/custom/table/table-container";
 import { TableSkeleton } from "@/components/custom/table/table-skeleton";
 import { CustomPagination } from "@/components/custom/table/custom-pagination";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
+import { PageSizeSelector } from "@/components/ui/page-size-selector";
 import { useStates } from "../hooks/use-states";
 import { useCasinoList } from "../hooks/use-casino-list";
 import { usePaginatedData } from "@/hooks/use-paginated-data";
+import { useMutation } from "convex/react";
+import { api } from "@convex/_generated/api";
+import { Id } from "@convex/_generated/dataModel";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
 export function CasinoListTable() {
-    const pageSize = 10;
+    const [pageSize, setPageSize] = useState(10);
     const { states } = useStates();
+    const toggleTrackCasino = useMutation(api.casinos.index.toggleTrackCasino);
 
     // --- Filters stay stable across data fetches ---
     const [filters, setFilters] = useState({
@@ -20,6 +30,21 @@ export function CasinoListTable() {
         stateId: "all",
         licenseStatus: "all",
         trackedStatus: "all"
+    });
+
+    // --- Track/Untrack state ---
+    const [confirmationDialog, setConfirmationDialog] = useState<{
+        open: boolean;
+        casinoId: Id<'casinos'> | null;
+        casinoName: string;
+        isTracked: boolean;
+        isLoading: boolean;
+    }>({
+        open: false,
+        casinoId: null,
+        casinoName: '',
+        isTracked: false,
+        isLoading: false,
     });
 
 
@@ -43,6 +68,7 @@ export function CasinoListTable() {
     }), [debouncedSearch, filters.stateId, filters.licenseStatus, filters.trackedStatus]);
 
     // --- Data fetching ---
+    // Use pageSize as part of a key to force re-fetch when page size changes
     const { casinos, isLoadingInitial, hasMore, loadMore } = useCasinoList(pageSize, apiFilters);
     const {
         currentPage,
@@ -80,6 +106,52 @@ export function CasinoListTable() {
     const clearFilter = (key: string) => {
         setFilters((prev) => ({ ...prev, [key]: key === "searchTerm" ? "" : "all" }));
         resetPagination(); // Reset to page 1 when clearing individual filters
+    };
+
+    // --- Page size handler ---
+    const handlePageSizeChange = (newPageSize: number) => {
+        setPageSize(newPageSize);
+        resetPagination(); // Reset to page 1 when changing page size
+    };
+
+    // --- Track/Untrack handlers ---
+    const handleTrackToggle = (casinoId: Id<'casinos'>, casinoName: string, isTracked: boolean) => {
+        setConfirmationDialog({
+            open: true,
+            casinoId,
+            casinoName,
+            isTracked,
+            isLoading: false,
+        });
+    };
+
+    const handleConfirmTrackToggle = async () => {
+        if (!confirmationDialog.casinoId) return;
+
+        setConfirmationDialog(prev => ({ ...prev, isLoading: true }));
+
+        try {
+            await toggleTrackCasino({
+                casinoId: confirmationDialog.casinoId,
+                isTracked: !confirmationDialog.isTracked,
+            });
+
+            toast.success(
+                `${confirmationDialog.casinoName} is now ${!confirmationDialog.isTracked ? 'tracked' : 'untracked'}`
+            );
+
+            setConfirmationDialog({
+                open: false,
+                casinoId: null,
+                casinoName: '',
+                isTracked: false,
+                isLoading: false,
+            });
+        } catch (error) {
+            console.error('Error toggling track status:', error);
+            toast.error('Failed to update track status. Please try again.');
+            setConfirmationDialog(prev => ({ ...prev, isLoading: false }));
+        }
     };
 
     // --- Always render filters, even while loading ---
@@ -131,14 +203,15 @@ export function CasinoListTable() {
                                 <TableHead>Source URL</TableHead>
                                 <TableHead>License</TableHead>
                                 <TableHead>State</TableHead>
-                                <TableHead className="text-right">Tracked</TableHead>
+                                <TableHead className="text-center">Tracked</TableHead>
+                                <TableHead className="text-right">Actions</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {currentPageData.map((c: any) => (
                                 <TableRow
                                     key={c._id}
-                                    className={!c.is_tracked ? "bg-red-50 dark:bg-red-500/15" : undefined}
+                                    className={!c.is_tracked ? "bg-red-50 dark:bg-red-500/15 hover:bg-red-100 dark:hover:bg-red-500/20" : undefined}
                                 >
                                     <TableCell className="flex flex-col">
                                         <div className="font-medium">{c.name}</div>
@@ -180,18 +253,46 @@ export function CasinoListTable() {
                                     <TableCell>
                                         {c.state?.abbreviation || <span className="text-muted-foreground">—</span>}
                                     </TableCell>
-                                    <TableCell className="text-right">
+                                    <TableCell className="text-center">
                                         {c.is_tracked ? (
                                             <span className="text-green-600 font-medium">Yes</span>
                                         ) : (
                                             <span className="text-red-600 font-semibold">No</span>
                                         )}
                                     </TableCell>
+                                    <TableCell className="text-right">
+                                        <Button
+                                            variant={c.is_tracked ? "destructive" : "default"}
+                                            size="sm"
+                                            onClick={() => handleTrackToggle(c._id, c.name, c.is_tracked)}
+                                            className={cn("h-8 px-3", c.is_tracked ? "bg-red-400 text-white hover:bg-red-500" : "bg-purple-500 text-white hover:bg-purple-600")}
+                                        >
+                                            {c.is_tracked ? (
+                                                <>
+                                                    <EyeOff className="h-3 w-3 mr-1" />
+                                                    Untrack
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <Eye className="h-3 w-3 mr-1" />
+                                                    Track
+                                                </>
+                                            )}
+                                        </Button>
+                                    </TableCell>
                                 </TableRow>
                             ))}
                         </TableBody>
                     </Table>
                 )}
+            </div>
+
+            {/* Page Size Selector */}
+            <div className="flex items-center justify-between py-4">
+                <PageSizeSelector
+                    pageSize={pageSize}
+                    onPageSizeChange={handlePageSizeChange}
+                />
             </div>
 
             <CustomPagination
@@ -204,6 +305,22 @@ export function CasinoListTable() {
                 pageSize={pageSize}
                 totalItems={totalLoaded}
                 isLoading={isLoadingMore}
+            />
+
+            <ConfirmationDialog
+                open={confirmationDialog.open}
+                onOpenChange={(open) => setConfirmationDialog(prev => ({ ...prev, open }))}
+                title={confirmationDialog.isTracked ? "Untrack Casino" : "Track Casino"}
+                description={
+                    confirmationDialog.isTracked
+                        ? `Are you sure you want to stop tracking "${confirmationDialog.casinoName}"? This will remove it from your tracked casinos list.`
+                        : `Are you sure you want to start tracking "${confirmationDialog.casinoName}"? This will add it to your tracked casinos list.`
+                }
+                confirmText={confirmationDialog.isTracked ? "Untrack" : "Track"}
+                cancelText="Cancel"
+                onConfirm={handleConfirmTrackToggle}
+                isLoading={confirmationDialog.isLoading}
+                variant={confirmationDialog.isTracked ? "destructive" : "default"}
             />
         </TableContainer>
     );

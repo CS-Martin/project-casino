@@ -8,6 +8,7 @@ export const getCasinosSearchableArgs = {
   stateId: v.optional(v.id('states')),
   licenseStatus: v.optional(v.string()),
   isTracked: v.optional(v.boolean()),
+  _refresh: v.optional(v.number()),
   paginationOpts: paginationOptsValidator,
 };
 
@@ -18,6 +19,7 @@ export const getCasinosSearchableHandler = async (
     stateId?: string;
     licenseStatus?: string;
     isTracked?: boolean;
+    _refresh?: number;
     paginationOpts: { numItems: number; cursor: string | null };
   }
 ) => {

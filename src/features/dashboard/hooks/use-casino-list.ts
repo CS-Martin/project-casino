@@ -1,7 +1,7 @@
 import { api } from '@convex/_generated/api';
 import { Id } from '@convex/_generated/dataModel';
 import { usePaginatedQuery } from 'convex/react';
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 
 interface CasinoListFilters {
   searchTerm?: string;
@@ -11,6 +11,13 @@ interface CasinoListFilters {
 }
 
 export const useCasinoList = (numItems: number = 10, filters?: CasinoListFilters) => {
+  // Force re-fetch when page size changes by using a unique key
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  useEffect(() => {
+    setRefreshKey((prev) => prev + 1);
+  }, [numItems]);
+
   const { results, status, loadMore } = usePaginatedQuery(
     api.casinos.index.getCasinosSearchable as any,
     {
@@ -18,6 +25,8 @@ export const useCasinoList = (numItems: number = 10, filters?: CasinoListFilters
       stateId: filters?.stateId as Id<'states'>,
       licenseStatus: filters?.licenseStatus,
       isTracked: filters?.isTracked,
+      // Use refreshKey to force new query instance
+      _refresh: refreshKey,
     },
     { initialNumItems: numItems }
   );

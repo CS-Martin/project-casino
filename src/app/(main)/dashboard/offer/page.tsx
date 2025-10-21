@@ -1,3 +1,5 @@
+"use client";
+
 import OfferKpis from "@/features/offer-dashboard/components/offer-kpis";
 import OfferTimelineChart from "@/features/offer-dashboard/components/offer-timeline-chart";
 import OfferTypeBreakdownChart from "@/features/offer-dashboard/components/offer-type-breakdown-chart";

@@ -2,13 +2,6 @@
 
 import * as React from 'react';
 import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from '@/components/ui/card';
-import {
     Table,
     TableBody,
     TableCell,
@@ -26,7 +19,12 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
+import { TableContainer } from '@/components/custom/table/table-container';
+import { TableSkeleton } from '@/components/custom/table/table-skeleton';
+import { CustomPagination } from '@/components/custom/table/custom-pagination';
+import { PageSizeSelector } from '@/components/ui/page-size-selector';
 import { useCasinosWithOfferStats } from '../hooks/use-casinos-with-offer-stats';
+import { usePaginatedData } from '@/hooks/use-paginated-data';
 import { CasinoWithOfferStats } from '@convex/casinos/queries/getCasinosWithOfferStats';
 import { Eye, RefreshCw, Search, ArrowUpDown } from 'lucide-react';
 import CasinoDetailModal from './casino-detail-modal';
@@ -36,13 +34,18 @@ type SortField = 'name' | 'state' | 'activeOffers' | 'lastCheck' | 'avgBonus';
 type SortDirection = 'asc' | 'desc';
 
 export default function CasinoResearchStatusTable() {
+    const [pageSize, setPageSize] = React.useState(10);
     const [statusFilter, setStatusFilter] = React.useState<'all' | 'current' | 'stale' | 'missing'>('all');
     const [sortField, setSortField] = React.useState<SortField>('lastCheck');
     const [sortDirection, setSortDirection] = React.useState<SortDirection>('desc');
     const [selectedCasinoId, setSelectedCasinoId] = React.useState<Id<'casinos'> | null>(null);
     const [modalOpen, setModalOpen] = React.useState(false);
 
-    const { casinos, isLoading } = useCasinosWithOfferStats({ status: statusFilter });
+    // Fetch data from server
+    const { casinos, isLoading: isLoadingInitial, loadMore, status: paginationStatus } = useCasinosWithOfferStats({
+        status: statusFilter,
+        pageSize
+    });
 
     const handleCasinoClick = (casinoId: string) => {
         setSelectedCasinoId(casinoId as Id<'casinos'>);
@@ -55,10 +58,8 @@ export default function CasinoResearchStatusTable() {
         setTimeout(() => setSelectedCasinoId(null), 200);
     };
 
-    // Sort casinos
+    // Sort casinos (client-side sorting)
     const sortedCasinos = React.useMemo(() => {
-        if (!casinos) return [];
-
         const sorted = [...casinos].sort((a, b) => {
             let comparison = 0;
 
@@ -89,6 +90,25 @@ export default function CasinoResearchStatusTable() {
         return sorted;
     }, [casinos, sortField, sortDirection]);
 
+    // Client-side pagination using the same hook as casino-list-table
+    const hasMore = paginationStatus === 'CanLoadMore';
+    const {
+        currentPage,
+        totalPages,
+        currentPageData,
+        totalLoaded,
+        isLoadingMore,
+        handlePageChange,
+        handleNextPage,
+        handlePreviousPage,
+        resetPagination
+    } = usePaginatedData({
+        data: sortedCasinos,
+        pageSize,
+        hasMore,
+        onLoadMore: loadMore
+    });
+
     const handleSort = (field: SortField) => {
         if (sortField === field) {
             setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
@@ -96,6 +116,17 @@ export default function CasinoResearchStatusTable() {
             setSortField(field);
             setSortDirection('desc');
         }
+        resetPagination(); // Reset to page 1 when sorting
+    };
+
+    const handlePageSizeChange = (newPageSize: number) => {
+        setPageSize(newPageSize);
+        resetPagination(); // Reset to page 1 when changing page size
+    };
+
+    const handleStatusFilterChange = (value: any) => {
+        setStatusFilter(value);
+        resetPagination(); // Reset to page 1 when filtering
     };
 
     const getStatusBadge = (status: CasinoWithOfferStats['status']) => {
@@ -123,47 +154,44 @@ export default function CasinoResearchStatusTable() {
         return `${days}d ago`;
     };
 
-    if (isLoading) {
-        return (
-            <Card>
-                <CardHeader>
-                    <CardTitle>Casino Research Status</CardTitle>
-                    <CardDescription>Track casino research coverage and data freshness</CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <Skeleton className="h-[400px] w-full" />
-                </CardContent>
-            </Card>
-        );
-    }
-
     return (
-        <Card>
-            <CardHeader>
-                <div className="flex items-center justify-between">
-                    <div>
-                        <CardTitle>Casino Research Status</CardTitle>
-                        <CardDescription>
-                            Track casino research coverage and data freshness
-                        </CardDescription>
-                    </div>
+        <TableContainer
+            title="Casino Research Status"
+            description={
+                isLoadingMore ? (
                     <div className="flex items-center gap-2">
-                        <Select value={statusFilter} onValueChange={(value: any) => setStatusFilter(value)}>
-                            <SelectTrigger className="w-[140px]">
-                                <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="all">All Status</SelectItem>
-                                <SelectItem value="current">Current</SelectItem>
-                                <SelectItem value="stale">Stale</SelectItem>
-                                <SelectItem value="missing">Missing</SelectItem>
-                            </SelectContent>
-                        </Select>
+                        <span>Loading more casinos...</span>
+                        <Skeleton className="h-4 w-4 rounded-full animate-pulse" />
                     </div>
-                </div>
-            </CardHeader>
-            <CardContent>
-                <div className="rounded-md border">
+                ) : (
+                    `Showing ${currentPageData.length} of ${totalLoaded} casinos${hasMore ? " (more available)" : ""}`
+                )
+            }
+        >
+            {/* Status Filter */}
+            <div className="flex items-center justify-end mb-4">
+                <Select value={statusFilter} onValueChange={handleStatusFilterChange}>
+                    <SelectTrigger className="w-[140px]">
+                        <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="all">All Status</SelectItem>
+                        <SelectItem value="current">Current</SelectItem>
+                        <SelectItem value="stale">Stale</SelectItem>
+                        <SelectItem value="missing">Missing</SelectItem>
+                    </SelectContent>
+                </Select>
+            </div>
+
+            {/* Table area */}
+            <div className="rounded-md border">
+                {isLoadingInitial ? (
+                    <TableSkeleton
+                        rows={pageSize}
+                        columns={7}
+                        columnWidths={["w-32", "w-16", "w-16", "w-20", "w-24", "w-20", "w-16"]}
+                    />
+                ) : (
                     <Table>
                         <TableHeader>
                             <TableRow>
@@ -227,14 +255,14 @@ export default function CasinoResearchStatusTable() {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {sortedCasinos.length === 0 ? (
+                            {currentPageData.length === 0 ? (
                                 <TableRow>
                                     <TableCell colSpan={7} className="text-center text-muted-foreground">
                                         No casinos found
                                     </TableCell>
                                 </TableRow>
                             ) : (
-                                sortedCasinos.map((casino) => (
+                                currentPageData.map((casino) => (
                                     <TableRow
                                         key={casino._id}
                                         className="cursor-pointer hover:bg-muted/50"
@@ -306,28 +334,48 @@ export default function CasinoResearchStatusTable() {
                             )}
                         </TableBody>
                     </Table>
-                </div>
+                )}
+            </div>
+
+            {/* Page Size Selector and Summary Stats */}
+            <div className="flex items-center justify-between py-4">
+                <PageSizeSelector
+                    pageSize={pageSize}
+                    onPageSizeChange={handlePageSizeChange}
+                />
 
                 {/* Summary Stats */}
-                <div className="mt-4 flex items-center justify-between text-sm text-muted-foreground">
-                    <div>
-                        Showing {sortedCasinos.length} casino{sortedCasinos.length !== 1 ? 's' : ''}
-                    </div>
-                    {casinos && (
-                        <div className="flex gap-4">
-                            <span>
-                                Current: {casinos.filter((c) => c.status === 'current').length}
-                            </span>
-                            <span>
-                                Stale: {casinos.filter((c) => c.status === 'stale').length}
-                            </span>
-                            <span>
-                                Missing: {casinos.filter((c) => c.status === 'missing').length}
-                            </span>
-                        </div>
-                    )}
+                <div className="flex gap-3 md:gap-4 text-xs md:text-sm text-muted-foreground">
+                    <span className="flex items-center gap-1">
+                        <span className="hidden sm:inline">Current:</span>
+                        <span className="sm:hidden">✓</span>
+                        <span className="font-medium">{casinos.filter((c) => c.status === 'current').length}</span>
+                    </span>
+                    <span className="flex items-center gap-1">
+                        <span className="hidden sm:inline">Stale:</span>
+                        <span className="sm:hidden">⚠</span>
+                        <span className="font-medium">{casinos.filter((c) => c.status === 'stale').length}</span>
+                    </span>
+                    <span className="flex items-center gap-1">
+                        <span className="hidden sm:inline">Missing:</span>
+                        <span className="sm:hidden">✕</span>
+                        <span className="font-medium">{casinos.filter((c) => c.status === 'missing').length}</span>
+                    </span>
                 </div>
-            </CardContent>
+            </div>
+
+            {/* Pagination */}
+            <CustomPagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+                onPrevious={handlePreviousPage}
+                onNext={handleNextPage}
+                hasMore={hasMore}
+                pageSize={pageSize}
+                totalItems={totalLoaded}
+                isLoading={isLoadingMore}
+            />
 
             {/* Casino Detail Modal */}
             <CasinoDetailModal
@@ -335,7 +383,7 @@ export default function CasinoResearchStatusTable() {
                 open={modalOpen}
                 onOpenChange={handleModalClose}
             />
-        </Card>
+        </TableContainer>
     );
 }
 

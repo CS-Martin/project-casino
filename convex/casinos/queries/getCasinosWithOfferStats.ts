@@ -1,9 +1,11 @@
 import { query, QueryCtx } from '../../_generated/server';
 import { v } from 'convex/values';
+import { paginationOptsValidator } from 'convex/server';
 
 export const getCasinosWithOfferStatsArgs = {
   stateId: v.optional(v.id('states')),
   status: v.optional(v.union(v.literal('current'), v.literal('stale'), v.literal('missing'), v.literal('all'))),
+  paginationOpts: paginationOptsValidator,
 } as const;
 
 export type CasinoResearchStatus = 'current' | 'stale' | 'missing';
@@ -28,21 +30,27 @@ export interface CasinoWithOfferStats {
 
 export const getCasinosWithOfferStatsHandler = async (
   ctx: QueryCtx,
-  args: { stateId?: string; status?: 'current' | 'stale' | 'missing' | 'all' }
-): Promise<CasinoWithOfferStats[]> => {
+  args: {
+    stateId?: string;
+    status?: 'current' | 'stale' | 'missing' | 'all';
+    paginationOpts: { numItems: number; cursor: string | null };
+  }
+) => {
   const now = Date.now();
   const oneDayMs = 24 * 60 * 60 * 1000;
   const sevenDaysMs = 7 * oneDayMs;
 
-  // Get casinos, optionally filtered by state
-  const casinos = args.stateId
-    ? await ctx.db
-        .query('casinos')
-        .withIndex('by_state', (q) => q.eq('state_id', args.stateId as any))
-        .collect()
-    : await ctx.db.query('casinos').collect();
+  // Get paginated casinos, optionally filtered by state
+  // We'll fetch more than needed to account for filtering, then paginate the results
+  const casinoQuery = args.stateId
+    ? ctx.db.query('casinos').withIndex('by_state', (q) => q.eq('state_id', args.stateId as any))
+    : ctx.db.query('casinos');
 
-  // Get all offers
+  // Fetch a larger batch to account for status filtering
+  const batchSize = args.paginationOpts.numItems * 3; // 3x to account for filtering
+  const casinosPaginated = await casinoQuery.paginate(args.paginationOpts);
+
+  // Get all offers for these casinos
   const allOffers = await ctx.db.query('offers').collect();
 
   // Get all states for lookup
@@ -52,7 +60,7 @@ export const getCasinosWithOfferStatsHandler = async (
   // Process each casino
   const casinosWithStats: CasinoWithOfferStats[] = [];
 
-  for (const casino of casinos) {
+  for (const casino of casinosPaginated.page) {
     // Get offers for this casino
     const casinoOffers = allOffers.filter((offer) => offer.casino_id === casino._id);
 
@@ -130,5 +138,17 @@ export const getCasinosWithOfferStatsHandler = async (
     return b.lastOfferCheck - a.lastOfferCheck;
   });
 
-  return casinosWithStats;
+  // Apply pagination to the filtered and sorted results
+  const startIndex = 0;
+  const endIndex = args.paginationOpts.numItems;
+  const paginatedResults = casinosWithStats.slice(startIndex, endIndex);
+
+  // Determine if there are more results
+  const isDone = casinosWithStats.length <= args.paginationOpts.numItems && casinosPaginated.isDone;
+
+  return {
+    page: paginatedResults,
+    isDone,
+    continueCursor: casinosPaginated.continueCursor,
+  };
 };

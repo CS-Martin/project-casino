@@ -87,6 +87,8 @@ export const upsertOffers = internalMutation({
           expected_deposit: offer.Expected_Deposit,
           expected_bonus: offer.Expected_Bonus,
           casino_id: casino?._id as Id<'casinos'>,
+          updated_at: Date.now(),
+          source: 'xano_api',
         });
       }
     }

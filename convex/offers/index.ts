@@ -1,19 +1,34 @@
-// Index.ts should contain the following code:
-/**
- * export const getCategoryById = query({
-  args: getCategoryByIdHandlerArgs,
-  handler: getCategoryByIdHandler,
-});
+import { action, internalAction, mutation, query } from '../_generated/server';
+import { v } from 'convex/values';
+import { upsertOffersArgs, upsertOffersHandler } from './mutations/upsertOffers';
+import { processOfferResearchBatchArgs, processOfferResearchBatchHandler } from './mutations/processOfferResearchBatch';
+import { triggerOfferResearchArgs, triggerOfferResearchHandler } from './mutations/triggerOfferResearch';
+import { getOfferResearchStatusArgs, getOfferResearchStatusHandler } from './queries/getOfferResearchStatus';
+import { getOfferResearchLogsArgs, getOfferResearchLogsHandler } from './queries/getOfferResearchLogs';
 
 // Mutations
-export const handleCreateCategory = mutation({
-  args: createCategoryHandlerArgs,
-  handler: createCategoryHandler,
+export const upsertOffers = mutation({
+  args: upsertOffersArgs,
+  handler: upsertOffersHandler,
 });
 
-export const handleDeleteCategory = mutation({
-  args: deleteCategoryhandlerArgs,
-  handler: deleteCategoryHandler,
+export const processOfferResearchBatch = mutation({
+  args: processOfferResearchBatchArgs,
+  handler: processOfferResearchBatchHandler,
 });
 
- */
+export const triggerOfferResearch = action({
+  args: triggerOfferResearchArgs,
+  handler: triggerOfferResearchHandler,
+});
+
+// Queries
+export const getOfferResearchStatus = query({
+  args: getOfferResearchStatusArgs,
+  handler: getOfferResearchStatusHandler,
+});
+
+export const getOfferResearchLogs = query({
+  args: getOfferResearchLogsArgs,
+  handler: getOfferResearchLogsHandler,
+});

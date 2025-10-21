@@ -1,4 +1,5 @@
 import { mutation, query } from '../_generated/server';
+import { v } from 'convex/values';
 import { createCasinoArgs, createCasinoHandler } from './mutations/createCasino';
 import { createMultipleCasinosArgs, createMultipleCasinosHandler } from './mutations/createMultipleCasinos';
 import { deleteCasinoArgs, deleteCasinoHandler } from './mutations/deleteCasino';
@@ -11,6 +12,11 @@ import { getCasinoStatsHandler } from './queries/getCasinoStats';
 import { getCasinosByStateStatsHandler } from './queries/getCasinosByStateStats';
 import { getCasinosPaginatedArgs, getCasinosPaginatedHandler } from './queries/getCasinosPaginated';
 import { getCasinosSearchableArgs, getCasinosSearchableHandler } from './queries/getCasinosSearchable';
+import {
+  getCasinosForOfferResearchArgs,
+  getCasinosForOfferResearchHandler,
+} from './queries/getCasinosForOfferResearch';
+import { updateOfferCheckTimestampArgs, updateOfferCheckTimestampHandler } from './mutations/updateOfferCheckTimestamp';
 
 // Queries
 export const getAllCasinos = query({
@@ -45,6 +51,11 @@ export const getCasinosSearchable = query({
   handler: getCasinosSearchableHandler,
 });
 
+export const getCasinosForOfferResearch = query({
+  args: getCasinosForOfferResearchArgs,
+  handler: getCasinosForOfferResearchHandler,
+});
+
 // Mutations
 export const createCasino = mutation({
   args: createCasinoArgs,
@@ -69,4 +80,9 @@ export const updateCasino = mutation({
 export const toggleTrackCasino = mutation({
   args: toggleTrackCasinoArgs,
   handler: toggleTrackCasinoHandler,
+});
+
+export const updateOfferCheckTimestamp = mutation({
+  args: updateOfferCheckTimestampArgs,
+  handler: updateOfferCheckTimestampHandler,
 });

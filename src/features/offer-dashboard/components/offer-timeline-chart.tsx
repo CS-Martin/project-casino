@@ -29,19 +29,80 @@ import { useOfferTimeline } from '../hooks/use-offer-timeline';
 import { Skeleton } from '@/components/ui/skeleton';
 
 const chartConfig = {
-    newOffers: {
-        label: 'New Offers',
-        color: 'hsl(var(--chart-1))',
+    offersCreated: {
+        label: 'Created',
+        color: '#10b981', // Green
+    },
+    offersSkipped: {
+        label: 'Skipped',
+        color: '#f59e0b', // Orange
     },
     expiredOffers: {
-        label: 'Expired Offers',
-        color: 'hsl(var(--chart-2))',
+        label: 'Expired',
+        color: '#ef4444', // Red
+    },
+    casinosResearched: {
+        label: 'Casinos Researched',
+        color: '#8b5cf6', // Purple
+    },
+    researchRuns: {
+        label: 'Research Runs',
+        color: '#06b6d4', // Cyan
     },
 } satisfies ChartConfig;
 
+type MetricKey = 'offersCreated' | 'offersSkipped' | 'expiredOffers' | 'casinosResearched' | 'researchRuns';
+
 export default function OfferTimelineChart() {
     const [timeRange, setTimeRange] = React.useState<'7d' | '30d' | '90d'>('7d');
+    const [selectedMetrics, setSelectedMetrics] = React.useState<MetricKey[]>([
+        'offersCreated',
+        'offersSkipped',
+        'expiredOffers',
+        'casinosResearched',
+        'researchRuns',
+    ]);
     const { timeline, isLoading } = useOfferTimeline(timeRange);
+
+    const toggleMetric = (metric: MetricKey) => {
+        setSelectedMetrics((prev) =>
+            prev.includes(metric) ? prev.filter((m) => m !== metric) : [...prev, metric]
+        );
+    };
+
+    // Calculate summary stats
+    const summaryStats = React.useMemo(() => {
+        if (!timeline) return null;
+
+        const totals = timeline.reduce(
+            (acc, day) => ({
+                offersCreated: acc.offersCreated + day.offersCreated,
+                offersUpdated: acc.offersUpdated + day.offersUpdated,
+                offersSkipped: acc.offersSkipped + day.offersSkipped,
+                expiredOffers: acc.expiredOffers + day.expiredOffers,
+                casinosResearched: acc.casinosResearched + day.casinosResearched,
+                researchRuns: acc.researchRuns + day.researchRuns,
+                successfulRuns: acc.successfulRuns + day.successfulRuns,
+                totalDuration: acc.totalDuration + day.avgDuration,
+            }),
+            {
+                offersCreated: 0,
+                offersUpdated: 0,
+                offersSkipped: 0,
+                expiredOffers: 0,
+                casinosResearched: 0,
+                researchRuns: 0,
+                successfulRuns: 0,
+                totalDuration: 0,
+            }
+        );
+
+        const successRate = totals.researchRuns > 0
+            ? Math.round((totals.successfulRuns / totals.researchRuns) * 100)
+            : 0;
+
+        return { ...totals, successRate };
+    }, [timeline]);
 
     const getTimeRangeLabel = () => {
         switch (timeRange) {
@@ -59,16 +120,33 @@ export default function OfferTimelineChart() {
     if (isLoading) {
         return (
             <Card className="pt-0 flex flex-col h-full">
-                <CardHeader className="flex items-center gap-2 space-y-0 border-b py-5 sm:flex-row">
-                    <div className="grid flex-1 gap-1">
-                        <CardTitle>Offer Update Timeline & Distribution</CardTitle>
-                        <CardDescription>
-                            New offers added and offers expired over time
-                        </CardDescription>
+                <CardHeader className="space-y-0 border-b py-5">
+                    <div className="flex items-start justify-between gap-4 mb-4">
+                        <div className="grid flex-1 gap-1">
+                            <CardTitle>Research Activity & Offer Timeline</CardTitle>
+                            <CardDescription>
+                                Track research runs, offers created/updated, and casino coverage over time
+                            </CardDescription>
+                        </div>
+                        <Skeleton className="h-10 w-[160px]" />
+                    </div>
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 pt-4">
+                        {Array.from({ length: 5 }).map((_, i) => (
+                            <div key={i} className="space-y-1">
+                                <Skeleton className="h-4 w-16" />
+                                <Skeleton className="h-8 w-12" />
+                            </div>
+                        ))}
+                    </div>
+                    <div className="flex flex-wrap gap-2 pt-4">
+                        <Skeleton className="h-4 w-24 mb-1" />
+                        {Array.from({ length: 5 }).map((_, i) => (
+                            <Skeleton key={i} className="h-8 w-28" />
+                        ))}
                     </div>
                 </CardHeader>
                 <CardContent className="flex-1 px-2 pt-4 sm:px-6 sm:pt-6">
-                    <Skeleton className="h-full w-full" />
+                    <Skeleton className="h-[350px] w-full" />
                 </CardContent>
             </Card>
         );
@@ -77,11 +155,11 @@ export default function OfferTimelineChart() {
     if (!timeline || timeline.length === 0) {
         return (
             <Card className="pt-0 flex flex-col h-full">
-                <CardHeader className="flex items-center gap-2 space-y-0 border-b py-5 sm:flex-row">
+                <CardHeader className="space-y-0 border-b py-5">
                     <div className="grid flex-1 gap-1">
-                        <CardTitle>Offer Update Timeline & Distribution</CardTitle>
+                        <CardTitle>Research Activity & Offer Timeline</CardTitle>
                         <CardDescription>
-                            New offers added and offers expired over time
+                            Track research runs, offers created/updated, and casino coverage over time
                         </CardDescription>
                     </div>
                 </CardHeader>
@@ -96,115 +174,157 @@ export default function OfferTimelineChart() {
 
     return (
         <Card className="pt-0 flex flex-col h-full">
-            <CardHeader className="flex items-center gap-2 space-y-0 border-b py-5 sm:flex-row">
-                <div className="grid flex-1 gap-1">
-                    <CardTitle>Offer Update Timeline & Distribution</CardTitle>
-                    <CardDescription>
-                        Showing new offers added and offers expired for {getTimeRangeLabel().toLowerCase()}
-                    </CardDescription>
-                </div>
-                <Select
-                    value={timeRange}
-                    onValueChange={(value) => setTimeRange(value as '7d' | '30d' | '90d')}
-                >
-                    <SelectTrigger
-                        className="w-[160px] rounded-lg sm:ml-auto"
-                        aria-label="Select a time range"
+            <CardHeader className="space-y-0 border-b py-5">
+                <div className="flex items-start justify-between gap-4 mb-4">
+                    <div className="grid flex-1 gap-1">
+                        <CardTitle>Research Activity & Offer Timeline</CardTitle>
+                        <CardDescription>
+                            Track research runs, offers created/updated, and casino coverage over time
+                        </CardDescription>
+                    </div>
+                    <Select
+                        value={timeRange}
+                        onValueChange={(value) => setTimeRange(value as '7d' | '30d' | '90d')}
                     >
-                        <SelectValue placeholder={getTimeRangeLabel()} />
-                    </SelectTrigger>
-                    <SelectContent className="rounded-xl">
-                        <SelectItem value="90d" className="rounded-lg">
-                            Last 3 months
-                        </SelectItem>
-                        <SelectItem value="30d" className="rounded-lg">
-                            Last 30 days
-                        </SelectItem>
-                        <SelectItem value="7d" className="rounded-lg">
-                            Last 7 days
-                        </SelectItem>
-                    </SelectContent>
-                </Select>
+                        <SelectTrigger
+                            className="w-[160px] rounded-lg"
+                            aria-label="Select a time range"
+                        >
+                            <SelectValue placeholder={getTimeRangeLabel()} />
+                        </SelectTrigger>
+                        <SelectContent className="rounded-xl">
+                            <SelectItem value="90d" className="rounded-lg">
+                                Last 3 months
+                            </SelectItem>
+                            <SelectItem value="30d" className="rounded-lg">
+                                Last 30 days
+                            </SelectItem>
+                            <SelectItem value="7d" className="rounded-lg">
+                                Last 7 days
+                            </SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+
+                {/* Summary Stats */}
+                {summaryStats && (
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 pt-4">
+                        <div className="space-y-1">
+                            <p className="text-xs text-muted-foreground">Created</p>
+                            <p className="text-2xl font-bold text-green-600">{summaryStats.offersCreated}</p>
+                        </div>
+                        <div className="space-y-1">
+                            <p className="text-xs text-muted-foreground">Skipped</p>
+                            <p className="text-2xl font-bold text-orange-600">{summaryStats.offersSkipped}</p>
+                        </div>
+                        <div className="space-y-1">
+                            <p className="text-xs text-muted-foreground">Expired</p>
+                            <p className="text-2xl font-bold text-red-600">{summaryStats.expiredOffers}</p>
+                        </div>
+                        <div className="space-y-1">
+                            <p className="text-xs text-muted-foreground">Casinos</p>
+                            <p className="text-2xl font-bold text-purple-600">{summaryStats.casinosResearched}</p>
+                        </div>
+                        <div className="space-y-1">
+                            <p className="text-xs text-muted-foreground">Success Rate</p>
+                            <p className="text-2xl font-bold text-cyan-600">{summaryStats.successRate}%</p>
+                        </div>
+                    </div>
+                )}
+
+                {/* Metric Toggles */}
+                <div className="flex flex-wrap gap-2 pt-4">
+                    <p className="text-xs text-muted-foreground w-full mb-1">Show metrics:</p>
+                    {(Object.keys(chartConfig) as MetricKey[]).map((metric) => (
+                        <button
+                            key={metric}
+                            onClick={() => toggleMetric(metric)}
+                            className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${selectedMetrics.includes(metric)
+                                ? 'bg-primary text-primary-foreground'
+                                : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                                }`}
+                        >
+                            <span
+                                className="inline-block w-2 h-2 rounded-full mr-2"
+                                style={{ backgroundColor: chartConfig[metric].color }}
+                            />
+                            {chartConfig[metric].label}
+                        </button>
+                    ))}
+                </div>
             </CardHeader>
             <CardContent className="flex-1 px-2 pt-4 sm:px-6 sm:pt-6">
-                <ChartContainer
-                    config={chartConfig}
-                    className="aspect-auto h-[350px] w-full"
-                >
-                    <AreaChart data={timeline}>
-                        <defs>
-                            <linearGradient id="fillNewOffers" x1="0" y1="0" x2="0" y2="1">
-                                <stop
-                                    offset="5%"
-                                    stopColor="var(--color-newOffers)"
-                                    stopOpacity={0.8}
+                {selectedMetrics.length === 0 ? (
+                    <div className="flex h-[350px] items-center justify-center text-muted-foreground">
+                        Please select at least one metric to display
+                    </div>
+                ) : (
+                    <ChartContainer
+                        config={chartConfig}
+                        className="aspect-auto h-[350px] w-full"
+                    >
+                        <AreaChart data={timeline}>
+                            <defs>
+                                {selectedMetrics.map((metric) => (
+                                    <linearGradient key={metric} id={`fill${metric}`} x1="0" y1="0" x2="0" y2="1">
+                                        <stop
+                                            offset="5%"
+                                            stopColor={chartConfig[metric].color}
+                                            stopOpacity={0.8}
+                                        />
+                                        <stop
+                                            offset="95%"
+                                            stopColor={chartConfig[metric].color}
+                                            stopOpacity={0.1}
+                                        />
+                                    </linearGradient>
+                                ))}
+                            </defs>
+                            <CartesianGrid vertical={false} />
+                            <XAxis
+                                dataKey="date"
+                                tickLine={false}
+                                axisLine={false}
+                                tickMargin={8}
+                                minTickGap={32}
+                                tickFormatter={(value) => {
+                                    const date = new Date(value);
+                                    return date.toLocaleDateString('en-US', {
+                                        month: 'short',
+                                        day: 'numeric',
+                                    });
+                                }}
+                            />
+                            <ChartTooltip
+                                cursor={false}
+                                content={
+                                    <ChartTooltipContent
+                                        labelFormatter={(value) => {
+                                            return new Date(value).toLocaleDateString('en-US', {
+                                                month: 'short',
+                                                day: 'numeric',
+                                                year: 'numeric',
+                                            });
+                                        }}
+                                        indicator="dot"
+                                    />
+                                }
+                            />
+                            {selectedMetrics.map((metric, index) => (
+                                <Area
+                                    key={metric}
+                                    dataKey={metric}
+                                    type="natural"
+                                    fill={`url(#fill${metric})`}
+                                    stroke={chartConfig[metric].color}
+                                    strokeWidth={2}
+                                    stackId={index % 2 === 0 ? 'a' : 'b'} // Alternate stacking for better visibility
                                 />
-                                <stop
-                                    offset="95%"
-                                    stopColor="var(--color-newOffers)"
-                                    stopOpacity={0.1}
-                                />
-                            </linearGradient>
-                            <linearGradient id="fillExpiredOffers" x1="0" y1="0" x2="0" y2="1">
-                                <stop
-                                    offset="5%"
-                                    stopColor="var(--color-expiredOffers)"
-                                    stopOpacity={0.8}
-                                />
-                                <stop
-                                    offset="95%"
-                                    stopColor="var(--color-expiredOffers)"
-                                    stopOpacity={0.1}
-                                />
-                            </linearGradient>
-                        </defs>
-                        <CartesianGrid vertical={false} />
-                        <XAxis
-                            dataKey="date"
-                            tickLine={false}
-                            axisLine={false}
-                            tickMargin={8}
-                            minTickGap={32}
-                            tickFormatter={(value) => {
-                                const date = new Date(value);
-                                return date.toLocaleDateString('en-US', {
-                                    month: 'short',
-                                    day: 'numeric',
-                                });
-                            }}
-                        />
-                        <ChartTooltip
-                            cursor={false}
-                            content={
-                                <ChartTooltipContent
-                                    labelFormatter={(value) => {
-                                        return new Date(value).toLocaleDateString('en-US', {
-                                            month: 'short',
-                                            day: 'numeric',
-                                            year: 'numeric',
-                                        });
-                                    }}
-                                    indicator="dot"
-                                />
-                            }
-                        />
-                        <Area
-                            dataKey="newOffers"
-                            type="natural"
-                            fill="#800080" // Purple
-                            stroke="#800080" // Purple
-                            stackId="a"
-                        />
-                        <Area
-                            dataKey="expiredOffers"
-                            type="natural"
-                            fill="#b366ff" // Light Purple
-                            stroke="#b366ff" // Purple
-                            stackId="a"
-                        />
-                        <ChartLegend content={<ChartLegendContent />} />
-                    </AreaChart>
-                </ChartContainer>
+                            ))}
+                            <ChartLegend content={<ChartLegendContent />} />
+                        </AreaChart>
+                    </ChartContainer>
+                )}
             </CardContent>
         </Card>
     );

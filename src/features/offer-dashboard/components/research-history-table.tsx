@@ -262,11 +262,29 @@ export function ResearchHistoryTable() {
                                                     </Badge>
                                                 </TableCell>
                                                 <TableCell className="text-center">
-                                                    {log.success ? (
-                                                        <CheckCircle2 className="h-5 w-5 text-green-600 mx-auto" />
-                                                    ) : (
-                                                        <XCircle className="h-5 w-5 text-red-600 mx-auto" />
-                                                    )}
+                                                    <TooltipProvider>
+                                                        <Tooltip>
+                                                            <TooltipTrigger asChild>
+                                                                <div className="flex justify-center cursor-help">
+                                                                    {log.success ? (
+                                                                        <CheckCircle2 className="h-5 w-5 text-green-600" />
+                                                                    ) : (
+                                                                        <XCircle className="h-5 w-5 text-red-600" />
+                                                                    )}
+                                                                </div>
+                                                            </TooltipTrigger>
+                                                            <TooltipContent>
+                                                                {log.success ? 'Successful' : 'Failed'}
+                                                                {log.errors && log.errors.length > 0 && (
+                                                                    <div className="mt-1 text-xs max-w-xs">
+                                                                        {log.errors.slice(0, 3).map((err: string, idx: number) => (
+                                                                            <div key={idx} className="truncate">• {err}</div>
+                                                                        ))}
+                                                                    </div>
+                                                                )}
+                                                            </TooltipContent>
+                                                        </Tooltip>
+                                                    </TooltipProvider>
                                                 </TableCell>
                                             </TableRow>
 

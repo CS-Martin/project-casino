@@ -9,6 +9,13 @@ export interface OfferTimelineDataPoint {
   date: string;
   newOffers: number;
   expiredOffers: number;
+  offersCreated: number; // From research logs
+  offersUpdated: number; // From research logs
+  offersSkipped: number; // From research logs
+  casinosResearched: number; // From research logs
+  researchRuns: number; // Number of research runs that day
+  successfulRuns: number; // Number of successful research runs
+  avgDuration: number; // Average duration in ms
 }
 
 export const getOfferTimelineHandler = async (
@@ -34,15 +41,45 @@ export const getOfferTimelineHandler = async (
   // Get all offers
   const allOffers = await ctx.db.query('offers').collect();
 
+  // Get all research logs in the time range
+  const researchLogs = await ctx.db
+    .query('offer_research_logs')
+    .withIndex('by_timestamp')
+    .filter((q) => q.gte(q.field('timestamp'), startTimestamp))
+    .collect();
+
   // Create a map to store counts by date
-  const dateMap = new Map<string, { newOffers: number; expiredOffers: number }>();
+  const dateMap = new Map<
+    string,
+    {
+      newOffers: number;
+      expiredOffers: number;
+      offersCreated: number;
+      offersUpdated: number;
+      offersSkipped: number;
+      casinosResearched: number;
+      researchRuns: number;
+      successfulRuns: number;
+      totalDuration: number;
+    }
+  >();
 
   // Initialize all dates in the range
   for (let i = 0; i <= daysToSubtract; i++) {
     const date = new Date(startDate);
     date.setDate(date.getDate() + i);
     const dateStr = date.toISOString().split('T')[0];
-    dateMap.set(dateStr, { newOffers: 0, expiredOffers: 0 });
+    dateMap.set(dateStr, {
+      newOffers: 0,
+      expiredOffers: 0,
+      offersCreated: 0,
+      offersUpdated: 0,
+      offersSkipped: 0,
+      casinosResearched: 0,
+      researchRuns: 0,
+      successfulRuns: 0,
+      totalDuration: 0,
+    });
   }
 
   // Count new offers by creation date
@@ -88,12 +125,37 @@ export const getOfferTimelineHandler = async (
     }
   });
 
+  // Process research logs
+  researchLogs.forEach((log) => {
+    const logDate = new Date(log.timestamp);
+    const dateStr = logDate.toISOString().split('T')[0];
+    const entry = dateMap.get(dateStr);
+    if (entry) {
+      entry.offersCreated += log.offers_created || 0;
+      entry.offersUpdated += log.offers_updated || 0;
+      entry.offersSkipped += log.offers_skipped || 0;
+      entry.casinosResearched += log.casinos_researched || 0;
+      entry.researchRuns += 1;
+      if (log.success) {
+        entry.successfulRuns += 1;
+      }
+      entry.totalDuration += log.duration_ms || 0;
+    }
+  });
+
   // Convert map to array and sort by date
   const timeline: OfferTimelineDataPoint[] = Array.from(dateMap.entries())
     .map(([date, counts]) => ({
       date,
       newOffers: counts.newOffers,
       expiredOffers: counts.expiredOffers,
+      offersCreated: counts.offersCreated,
+      offersUpdated: counts.offersUpdated,
+      offersSkipped: counts.offersSkipped,
+      casinosResearched: counts.casinosResearched,
+      researchRuns: counts.researchRuns,
+      successfulRuns: counts.successfulRuns,
+      avgDuration: counts.researchRuns > 0 ? Math.round(counts.totalDuration / counts.researchRuns) : 0,
     }))
     .sort((a, b) => a.date.localeCompare(b.date));
 

@@ -3,7 +3,7 @@
 # Rate Limit Test Script
 # Tests the rate limiting functionality by making multiple requests
 
-echo "🧪 Testing Rate Limit (10 requests/minute)"
+echo "🧪 Testing Rate Limit (5 requests/minute)"
 echo "=========================================="
 echo ""
 
@@ -13,8 +13,13 @@ REQUESTS=15
 echo "Making $REQUESTS requests to: $URL"
 echo ""
 
+  # Get IP address
+  IP=$(curl -s ifconfig.me)
+  echo "IP: $IP"
+  
 for i in $(seq 1 $REQUESTS); do
   echo "Request $i:"
+
   
   RESPONSE=$(curl -s -w "\nHTTP_CODE:%{http_code}" "$URL")
   HTTP_CODE=$(echo "$RESPONSE" | grep HTTP_CODE | cut -d: -f2)

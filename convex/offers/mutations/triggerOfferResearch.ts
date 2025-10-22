@@ -1,7 +1,10 @@
+import { researchCasinoOffers } from '../../../src/features/promotional-research/ai-agent/research-offers';
 import { api } from '../../_generated/api';
 import { Id } from '../../_generated/dataModel';
 import { action, ActionCtx } from '../../_generated/server';
 import { v } from 'convex/values';
+
+const DEFAULT_BATCH_SIZE = 30;
 
 export const triggerOfferResearchArgs = {
   casinoIds: v.optional(v.array(v.id('casinos'))),
@@ -12,7 +15,7 @@ export const triggerOfferResearchHandler = async (
   ctx: ActionCtx,
   args: { casinoIds?: Id<'casinos'>[]; batchSize?: number }
 ) => {
-  const batchSize = args.batchSize || 30;
+  const batchSize = args.batchSize || DEFAULT_BATCH_SIZE;
   const startTime = Date.now();
 
   try {
@@ -39,9 +42,6 @@ export const triggerOfferResearchHandler = async (
     }
 
     // Import the research service dynamically to avoid circular dependencies
-    const { researchCasinoOffers } = await import(
-      '../../../src/features/promotional-research/ai-agent/research-offers'
-    );
 
     // Prepare casino data for AI research
     const casinosForResearch = casinos.map((casino) => ({

@@ -2,7 +2,7 @@ import OpenAI from 'openai';
 import { zodTextFormat } from 'openai/helpers/zod';
 import { OFFER_RESEARCH_SYSTEM_PROMPT, createOfferResearchUserPrompt } from '../lib/constants';
 import { OfferResearchSchema, CasinoOfferResearch } from '../schema/offer-research.schema';
-import { logger } from '../lib/logger';
+import { logger } from '@/lib/logger';
 
 const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
@@ -44,7 +44,8 @@ export async function researchCasinoOffers(casinos: CasinoForResearch[]): Promis
     const duration = Date.now() - startTime;
 
     if (!response.output_parsed) {
-      logger.error('No offer research results generated from OpenAI response', {
+      logger.error('No offer research results generated from OpenAI response', undefined, {
+        function: 'researchCasinoOffers',
         duration,
         casinoCount: casinos.length,
       });
@@ -57,9 +58,12 @@ export async function researchCasinoOffers(casinos: CasinoForResearch[]): Promis
       timestamp: Date.now(),
     };
   } catch (error: any) {
+    const duration = Date.now();
     logger.error(
       'AI offer research failed',
       {
+        function: 'researchCasinoOffers',
+        duration,
         casinoCount: casinos.length,
         casinoNames: casinos.map((c) => c.name),
       },

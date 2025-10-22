@@ -7,7 +7,6 @@
 import { cronJobs } from 'convex/server';
 import { internal } from './_generated/api';
 
-// Create a new cron job manager instance
 const crons = cronJobs();
 
 // 🕐 Schedule: Sync Xano API data every 3 hours
@@ -27,7 +26,7 @@ crons.interval('Sync Xano API data every 24 hours', { hours: 30 }, internal.xano
 // This job automatically researches promotional offers for tracked casinos
 // using AI to find current bonuses, free spins, and other promotions.
 // Runs every 6 hours with a small batch size to focus on new casinos.
-crons.interval('AI offer research every 6 hours', { hours: 1 }, internal.offers.index.scheduledOfferResearch, {
+crons.interval('AI offer research every 6 hours', { hours: 6 }, internal.offers.index.scheduledOfferResearch, {
   batchSize: 5,
 });
 
@@ -35,7 +34,7 @@ crons.interval('AI offer research every 6 hours', { hours: 1 }, internal.offers.
 // ------------------------------------------
 // This job automatically discovers new online casinos across different states
 // using AI to find new gaming platforms, their licensing info, and websites.
-// Runs every 12 hours to keep the casino database up-to-date.
-crons.interval('AI casino discovery every 8hours', { hours: 1 }, internal.casinos.index.scheduledCasinoDiscovery);
+// Runs every 8 hours to keep the casino database up-to-date.
+crons.interval('AI casino discovery every 8 hours', { hours: 8 }, internal.casinos.index.scheduledCasinoDiscovery);
 
 export default crons;

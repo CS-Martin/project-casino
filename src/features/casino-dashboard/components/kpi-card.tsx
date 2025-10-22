@@ -1,20 +1,25 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { NumberTicker } from "@/components/ui/number-ticker";
 import { Skeleton } from "@/components/ui/skeleton";
-import { LucideIcon } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { LucideIcon, Info } from "lucide-react";
 
 export default function KPICard({
     title,
     value,
     isLoading,
     variant = "default",
-    icon: Icon
+    icon: Icon,
+    tooltip,
+    subtitle
 }: {
     title: string;
     value: string | number;
     isLoading: boolean;
     variant?: "default" | "positive" | "negative";
     icon: LucideIcon;
+    tooltip?: string;
+    subtitle?: string;
 }) {
     const getVariantStyles = () => {
         switch (variant) {
@@ -75,29 +80,70 @@ export default function KPICard({
 
     const { numericValue, suffix } = parseValue(value);
 
-    return (
+    const cardContent = (
         <Card className={`transition-all duration-200 hover:shadow-md`}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
-                    {title}
-                </CardTitle>
+                <div className="flex items-center gap-2">
+                    <CardTitle className="text-sm font-medium text-muted-foreground">
+                        {title}
+                    </CardTitle>
+                    {tooltip && (
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Info className="h-3.5 w-3.5 text-muted-foreground cursor-help md:hidden" />
+                                </TooltipTrigger>
+                                <TooltipContent className="max-w-xs">
+                                    <p>{tooltip}</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
+                    )}
+                </div>
                 <Icon className={`h-4 w-4 ${getIconColor()}`} />
             </CardHeader>
             <CardContent>
                 {isLoading ? (
                     <Skeleton className="h-8 w-24" />
                 ) : (
-                    <div className="flex items-baseline">
-                        <NumberTicker
-                            value={numericValue}
-                            className={`text-xl font-bold ${getValueColor()}`}
-                        />
-                        {suffix && (
-                            <span className={`text-xl font-bold ${getValueColor()}`}>{suffix}</span>
+                    <div className="space-y-1">
+                        <div className="flex items-baseline">
+                            <NumberTicker
+                                value={numericValue}
+                                className={`text-xl font-bold ${getValueColor()}`}
+                            />
+                            {suffix && (
+                                <span className={`text-xl font-bold ${getValueColor()}`}>{suffix}</span>
+                            )}
+                        </div>
+                        {subtitle && (
+                            <p className="text-xs text-muted-foreground">{subtitle}</p>
                         )}
                     </div>
                 )}
             </CardContent>
         </Card>
     );
+
+    // On desktop, wrap the entire card in a tooltip for hover behavior
+    if (tooltip) {
+        return (
+            <TooltipProvider>
+                <Tooltip>
+                    <TooltipTrigger asChild className="hidden md:block cursor-help">
+                        {cardContent}
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-xs">
+                        <p>{tooltip}</p>
+                    </TooltipContent>
+                </Tooltip>
+                {/* Mobile version without full card tooltip */}
+                <div className="md:hidden">
+                    {cardContent}
+                </div>
+            </TooltipProvider>
+        );
+    }
+
+    return cardContent;
 }

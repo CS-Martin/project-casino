@@ -38,6 +38,8 @@ export default function DashboardPage() {
                         isLoading={false}
                         variant="default"
                         icon={Building2}
+                        tooltip="Total number of casinos discovered and stored in the database across all states"
+                        subtitle="All casinos"
                     />
                     <KPICard
                         title="Tracked Casinos"
@@ -45,6 +47,8 @@ export default function DashboardPage() {
                         isLoading={false}
                         variant="positive"
                         icon={CheckCircle}
+                        tooltip="Casinos actively monitored for promotional offers and updates. These casinos are being researched regularly."
+                        subtitle={`${Math.round(((casinoStats?.tracked || 0) / (casinoStats?.total || 1)) * 100)}% of total`}
                     />
                     <KPICard
                         title="Untracked Casinos"
@@ -52,6 +56,8 @@ export default function DashboardPage() {
                         isLoading={false}
                         variant="negative"
                         icon={XCircle}
+                        tooltip="Casinos in the database that are not currently being monitored. These may need review or activation."
+                        subtitle={`${Math.round(((casinoStats?.untracked || 0) / (casinoStats?.total || 1)) * 100)}% of total`}
                     />
                     <KPICard
                         title="Coverage Gap"
@@ -59,6 +65,8 @@ export default function DashboardPage() {
                         isLoading={false}
                         variant="negative"
                         icon={AlertTriangle}
+                        tooltip="Percentage of casinos not being tracked. A lower gap indicates better market coverage and monitoring."
+                        subtitle="Opportunity to improve"
                     />
                 </div>
             )}

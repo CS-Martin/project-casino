@@ -2,10 +2,19 @@
 
 > A full-stack AI-powered platform for automated casino discovery and promotional offer tracking with real-time analytics dashboards.
 
+🔗 **Live Demo**: [https://project-casino.martinatole.com](https://project-casino.martinatole.com)
+
 [![Next.js](https://img.shields.io/badge/Next.js-15.5-black)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)](https://www.typescriptlang.org/)
 [![Convex](https://img.shields.io/badge/Convex-Real--time-orange)](https://convex.dev/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-4.0-38bdf8)](https://tailwindcss.com/)
+
+## Sample Screenshots
+
+### Casino Dashboard
+
+![Casino Dashboard Overview](./docs/screenshots/dashboard-sample-screenshot.png)
+_Real-time casino management with KPI metrics, market coverage visualization, and discovery history_
 
 ## Overview
 
@@ -224,6 +233,7 @@ Key configuration files:
 ⚠️ **Important**: This project currently has **no authentication** on backend functions.
 
 - All Convex queries/mutations are publicly accessible
+- **Live demo** at [project-casino.martinatole.com](https://project-casino.martinatole.com) is intentionally public for demonstration
 - Suitable for demo/portfolio projects
 - Add authentication before production use with sensitive data
 - Safe to share Convex URLs for educational/demo purposes

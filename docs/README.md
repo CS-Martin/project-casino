@@ -2,6 +2,8 @@
 
 Welcome to the Casino Intelligence Platform documentation.
 
+🔗 **Live Demo**: [https://project-casino.martinatole.com](https://project-casino.martinatole.com)
+
 ## 📚 Documentation Index
 
 ### Getting Started

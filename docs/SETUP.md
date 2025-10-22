@@ -2,6 +2,8 @@
 
 Complete guide for setting up the Casino Intelligence Platform locally.
 
+🔗 **Live Demo**: [https://project-casino.martinatole.com](https://project-casino.martinatole.com)
+
 ## Prerequisites
 
 Before starting, ensure you have:

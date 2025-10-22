@@ -5,7 +5,7 @@ Complete API reference for the Casino Intelligence Platform.
 ## Base URL
 
 - **Development**: `http://localhost:3000`
-- **Production**: `https://your-app.vercel.app`
+- **Production**: `https://project-casino.martinatole.com`
 
 ## REST API Endpoints
 

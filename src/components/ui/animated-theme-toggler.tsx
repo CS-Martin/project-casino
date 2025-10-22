@@ -97,7 +97,7 @@ export const AnimatedThemeToggler = ({ className }: Props) => {
     <button ref={buttonRef} onClick={changeTheme} className={cn(className)}>
       <span
         ref={iconRef}
-        className="flex border p-1.5 rounded-md cursor-pointer border-neutral-200"
+        className="flex hover:bg-muted hover:border-neutral-200/20 hover:border p-1.5 rounded-md cursor-pointer"
       >
         {theme === "dark" ? (
           <Sun className="w-5 h-5" />

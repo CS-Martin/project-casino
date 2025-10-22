@@ -5,7 +5,7 @@ import { Separator } from "@/components/ui/separator"
 import { SidebarTrigger } from "@/components/ui/sidebar"
 import { AnimatedThemeToggler } from "../ui/animated-theme-toggler"
 import { Button } from "@/components/ui/button"
-import { MessageCircle } from "lucide-react"
+import { MessageCircle, Sparkles } from "lucide-react"
 import { ChatbotWidget } from "@/features/chatbot"
 
 export function SiteHeader() {
@@ -35,14 +35,16 @@ export function SiteHeader() {
                 <div className="flex w-full items-center gap-1 px-4 lg:gap-2 lg:px-6">
                     <SidebarTrigger className="-ml-1" />
                     <Separator orientation="vertical" className="mx-2 data-[orientation=vertical]:h-4" />
-                    <div className="ml-auto flex items-center gap-2">
+                    <div className="ml-auto flex items-center gap-4">
                         <Button
-                            variant="ghost"
+                            variant="outline"
                             size="icon"
                             onClick={() => setChatbotOpen(true)}
                             title="Open AI Assistant"
+                            className="flex px-3 items-center gap-2 w-full sm:w-auto bg-linear-to-r from-purple-50 to-blue-50 dark:from-purple-950/30 dark:to-blue-950/30 hover:from-purple-100 hover:to-blue-100 dark:hover:from-purple-900/40 dark:hover:to-blue-900/40 border-purple-200 dark:border-purple-800"
                         >
-                            <MessageCircle className="h-5 w-5" />
+                            <Sparkles className="h-5 w-5" />
+                            Ask AI
                         </Button>
                         <AnimatedThemeToggler />
                     </div>

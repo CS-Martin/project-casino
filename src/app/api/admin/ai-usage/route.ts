@@ -1,12 +1,20 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { ConvexHttpClient } from 'convex/browser';
 import { api } from '../../../../../convex/_generated/api';
+import { apiRateLimiter, getClientIp, createRateLimitResponse } from '@/lib/rate-limiter';
 
 const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
 // GET /api/admin/ai-usage - Get AI usage statistics
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
+    // Rate limiting
+    const clientIp = getClientIp(request);
+    const rateLimitResult = await apiRateLimiter.check(clientIp);
+
+    if (!rateLimitResult.success) {
+      return createRateLimitResponse(rateLimitResult.reset);
+    }
     const { searchParams } = new URL(request.url);
     const period = searchParams.get('period') || '24h';
 

@@ -6,12 +6,20 @@ import {
   type OfferForAnalysis,
 } from '@/features/promotional-research/ai-agent/determine-best-offer';
 import { logger } from '@/lib/logger';
+import { apiRateLimiter, strictRateLimiter, getClientIp, createRateLimitResponse } from '@/lib/rate-limiter';
 
 // GET /api/offers/best?casinoId=xxx - Get cached best offer
 export async function GET(request: NextRequest) {
   const startTime = Date.now();
 
   try {
+    // Rate limiting (standard for GET - cache lookups)
+    const clientIp = getClientIp(request);
+    const rateLimitResult = await apiRateLimiter.check(clientIp);
+
+    if (!rateLimitResult.success) {
+      return createRateLimitResponse(rateLimitResult.reset);
+    }
     const { searchParams } = new URL(request.url);
     const casinoId = searchParams.get('casinoId');
 
@@ -73,6 +81,13 @@ export async function POST(request: NextRequest) {
   const startTime = Date.now();
 
   try {
+    // Rate limiting (strict for POST - AI operations)
+    const clientIp = getClientIp(request);
+    const rateLimitResult = await strictRateLimiter.check(clientIp);
+
+    if (!rateLimitResult.success) {
+      return createRateLimitResponse(rateLimitResult.reset);
+    }
     const body = await request.json();
     const { casinoName, casinoId, offers } = body as {
       casinoName: string;

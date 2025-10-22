@@ -1,16 +1,24 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { DiscoverCasino } from '@/features/casino-discovery/ai-agent/discover-casino';
 import { CasinoDiscoveryService } from '@/features/casino-discovery/services/casino-discovery.service';
 import { ConvexHttpClient } from 'convex/browser';
 import { api } from '../../../../../convex/_generated/api';
+import { strictRateLimiter, getClientIp, createRateLimitResponse } from '@/lib/rate-limiter';
 
 const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
-export async function POST() {
+export async function POST(request: NextRequest) {
   const startTime = Date.now();
   const triggeredBy = 'manual';
 
   try {
+    // Rate limiting (strict - expensive AI operation)
+    const clientIp = getClientIp(request);
+    const rateLimitResult = await strictRateLimiter.check(clientIp);
+
+    if (!rateLimitResult.success) {
+      return createRateLimitResponse(rateLimitResult.reset);
+    }
     const discovered = await DiscoverCasino();
     const result = await CasinoDiscoveryService.saveDiscoveredCasinos(discovered.discoverCasino);
     const duration = Date.now() - startTime;

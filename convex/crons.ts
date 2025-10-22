@@ -36,6 +36,6 @@ crons.interval('AI offer research every 6 hours', { hours: 6 }, internal.offers.
 // This job automatically discovers new online casinos across different states
 // using AI to find new gaming platforms, their licensing info, and websites.
 // Runs every 12 hours to keep the casino database up-to-date.
-crons.interval('AI casino discovery every 12 hours', { hours: 12 }, internal.casinos.index.scheduledCasinoDiscovery);
+crons.interval('AI casino discovery every 8hours', { hours: 8 }, internal.casinos.index.scheduledCasinoDiscovery);
 
 export default crons;

@@ -8,6 +8,9 @@
  * @module
  */
 
+import type * as casino_discovery_logs_index from "../casino_discovery_logs/index.js";
+import type * as casino_discovery_logs_mutations_createDiscoveryLog from "../casino_discovery_logs/mutations/createDiscoveryLog.js";
+import type * as casino_discovery_logs_queries_getDiscoveryLogs from "../casino_discovery_logs/queries/getDiscoveryLogs.js";
 import type * as casinos_actions_scheduledCasinoDiscovery from "../casinos/actions/scheduledCasinoDiscovery.js";
 import type * as casinos_index from "../casinos/index.js";
 import type * as casinos_mutations_createCasino from "../casinos/mutations/createCasino.js";
@@ -62,6 +65,9 @@ import type {
  * ```
  */
 declare const fullApi: ApiFromModules<{
+  "casino_discovery_logs/index": typeof casino_discovery_logs_index;
+  "casino_discovery_logs/mutations/createDiscoveryLog": typeof casino_discovery_logs_mutations_createDiscoveryLog;
+  "casino_discovery_logs/queries/getDiscoveryLogs": typeof casino_discovery_logs_queries_getDiscoveryLogs;
   "casinos/actions/scheduledCasinoDiscovery": typeof casinos_actions_scheduledCasinoDiscovery;
   "casinos/index": typeof casinos_index;
   "casinos/mutations/createCasino": typeof casinos_mutations_createCasino;

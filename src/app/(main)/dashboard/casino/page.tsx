@@ -8,6 +8,7 @@ import { KPICardsSkeleton } from "@/features/casino-dashboard/components/skeleto
 import { useDashboardStats } from "@/features/casino-dashboard/hooks/use-dashboard-stats";
 import { SearchCasinosBtn } from "@/features/casino-dashboard/components/search-casinos-btn";
 import { CasinoListTable } from "@/features/casino-dashboard/components/casino-list-table";
+import { DiscoveryHistoryTable } from "@/features/casino-dashboard/components/discovery-history-table";
 
 export default function DashboardPage() {
     const { casinoStats, isLoading } = useDashboardStats();
@@ -70,6 +71,11 @@ export default function DashboardPage() {
                 <div className="w-full 2xl:w-[40%]">
                     <StateChart />
                 </div>
+            </div>
+
+            {/* Discovery History */}
+            <div>
+                <DiscoveryHistoryTable />
             </div>
 
             {/* Casino List */}

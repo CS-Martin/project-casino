@@ -25,8 +25,6 @@ export const getCasinosSearchableHandler = async (
 ) => {
   // If there's a search term, we need to get ALL data first, then filter and paginate
   if (args.searchTerm) {
-    console.log('Search term detected, fetching all data first...');
-
     // Get all casinos (we'll need to implement proper pagination later)
     const allCasinos = await ctx.db.query('casinos').order('desc').collect();
 
@@ -43,8 +41,6 @@ export const getCasinosSearchableHandler = async (
 
     // Apply search filter
     const searchLower = args.searchTerm.toLowerCase();
-    console.log('Searching for:', searchLower);
-    console.log('Total casinos before search:', filteredResults.length);
 
     filteredResults = filteredResults.filter((casino) => {
       const nameMatch = casino.name.toLowerCase().includes(searchLower);
@@ -55,14 +51,8 @@ export const getCasinosSearchableHandler = async (
 
       const matches = nameMatch || websiteMatch || licenseMatch || stateNameMatch || stateAbbrMatch;
 
-      if (casino.name.toLowerCase().includes('betmgm') || casino.name.toLowerCase().includes('mgm')) {
-        console.log('BetMGM casino found:', casino.name, 'matches:', matches);
-      }
-
       return matches;
     });
-
-    console.log('Total casinos after search:', filteredResults.length);
 
     // Apply other filters
     if (args.stateId && args.stateId !== 'all') {

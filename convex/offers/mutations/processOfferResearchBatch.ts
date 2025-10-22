@@ -14,8 +14,6 @@ export const processOfferResearchBatchHandler = async (ctx: MutationCtx, args: {
   const batchSize = args.batchSize || 30;
   const startTime = Date.now();
 
-  console.log(`🚀 Starting offer research batch processing (batch size: ${batchSize})`);
-
   try {
     // Get casinos for research
     const casinos = await ctx.db
@@ -25,7 +23,6 @@ export const processOfferResearchBatchHandler = async (ctx: MutationCtx, args: {
       .take(batchSize);
 
     if (casinos.length === 0) {
-      console.log('ℹ️ No tracked casinos found for offer research');
       return {
         success: true,
         message: 'No tracked casinos found for offer research',
@@ -33,8 +30,6 @@ export const processOfferResearchBatchHandler = async (ctx: MutationCtx, args: {
         duration: Date.now() - startTime,
       };
     }
-
-    console.log(`📋 Processing ${casinos.length} casinos for offer research`);
 
     // Prepare casino data for AI research
     const casinosForResearch: CasinoForResearch[] = casinos.map((casino) => ({
@@ -85,10 +80,6 @@ export const processOfferResearchBatchHandler = async (ctx: MutationCtx, args: {
         processingResults.totalCreated += createResult.created;
         processingResults.totalUpdated += createResult.updated;
         processingResults.totalSkipped += createResult.skipped;
-
-        console.log(
-          `✅ Processed ${casinoResearch.casino_name}: ${createResult.created} created, ${createResult.updated} updated, ${createResult.skipped} skipped`
-        );
       } catch (error: any) {
         const errorMsg = `Failed to process offers for ${casinoResearch.casino_name}: ${error.message}`;
         console.error(`❌ ${errorMsg}`);
@@ -104,10 +95,6 @@ export const processOfferResearchBatchHandler = async (ctx: MutationCtx, args: {
     });
 
     const duration = Date.now() - startTime;
-    console.log(`🎉 Batch processing completed in ${duration}ms`);
-    console.log(
-      `📊 Results: ${processingResults.totalProcessed} casinos processed, ${processingResults.totalCreated} offers created, ${processingResults.totalUpdated} offers updated`
-    );
 
     return {
       success: true,

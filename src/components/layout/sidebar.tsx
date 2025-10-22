@@ -14,7 +14,7 @@ import {
 import { NavMain } from "./nav-main"
 import Image from "next/image"
 import { useTheme } from "next-themes"
-import { LayoutDashboard, BarChart3 } from "lucide-react"
+import { LayoutDashboard, BarChart3, Brain } from "lucide-react"
 import { Label } from "../ui/label"
 
 const data = {
@@ -29,6 +29,11 @@ const data = {
             title: "Offer Dashboard",
             url: "/dashboard/offer",
             icon: <BarChart3 className="h-5 w-5" />,
+        },
+        {
+            title: "AI Usage",
+            url: "/dashboard/ai-usage",
+            icon: <Brain className="h-5 w-5" />,
         },
     ],
 }

@@ -4,6 +4,7 @@ import { BestOfferResult, BestOfferResultSchema } from '../schema/best-offer-res
 import { BEST_OFFER_SYSTEM_PROMPT, createBestOfferUserPrompt } from '../lib/constants';
 import redis from '@/lib/redis';
 import { logger } from '@/lib/logger';
+import { aiUsageTracker } from '@/lib/ai-cost-tracker';
 
 const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
@@ -129,7 +130,21 @@ export async function determineBestOffer(
       },
     });
 
+    const duration = Date.now() - startTime;
+
     if (!response.output_parsed) {
+      // Track failed AI call
+      await aiUsageTracker.trackFromResponse(response, {
+        model: 'gpt-4o-mini',
+        operation: 'best-offer-analysis',
+        durationMs: duration,
+        context: {
+          casinoId,
+          casinoName,
+          offersCount: offers.length,
+        },
+      });
+
       logger.error('No analysis result generated from AI', undefined, {
         function: 'determineBestOffer',
         casinoId,
@@ -137,6 +152,18 @@ export async function determineBestOffer(
       });
       throw new Error('No analysis result generated from AI');
     }
+
+    // Track successful AI call
+    await aiUsageTracker.trackFromResponse(response, {
+      model: 'gpt-4o-mini',
+      operation: 'best-offer-analysis',
+      durationMs: duration,
+      context: {
+        casinoId,
+        casinoName,
+        offersCount: offers.length,
+      },
+    });
 
     const parsedData = response.output_parsed as any;
 
@@ -159,7 +186,6 @@ export async function determineBestOffer(
       // Don't fail the request if cache write fails
     }
 
-    const duration = Date.now() - startTime;
     logger.info('Best offer analysis completed', {
       function: 'determineBestOffer',
       casinoId,
@@ -175,6 +201,27 @@ export async function determineBestOffer(
     };
   } catch (error: any) {
     const duration = Date.now() - startTime;
+
+    // Track failed AI call with error
+    try {
+      await aiUsageTracker.track({
+        model: 'gpt-4o-mini',
+        operation: 'best-offer-analysis',
+        inputTokens: 0,
+        outputTokens: 0,
+        durationMs: duration,
+        success: false,
+        error: error.message,
+        context: {
+          casinoId,
+          casinoName,
+          offersCount: offers.length,
+        },
+      });
+    } catch (trackError) {
+      // Ignore tracking errors
+    }
+
     logger.error('AI best offer determination failed', error, {
       function: 'determineBestOffer',
       casinoId,

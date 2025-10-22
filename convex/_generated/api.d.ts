@@ -8,6 +8,10 @@
  * @module
  */
 
+import type * as ai_usage_index from "../ai_usage/index.js";
+import type * as ai_usage_mutations_logAIUsage from "../ai_usage/mutations/logAIUsage.js";
+import type * as ai_usage_queries_getAIUsageStats from "../ai_usage/queries/getAIUsageStats.js";
+import type * as ai_usage_queries_getRecentAIUsage from "../ai_usage/queries/getRecentAIUsage.js";
 import type * as casino_discovery_logs_index from "../casino_discovery_logs/index.js";
 import type * as casino_discovery_logs_mutations_createDiscoveryLog from "../casino_discovery_logs/mutations/createDiscoveryLog.js";
 import type * as casino_discovery_logs_queries_getDiscoveryLogs from "../casino_discovery_logs/queries/getDiscoveryLogs.js";
@@ -65,6 +69,10 @@ import type {
  * ```
  */
 declare const fullApi: ApiFromModules<{
+  "ai_usage/index": typeof ai_usage_index;
+  "ai_usage/mutations/logAIUsage": typeof ai_usage_mutations_logAIUsage;
+  "ai_usage/queries/getAIUsageStats": typeof ai_usage_queries_getAIUsageStats;
+  "ai_usage/queries/getRecentAIUsage": typeof ai_usage_queries_getRecentAIUsage;
   "casino_discovery_logs/index": typeof casino_discovery_logs_index;
   "casino_discovery_logs/mutations/createDiscoveryLog": typeof casino_discovery_logs_mutations_createDiscoveryLog;
   "casino_discovery_logs/queries/getDiscoveryLogs": typeof casino_discovery_logs_queries_getDiscoveryLogs;

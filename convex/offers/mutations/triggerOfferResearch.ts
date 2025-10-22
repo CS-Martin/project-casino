@@ -73,6 +73,28 @@ export const triggerOfferResearchHandler = async (
     // Research offers using AI
     const researchResult = await researchCasinoOffers(casinosForResearch);
 
+    if (researchResult.usage) {
+      try {
+        await ctx.runMutation(api.ai_usage.index.logAIUsage, {
+          model: 'gpt-4o-mini',
+          operation: 'offer-research',
+          input_tokens: researchResult.usage.inputTokens,
+          output_tokens: researchResult.usage.outputTokens,
+          total_tokens: researchResult.usage.totalTokens,
+          estimated_cost: researchResult.usage.estimatedCost,
+          duration_ms: Date.now() - startTime,
+          success: researchResult.success,
+          error_message: researchResult.error,
+          context: {
+            batchSize: casinos.length,
+            offersCount: researchResult.data?.length || 0,
+          },
+        });
+      } catch (logError) {
+        console.error('Failed to log AI usage:', logError);
+      }
+    }
+
     if (!researchResult.success || !researchResult.data) {
       const duration = Date.now() - startTime;
 

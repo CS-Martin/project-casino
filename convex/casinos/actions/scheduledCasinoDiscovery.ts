@@ -20,6 +20,28 @@ export const scheduledCasinoDiscoveryHandler = async (ctx: ActionCtx) => {
     // This makes an external API call to OpenAI with web search capabilities
     const discoveryResult = await DiscoverCasino();
 
+    // STEP 2.5: Log AI usage to database
+    if (discoveryResult.usage) {
+      try {
+        await ctx.runMutation(api.ai_usage.index.logAIUsage, {
+          model: 'gpt-4o-mini',
+          operation: 'casino-discovery',
+          input_tokens: discoveryResult.usage.inputTokens,
+          output_tokens: discoveryResult.usage.outputTokens,
+          total_tokens: discoveryResult.usage.totalTokens,
+          estimated_cost: discoveryResult.usage.estimatedCost,
+          duration_ms: Date.now() - startTime,
+          success: !!discoveryResult.discoverCasino,
+          context: {
+            statesCount: discoveryResult.discoverCasino?.length || 0,
+          },
+        });
+      } catch (logError) {
+        // Don't fail the whole operation if logging fails
+        console.error('Failed to log AI usage:', logError);
+      }
+    }
+
     if (!discoveryResult || !discoveryResult.discoverCasino) {
       const duration = Date.now() - startTime;
       const errorMessage = 'AI discovery returned no results';

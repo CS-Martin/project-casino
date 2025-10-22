@@ -23,11 +23,17 @@ export default function OfferDashboardPage() {
                 </div>
 
 
+
+                {/* Offer Timeline Chart */}
+                <div>
+                    <OfferTimelineChart />
+                </div>
+
                 {/* Charts Row */}
                 <div className="grid gap-4 md:grid-cols-5">
                     {/* Timeline Chart */}
                     <div className="md:col-span-3">
-                        <OfferTimelineChart />
+                        <ResearchHistoryTable />
                     </div>
 
                     {/* Offer Type Breakdown */}
@@ -36,10 +42,6 @@ export default function OfferDashboardPage() {
                     </div>
                 </div>
 
-                {/* Research History */}
-                <div>
-                    <ResearchHistoryTable />
-                </div>
                 {/* Casino Research Status Table */}
                 <div>
                     <CasinoResearchStatusTable />

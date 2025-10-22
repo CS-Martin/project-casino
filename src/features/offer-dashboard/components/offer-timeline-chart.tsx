@@ -132,8 +132,8 @@ export default function OfferTimelineChart() {
                     </div>
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 pt-4">
                         {Array.from({ length: 5 }).map((_, i) => (
-                            <div key={i} className="space-y-1">
-                                <Skeleton className="h-4 w-16" />
+                            <div key={i} className="rounded-lg border bg-card p-3 shadow-sm">
+                                <Skeleton className="h-4 w-16 mb-1" />
                                 <Skeleton className="h-8 w-12" />
                             </div>
                         ))}
@@ -146,7 +146,7 @@ export default function OfferTimelineChart() {
                     </div>
                 </CardHeader>
                 <CardContent className="flex-1 px-2 pt-4 sm:px-6 sm:pt-6">
-                    <Skeleton className="h-[350px] w-full" />
+                    <Skeleton className="h-[250px] w-full" />
                 </CardContent>
             </Card>
         );
@@ -208,26 +208,26 @@ export default function OfferTimelineChart() {
 
                 {/* Summary Stats */}
                 {summaryStats && (
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 pt-4">
-                        <div className="space-y-1">
-                            <p className="text-xs text-muted-foreground">Created</p>
-                            <p className="text-2xl font-bold text-green-600">{summaryStats.offersCreated}</p>
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+                        <div className="rounded-lg border bg-card p-3 shadow-sm">
+                            <p className="text-xs text-muted-foreground mb-1">Created</p>
+                            <p className="font-semibold">{summaryStats.offersCreated}</p>
                         </div>
-                        <div className="space-y-1">
-                            <p className="text-xs text-muted-foreground">Skipped</p>
-                            <p className="text-2xl font-bold text-orange-600">{summaryStats.offersSkipped}</p>
+                        <div className="rounded-lg border bg-card p-3 shadow-sm">
+                            <p className="text-xs text-muted-foreground mb-1">Skipped</p>
+                            <p className="font-semibold">{summaryStats.offersSkipped}</p>
                         </div>
-                        <div className="space-y-1">
-                            <p className="text-xs text-muted-foreground">Expired</p>
-                            <p className="text-2xl font-bold text-red-600">{summaryStats.expiredOffers}</p>
+                        <div className="rounded-lg border bg-card p-3 shadow-sm">
+                            <p className="text-xs text-muted-foreground mb-1">Expired</p>
+                            <p className="font-semibold">{summaryStats.expiredOffers}</p>
                         </div>
-                        <div className="space-y-1">
-                            <p className="text-xs text-muted-foreground">Casinos</p>
-                            <p className="text-2xl font-bold text-purple-600">{summaryStats.casinosResearched}</p>
+                        <div className="rounded-lg border bg-card p-3 shadow-sm">
+                            <p className="text-xs text-muted-foreground mb-1">Casinos</p>
+                            <p className="font-semibold">{summaryStats.casinosResearched}</p>
                         </div>
-                        <div className="space-y-1">
-                            <p className="text-xs text-muted-foreground">Success Rate</p>
-                            <p className="text-2xl font-bold text-cyan-600">{summaryStats.successRate}%</p>
+                        <div className="rounded-lg border bg-card p-3 shadow-sm">
+                            <p className="text-xs text-muted-foreground mb-1">Success Rate</p>
+                            <p className="font-semibold">{summaryStats.successRate}%</p>
                         </div>
                     </div>
                 )}
@@ -255,13 +255,13 @@ export default function OfferTimelineChart() {
             </CardHeader>
             <CardContent className="flex-1 px-2 pt-4 sm:px-6 sm:pt-6">
                 {selectedMetrics.length === 0 ? (
-                    <div className="flex h-[350px] items-center justify-center text-muted-foreground">
+                    <div className="flex h-[250px] items-center justify-center text-muted-foreground">
                         Please select at least one metric to display
                     </div>
                 ) : (
                     <ChartContainer
                         config={chartConfig}
-                        className="aspect-auto h-[350px] w-full"
+                        className="aspect-auto h-[250px] w-full"
                     >
                         <AreaChart data={timeline}>
                             <defs>

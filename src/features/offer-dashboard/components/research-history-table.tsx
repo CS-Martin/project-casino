@@ -45,7 +45,7 @@ interface OfferDetail {
 }
 
 export function ResearchHistoryTable() {
-    const { logs, stats, isLoading } = useResearchLogs(5);
+    const { logs, stats, isLoading } = useResearchLogs(7);
     const [expandedRows, setExpandedRows] = React.useState<Set<string>>(new Set());
 
     const toggleRow = (logId: string) => {
@@ -96,12 +96,12 @@ export function ResearchHistoryTable() {
 
     if (isLoading) {
         return (
-            <Card>
+            <Card className="flex flex-col h-full">
                 <CardHeader>
                     <Skeleton className="h-6 w-48" />
                     <Skeleton className="h-4 w-64 mt-2" />
                 </CardHeader>
-                <CardContent>
+                <CardContent className="flex-1">
                     <div className="space-y-3">
                         {[1, 2, 3, 4, 5].map((i) => (
                             <Skeleton key={i} className="h-16 w-full" />
@@ -113,7 +113,7 @@ export function ResearchHistoryTable() {
     }
 
     return (
-        <Card>
+        <Card className="flex flex-col h-full">
             <CardHeader>
                 <div className="flex items-center justify-between">
                     <div>
@@ -140,7 +140,7 @@ export function ResearchHistoryTable() {
                     )}
                 </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="flex-1 overflow-auto">
                 {logs.length === 0 ? (
                     <div className="text-center py-8 text-muted-foreground">
                         <Calendar className="h-12 w-12 mx-auto mb-2 opacity-50" />
@@ -210,22 +210,22 @@ export function ResearchHistoryTable() {
                                                         );
                                                         return (
                                                             <div className="flex items-center gap-1 flex-wrap">
-                                                                {uniqueCasinos.slice(0, 2).map((casino: any, idx: number) => (
+                                                                {uniqueCasinos.slice(0, 1).map((casino: any, idx: number) => (
                                                                     <Badge key={idx} variant="outline" className="text-xs">
                                                                         {casino.state ? `${casino.state} - ` : ''}{casino.name}
                                                                     </Badge>
                                                                 ))}
-                                                                {uniqueCasinos.length > 2 && (
+                                                                {uniqueCasinos.length > 1 && (
                                                                     <TooltipProvider>
                                                                         <Tooltip>
                                                                             <TooltipTrigger asChild>
                                                                                 <Badge variant="secondary" className="text-xs cursor-help">
-                                                                                    +{uniqueCasinos.length - 2} more
+                                                                                    +{uniqueCasinos.length - 1} more
                                                                                 </Badge>
                                                                             </TooltipTrigger>
                                                                             <TooltipContent>
                                                                                 <div className="space-y-1">
-                                                                                    {uniqueCasinos.slice(2).map((casino: any, idx: number) => (
+                                                                                    {uniqueCasinos.slice(1).map((casino: any, idx: number) => (
                                                                                         <div key={idx}>
                                                                                             {casino.state ? `${casino.state} - ` : ''}{casino.name}
                                                                                         </div>

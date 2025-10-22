@@ -51,9 +51,9 @@ export function CasinoResearchSearchFilters({
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem value="all">All Status</SelectItem>
-                                <SelectItem value="current">Current</SelectItem>
-                                <SelectItem value="stale">Stale</SelectItem>
-                                <SelectItem value="missing">Missing</SelectItem>
+                                <SelectItem value="recent">Recent</SelectItem>
+                                <SelectItem value="old">Old</SelectItem>
+                                <SelectItem value="never">Never</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>

@@ -4,11 +4,11 @@ import { paginationOptsValidator } from 'convex/server';
 
 export const getCasinosWithOfferStatsArgs = {
   stateId: v.optional(v.id('states')),
-  status: v.optional(v.union(v.literal('current'), v.literal('stale'), v.literal('missing'), v.literal('all'))),
+  status: v.optional(v.union(v.literal('recent'), v.literal('old'), v.literal('never'), v.literal('all'))),
   paginationOpts: paginationOptsValidator,
 } as const;
 
-export type CasinoResearchStatus = 'current' | 'stale' | 'missing';
+export type CasinoResearchStatus = 'recent' | 'old' | 'never';
 
 export interface CasinoWithOfferStats {
   _id: string;
@@ -32,7 +32,7 @@ export const getCasinosWithOfferStatsHandler = async (
   ctx: QueryCtx,
   args: {
     stateId?: string;
-    status?: 'current' | 'stale' | 'missing' | 'all';
+    status?: 'recent' | 'old' | 'never' | 'all';
     paginationOpts: { numItems: number; cursor: string | null };
   }
 ) => {
@@ -86,7 +86,7 @@ export const getCasinosWithOfferStatsHandler = async (
     }
 
     // Determine status based on last_offer_check
-    let status: CasinoResearchStatus = 'missing';
+    let status: CasinoResearchStatus = 'never';
     let daysSinceLastCheck: number | null = null;
 
     if (casino.last_offer_check) {
@@ -94,9 +94,9 @@ export const getCasinosWithOfferStatsHandler = async (
       daysSinceLastCheck = Math.floor(timeSinceCheck / oneDayMs);
 
       if (timeSinceCheck < sevenDaysMs) {
-        status = 'current';
+        status = 'recent';
       } else {
-        status = 'stale';
+        status = 'old';
       }
     }
 

@@ -47,7 +47,7 @@ export default function CasinoResearchStatusTable() {
     }, [filters.searchTerm]);
 
     // Fetch data from server with status filter
-    const statusFilterValue = filters.statusFilter !== "all" ? filters.statusFilter as 'current' | 'stale' | 'missing' : undefined;
+    const statusFilterValue = filters.statusFilter !== "all" ? filters.statusFilter as 'recent' | 'old' | 'never' : undefined;
     const { casinos, isLoading: isLoadingInitial, loadMore, status: paginationStatus } = useCasinosWithOfferStats({
         status: statusFilterValue || 'all',
         pageSize
@@ -167,12 +167,12 @@ export default function CasinoResearchStatusTable() {
 
     const getStatusBadge = (status: CasinoWithOfferStats['status']) => {
         switch (status) {
-            case 'current':
-                return <Badge className="bg-green-500">✓ Current</Badge>;
-            case 'stale':
-                return <Badge variant="outline" className="border-yellow-500 text-yellow-600">⚠ Stale</Badge>;
-            case 'missing':
-                return <Badge variant="destructive">✕ Missing</Badge>;
+            case 'recent':
+                return <Badge className="bg-green-500">✓ Recent</Badge>;
+            case 'old':
+                return <Badge variant="outline" className="border-yellow-500 text-yellow-600">⚠ Old</Badge>;
+            case 'never':
+                return <Badge variant="destructive">✕ Never</Badge>;
         }
     };
 
@@ -347,14 +347,14 @@ export default function CasinoResearchStatusTable() {
                                                 >
                                                     <Eye className="h-4 w-4" />
                                                 </Button>
-                                                {casino.status !== 'current' && (
+                                                {casino.status !== 'recent' && (
                                                     <Button
                                                         variant="ghost"
                                                         size="sm"
-                                                        title={casino.status === 'missing' ? 'Research' : 'Update'}
+                                                        title={casino.status === 'never' ? 'Research' : 'Update'}
                                                         onClick={(e) => e.stopPropagation()}
                                                     >
-                                                        {casino.status === 'missing' ? (
+                                                        {casino.status === 'never' ? (
                                                             <Search className="h-4 w-4" />
                                                         ) : (
                                                             <RefreshCw className="h-4 w-4" />
@@ -381,19 +381,19 @@ export default function CasinoResearchStatusTable() {
                 {/* Summary Stats */}
                 <div className="flex gap-3 md:gap-4 text-xs md:text-sm text-muted-foreground">
                     <span className="flex items-center gap-1">
-                        <span className="hidden sm:inline">Current:</span>
+                        <span className="hidden sm:inline">Recent:</span>
                         <span className="sm:hidden">✓</span>
-                        <span className="font-medium">{casinos.filter((c) => c.status === 'current').length}</span>
+                        <span className="font-medium">{casinos.filter((c) => c.status === 'recent').length}</span>
                     </span>
                     <span className="flex items-center gap-1">
-                        <span className="hidden sm:inline">Stale:</span>
+                        <span className="hidden sm:inline">Old:</span>
                         <span className="sm:hidden">⚠</span>
-                        <span className="font-medium">{casinos.filter((c) => c.status === 'stale').length}</span>
+                        <span className="font-medium">{casinos.filter((c) => c.status === 'old').length}</span>
                     </span>
                     <span className="flex items-center gap-1">
-                        <span className="hidden sm:inline">Missing:</span>
+                        <span className="hidden sm:inline">Never:</span>
                         <span className="sm:hidden">✕</span>
-                        <span className="font-medium">{casinos.filter((c) => c.status === 'missing').length}</span>
+                        <span className="font-medium">{casinos.filter((c) => c.status === 'never').length}</span>
                     </span>
                 </div>
             </div>

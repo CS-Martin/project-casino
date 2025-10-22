@@ -170,7 +170,6 @@ export const createOffersHandler = async (
   for (const newOffer of args.offers) {
     // Check if the offer is expired
     if (isOfferExpired(newOffer.valid_until)) {
-      console.log(`Skipping expired offer: "${newOffer.offer_name}" (valid_until: ${newOffer.valid_until})`);
       results.skipped++;
       results.details.push({
         offer_name: newOffer.offer_name,
@@ -185,9 +184,6 @@ export const createOffersHandler = async (
     // Check for duplicate offers
     const matchingOffer = findMatchingOffer(existingOffers, newOffer);
     if (matchingOffer) {
-      console.log(
-        `Skipping duplicate offer: "${newOffer.offer_name}" (matches existing: "${matchingOffer.offer_name}")`
-      );
       results.skipped++;
       results.details.push({
         offer_name: newOffer.offer_name,

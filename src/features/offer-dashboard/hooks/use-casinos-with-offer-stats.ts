@@ -7,7 +7,7 @@ import { Id } from '@convex/_generated/dataModel';
 
 interface UseCasinosWithOfferStatsParams {
   stateId?: Id<'states'>;
-  status?: 'current' | 'stale' | 'missing' | 'all';
+  status?: 'recent' | 'old' | 'never' | 'all';
   pageSize?: number;
 }
 

@@ -83,6 +83,10 @@ OPENAI_API_KEY=sk-your-openai-api-key
 # Upstash Redis (optional - for caching)
 UPSTASH_REDIS_REST_URL=https://your-redis-url.upstash.io
 UPSTASH_REDIS_REST_TOKEN=your-redis-token
+
+# Logging (optional - defaults to 'error' in production, 'debug' in development)
+# Options: 'error' | 'warn' | 'info' | 'debug'
+LOG_LEVEL=error
 ```
 
 Add OpenAI key to Convex environment:

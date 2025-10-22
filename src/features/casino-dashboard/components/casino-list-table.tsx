@@ -148,7 +148,12 @@ export function CasinoListTable() {
                 isLoading: false,
             });
         } catch (error) {
-            console.error('Error toggling track status:', error);
+            logger.error('Failed to toggle casino track status', error, {
+                component: 'CasinoListTable',
+                casinoId: confirmationDialog.casinoId,
+                casinoName: confirmationDialog.casinoName,
+                isTracked: confirmationDialog.isTracked,
+            });
             toast.error('Failed to update track status. Please try again.');
             setConfirmationDialog(prev => ({ ...prev, isLoading: false }));
         }

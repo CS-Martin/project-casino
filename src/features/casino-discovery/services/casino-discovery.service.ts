@@ -3,6 +3,7 @@ import { ConvexHttpClient } from 'convex/browser';
 import { api } from '../../../../convex/_generated/api';
 import { CasinoDuplicateDetector } from './casino-duplicate-detector.service';
 import { Doc } from '../../../../convex/_generated/dataModel';
+import { logger } from '@/lib/logger';
 
 const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
@@ -93,7 +94,12 @@ export class CasinoDiscoveryService {
           }
         }
       } catch (error) {
-        console.error(`❌ Error saving casinos for ${stateData.state_abbreviation}:`, error);
+        logger.error('Failed to save casinos for state', error, {
+          service: 'CasinoDiscoveryService',
+          function: 'saveDiscoveredCasinos',
+          state: stateData.state_abbreviation,
+          casinoCount: stateData.casinos.length,
+        });
       }
     }
 

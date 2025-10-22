@@ -6,6 +6,7 @@ import { flushSync } from "react-dom";
 import gsap from "gsap";
 import { cn } from "@/lib/utils";
 import { useTheme } from "next-themes";
+import { logger } from "@/lib/logger";
 
 type Props = {
   className?: string;
@@ -83,7 +84,10 @@ export const AnimatedThemeToggler = ({ className }: Props) => {
         { rotate: 0, scale: 1, duration: 0.3, ease: "power2.inOut" }
       );
     } catch (error) {
-      console.error('Error changing theme:', error);
+      logger.warn('Theme animation failed, using fallback', {
+        component: 'AnimatedThemeToggler',
+        error: error instanceof Error ? error.message : String(error),
+      });
       // Fallback: just change the theme without animation
       setTheme(nextTheme);
     }

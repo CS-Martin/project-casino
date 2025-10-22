@@ -7,6 +7,7 @@ import { OfferWithChanges } from '@convex/casinos/queries/getCasinoDetailWithOff
 import { OfferCard } from './offer-card';
 import { AiOfferAnalysis } from './ai-offer-analysis';
 import { BestOfferSkeleton } from './skeletons';
+import { logger } from '@/lib/logger';
 
 interface ActiveOffersSectionProps {
     activeOffers: OfferWithChanges[];
@@ -47,7 +48,10 @@ export function ActiveOffersSection({
                     setAiAnalysis(null);
                 }
             } catch (error) {
-                console.error('Error loading cached analysis:', error);
+                logger.error('Failed to load cached AI analysis', error, {
+                    component: 'ActiveOffersSection',
+                    casinoId,
+                });
                 setAiAnalysis(null);
             } finally {
                 setIsLoadingCache(false);
@@ -113,10 +117,19 @@ export function ActiveOffersSection({
                 setAiAnalysis(data.data);
 
             } else {
-                console.error('AI analysis failed:', data.error);
+                logger.error('AI analysis failed', undefined, {
+                    component: 'ActiveOffersSection',
+                    casinoId,
+                    casinoName,
+                    error: data.error,
+                });
             }
         } catch (error) {
-            console.error('Error calling AI analysis:', error);
+            logger.error('Error calling AI analysis', error, {
+                component: 'ActiveOffersSection',
+                casinoId,
+                casinoName,
+            });
         } finally {
             setIsAnalyzing(false);
         }

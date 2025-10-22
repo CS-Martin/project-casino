@@ -1,4 +1,5 @@
 import redis from '@/lib/redis';
+import { logger } from '@/lib/logger';
 
 /**
  * Invalidates the cached best offer analysis for a specific casino
@@ -12,9 +13,16 @@ export async function invalidateBestOfferCache(casinoId: string): Promise<void> 
 
   try {
     await redis.del(cacheKey);
-    console.log(`🗑️  Invalidated best offer cache for casino: ${casinoId}`);
+    logger.cacheOperation('delete', cacheKey, {
+      function: 'invalidateBestOfferCache',
+      casinoId,
+    });
   } catch (error) {
-    console.error('Failed to invalidate best offer cache:', error);
+    logger.error('Failed to invalidate best offer cache', error, {
+      function: 'invalidateBestOfferCache',
+      cacheKey,
+      casinoId,
+    });
     // Don't throw - cache invalidation failure shouldn't break the app
   }
 }
@@ -29,12 +37,19 @@ export async function invalidateAllBestOfferCaches(): Promise<void> {
 
     if (keys.length > 0) {
       await redis.del(...keys);
-      console.log(`🗑️  Invalidated ${keys.length} best offer caches`);
+      logger.info('Invalidated all best offer caches', {
+        function: 'invalidateAllBestOfferCaches',
+        count: keys.length,
+      });
     } else {
-      console.log('No best offer caches to invalidate');
+      logger.info('No best offer caches to invalidate', {
+        function: 'invalidateAllBestOfferCaches',
+      });
     }
   } catch (error) {
-    console.error('Failed to invalidate all best offer caches:', error);
+    logger.error('Failed to invalidate all best offer caches', error, {
+      function: 'invalidateAllBestOfferCaches',
+    });
   }
 }
 
@@ -48,7 +63,11 @@ export async function getBestOfferCacheTTL(casinoId: string): Promise<number | n
     const ttl = await redis.ttl(cacheKey);
     return ttl > 0 ? ttl : null;
   } catch (error) {
-    console.error('Failed to get cache TTL:', error);
+    logger.error('Failed to get cache TTL', error, {
+      function: 'getBestOfferCacheTTL',
+      cacheKey,
+      casinoId,
+    });
     return null;
   }
 }

@@ -3,6 +3,7 @@ import { zodTextFormat } from 'openai/helpers/zod';
 import { BestOfferResult, BestOfferResultSchema } from '../schema/best-offer-result-schema';
 import { BEST_OFFER_SYSTEM_PROMPT, createBestOfferUserPrompt } from '../lib/constants';
 import redis from '@/lib/redis';
+import { logger } from '@/lib/logger';
 
 const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
@@ -29,9 +30,17 @@ export async function determineBestOffer(
   casinoId: string,
   offers: OfferForAnalysis[]
 ): Promise<{ success: boolean; data?: BestOfferResult; error?: string; cached?: boolean }> {
+  const startTime = Date.now();
+
   try {
     // Validate input
     if (!offers || offers.length === 0) {
+      logger.warn('No offers provided for analysis', {
+        function: 'determineBestOffer',
+        casinoId,
+        casinoName,
+      });
+
       return {
         success: false,
         error: 'No offers provided for analysis',
@@ -43,19 +52,40 @@ export async function determineBestOffer(
     try {
       const cachedResult = await redis.get<BestOfferResult>(cacheKey);
       if (cachedResult) {
+        logger.cacheOperation('hit', cacheKey, {
+          casinoId,
+          casinoName,
+        });
+
         return {
           success: true,
           data: cachedResult,
           cached: true,
         };
       }
+
+      logger.cacheOperation('miss', cacheKey, {
+        casinoId,
+        casinoName,
+      });
     } catch (cacheError) {
-      console.error('Redis cache read error:', cacheError);
+      logger.error('Redis cache read failed', cacheError, {
+        function: 'determineBestOffer',
+        operation: 'cache_read',
+        cacheKey,
+      });
       // Continue with AI analysis if cache fails
     }
 
     if (offers.length === 1) {
       // If only one offer, return it as the best by default (no need to cache this)
+      logger.info('Single offer detected, returning as best by default', {
+        function: 'determineBestOffer',
+        casinoId,
+        casinoName,
+        offerId: offers[0]._id,
+      });
+
       return {
         success: true,
         data: {
@@ -75,6 +105,13 @@ export async function determineBestOffer(
       };
     }
 
+    logger.aiOperation('Best offer determination', 'gpt-4o-mini', {
+      function: 'determineBestOffer',
+      casinoId,
+      casinoName,
+      offersCount: offers.length,
+    });
+
     const response = await client.responses.parse({
       model: 'gpt-4o-mini',
       input: [
@@ -93,6 +130,11 @@ export async function determineBestOffer(
     });
 
     if (!response.output_parsed) {
+      logger.error('No analysis result generated from AI', undefined, {
+        function: 'determineBestOffer',
+        casinoId,
+        model: 'gpt-4o-mini',
+      });
       throw new Error('No analysis result generated from AI');
     }
 
@@ -104,10 +146,27 @@ export async function determineBestOffer(
     // Save to Redis cache
     try {
       await redis.set(cacheKey, analysisData, { ex: CACHE_TTL_SECONDS });
+      logger.cacheOperation('set', cacheKey, {
+        casinoId,
+        ttl: CACHE_TTL_SECONDS,
+      });
     } catch (cacheError) {
-      console.error('Redis cache write error:', cacheError);
+      logger.error('Redis cache write failed', cacheError, {
+        function: 'determineBestOffer',
+        operation: 'cache_write',
+        cacheKey,
+      });
       // Don't fail the request if cache write fails
     }
+
+    const duration = Date.now() - startTime;
+    logger.info('Best offer analysis completed', {
+      function: 'determineBestOffer',
+      casinoId,
+      casinoName,
+      bestOfferId: analysisData.bestOfferId,
+      duration,
+    });
 
     return {
       success: true,
@@ -115,7 +174,14 @@ export async function determineBestOffer(
       cached: false,
     };
   } catch (error: any) {
-    console.error('AI best offer determination failed:', error);
+    const duration = Date.now() - startTime;
+    logger.error('AI best offer determination failed', error, {
+      function: 'determineBestOffer',
+      casinoId,
+      casinoName,
+      duration,
+    });
+
     return {
       success: false,
       error: error.message || 'Unknown error occurred during analysis',

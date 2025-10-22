@@ -1,3 +1,5 @@
+import { logger } from '@/lib/logger';
+
 /**
  * Utility functions for validating offer data
  */
@@ -18,13 +20,20 @@ export function isOfferExpired(validUntil?: string): boolean {
 
     // Check if the date is valid
     if (isNaN(expirationDate.getTime())) {
-      console.warn(`Invalid date format for valid_until: ${validUntil}`);
+      logger.warn('Invalid date format for valid_until', {
+        function: 'isOfferExpired',
+        validUntil,
+      });
       return false; // If we can't parse the date, assume it's still valid
     }
 
     return expirationDate < now;
   } catch (error) {
-    console.warn(`Error parsing valid_until date: ${validUntil}`, error);
+    logger.warn('Error parsing valid_until date', {
+      function: 'isOfferExpired',
+      validUntil,
+      error: error instanceof Error ? error.message : String(error),
+    });
     return false; // If there's an error parsing, assume it's still valid
   }
 }

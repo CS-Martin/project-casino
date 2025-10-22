@@ -1,9 +1,45 @@
 import { NextRequest, NextResponse } from 'next/server';
+import redis from '@/lib/redis';
+import { BestOfferResult } from '@/features/promotional-research/schema/best-offer-result-schema';
 import {
   determineBestOffer,
   type OfferForAnalysis,
 } from '@/features/promotional-research/ai-agent/determine-best-offer';
 
+// GET /api/offers/best?casinoId=xxx - Get cached best offer
+export async function GET(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const casinoId = searchParams.get('casinoId');
+
+    if (!casinoId) {
+      return NextResponse.json({ error: 'casinoId is required' }, { status: 400 });
+    }
+
+    // Check Redis cache only (no AI generation)
+    const cacheKey = `best-offer:${casinoId}`;
+    const cachedResult = await redis.get<BestOfferResult>(cacheKey);
+
+    if (cachedResult) {
+      return NextResponse.json({
+        success: true,
+        data: cachedResult,
+        cached: true,
+      });
+    }
+
+    return NextResponse.json({
+      success: true,
+      data: null,
+      cached: false,
+    });
+  } catch (error: any) {
+    console.error('Get cached best offer API error:', error);
+    return NextResponse.json({ error: error.message || 'Internal server error' }, { status: 500 });
+  }
+}
+
+// POST /api/offers/best - Determine best offer with AI
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();

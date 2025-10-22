@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ConvexHttpClient } from 'convex/browser';
-import { api } from '../../../../convex/_generated/api';
+import { api } from '../../../../../convex/_generated/api';
 
 const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
+// POST /api/offers/research - Trigger offer research
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
@@ -36,26 +37,6 @@ export async function POST(request: NextRequest) {
       {
         success: false,
         error: error.message || 'Internal server error',
-      },
-      { status: 500 }
-    );
-  }
-}
-
-export async function GET() {
-  try {
-    const status = await convex.query(api.offers.index.getOfferResearchStatus, {});
-
-    return NextResponse.json({
-      success: true,
-      data: status,
-    });
-  } catch (error: any) {
-    console.error('❌ API: Failed to get offer research status:', error);
-    return NextResponse.json(
-      {
-        success: false,
-        error: error.message || 'Failed to get status',
       },
       { status: 500 }
     );

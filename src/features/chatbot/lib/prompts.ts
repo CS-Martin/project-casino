@@ -113,14 +113,16 @@ Tool: get_casinos_by_state (for state breakdown) OR get_casino_stats (for totals
 Example: "How many casinos in Michigan?" → get_casinos_by_state
 
 **2. SPECIFIC CASINO SEARCH**
-Triggers: casino name mentioned, "search for", "find casino", "tell me about [casino]"
+Triggers: casino name mentioned, "search for", "find casino", "tell me about [casino]", "list casinos in [state]"
 Tool: search_casinos
 CRITICAL: Clean the query before searching!
-- Remove: "in", "at", "for", "casino", "the"
+- Remove: "in", "at", "for", "casino", "the", "list", "show"
 - Keep: Casino name + State (if mentioned)
 - Examples:
   ✓ "BetMGM in Michigan" → search: "BetMGM Michigan"
   ✓ "find casino DraftKings" → search: "DraftKings"
+  ✓ "list all casinos in West Virginia" → search: "West Virginia"
+  ✓ "show me Pennsylvania casinos" → search: "Pennsylvania"
   ✗ "BetMGM in Michigan" (don't search with "in")
 
 **3. CASINO OFFERS**

@@ -15,6 +15,23 @@ const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 const US_STATES = ['Michigan', 'New Jersey', 'Pennsylvania', 'West Virginia'];
 
 /**
+ * State abbreviation mapping
+ */
+const STATE_ABBREVIATIONS: Record<string, string> = {
+  michigan: 'MI',
+  'new jersey': 'NJ',
+  pennsylvania: 'PA',
+  'west virginia': 'WV',
+};
+
+/**
+ * Get state abbreviation from state name
+ */
+function getStateAbbreviation(stateName: string): string | null {
+  return STATE_ABBREVIATIONS[stateName.toLowerCase()] || null;
+}
+
+/**
  * Extracts casino name and state from a search query
  */
 function parseSearchQuery(query: string): { casinoName: string; stateName: string | null } {
@@ -30,6 +47,9 @@ function parseSearchQuery(query: string): { casinoName: string; stateName: strin
       break;
     }
   }
+
+  // Clean up common filler words from casino name
+  casinoName = casinoName.replace(/\b(in|at|for|casino|casinos|the|list|show|all|down|me)\b/gi, '').trim();
 
   return { casinoName, stateName };
 }
@@ -59,6 +79,30 @@ export async function executeTool(name: string, args: any): Promise<string> {
       const { casinoName, stateName } = parseSearchQuery(args.query);
       console.log('[Chatbot] Extracted - Casino:', casinoName, 'State:', stateName);
 
+      // If only a state is provided (no casino name), return all casinos for that state
+      if (stateName && (!casinoName || casinoName.trim() === '')) {
+        console.log('[Chatbot] State-only query detected, fetching all casinos for:', stateName);
+        const allCasinos = await convex.query(api.casinos.index.getCasinosSearchable, {
+          searchTerm: '', // Empty search returns all
+          paginationOpts: { numItems: 100, cursor: null }, // Get more results for state filtering
+        });
+
+        // Filter by state
+        const stateAbbrev = getStateAbbreviation(stateName);
+        const casinosInState = allCasinos.page.filter((casino: any) => {
+          return (
+            casino.state?.name?.toLowerCase() === stateName!.toLowerCase() ||
+            casino.state?.abbreviation?.toLowerCase() === stateAbbrev?.toLowerCase()
+          );
+        });
+
+        console.log('[Chatbot] Found', casinosInState.length, 'casinos in', stateName);
+
+        // Limit results
+        const limitedCasinos = casinosInState.slice(0, args.limit || 20);
+        return JSON.stringify(limitedCasinos, null, 2);
+      }
+
       // First try: search with just the casino name (more flexible)
       let casinos = await convex.query(api.casinos.index.getCasinosSearchable, {
         searchTerm: casinoName,
@@ -69,10 +113,11 @@ export async function executeTool(name: string, args: any): Promise<string> {
 
       // If we have a state and multiple results, filter by state
       if (stateName && casinos.page.length > 1) {
+        const stateAbbrev = getStateAbbreviation(stateName);
         casinos.page = casinos.page.filter((casino: any) => {
           return (
-            casino.state?.name?.toLowerCase().includes(stateName!.toLowerCase()) ||
-            casino.state?.abbreviation?.toLowerCase() === stateName!.substring(0, 2).toLowerCase()
+            casino.state?.name?.toLowerCase() === stateName!.toLowerCase() ||
+            casino.state?.abbreviation?.toLowerCase() === stateAbbrev?.toLowerCase()
           );
         });
         console.log('[Chatbot] After state filtering:', casinos.page.length, 'casinos');

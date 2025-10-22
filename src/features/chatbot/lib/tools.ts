@@ -40,14 +40,14 @@ export const tools: OpenAI.Chat.Completions.ChatCompletionTool[] = [
     function: {
       name: 'search_casinos',
       description:
-        'Search for casinos by name and/or state. When 1-2 casinos are found, their offers are automatically included. IMPORTANT: Only use casino name and state in the query, omit filler words like "in", "at", "for", "casino". Examples: "BetMGM Michigan" (not "BetMGM in Michigan"), "DraftKings" (not "casino DraftKings").',
+        'Search for casinos by name and/or state. Also use this to LIST ALL casinos in a specific state. When 1-2 casinos are found, their offers are automatically included. IMPORTANT: Only use casino name and state in the query, omit filler words. Examples: "BetMGM Michigan", "DraftKings", "West Virginia" (to list all casinos in WV).',
       parameters: {
         type: 'object',
         properties: {
           query: {
             type: 'string',
             description:
-              'Clean search query with just casino name and/or state. Examples: "BetMGM Michigan", "DraftKings New Jersey", "Caesars"',
+              'Search query: casino name, state name, or both. Examples: "BetMGM Michigan", "DraftKings", "West Virginia", "Pennsylvania"',
           },
           limit: {
             type: 'number',

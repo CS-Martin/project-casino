@@ -14,8 +14,10 @@ import {
 import { NavMain } from "./nav-main"
 import Image from "next/image"
 import { useTheme } from "next-themes"
-import { LayoutDashboard, BarChart3, Brain } from "lucide-react"
+import { LayoutDashboard, BarChart3, Brain, MessageCircle } from "lucide-react"
 import { Label } from "../ui/label"
+import { ChatbotWidget } from "@/features/chatbot"
+import { AskAiBtn } from "@/features/chatbot/components/ask-ai-btn"
 
 const data = {
 
@@ -42,6 +44,7 @@ const data = {
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     const { theme } = useTheme()
     const [mounted, setMounted] = useState(false)
+    const [chatbotOpen, setChatbotOpen] = useState(false)
 
     useEffect(() => {
         setMounted(true)
@@ -69,14 +72,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 </SidebarMenu>
             </SidebarHeader>
             <SidebarContent>
+                <AskAiBtn className="w-full mt-5" />
                 <Label className="text-gray-500 text-xs px-2">Main</Label>
                 <NavMain items={data.navMain} />
                 {/* <NavDocuments items={data.documents} />
                 <NavSecondary items={data.navSecondary} className="mt-auto" /> */}
             </SidebarContent>
-            <SidebarFooter>
-                Footer
-            </SidebarFooter>
+
         </Sidebar>
     )
 }

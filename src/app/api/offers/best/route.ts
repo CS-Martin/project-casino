@@ -18,7 +18,12 @@ export async function GET(request: NextRequest) {
     const rateLimitResult = await apiRateLimiter.check(clientIp);
 
     if (!rateLimitResult.success) {
-      return createRateLimitResponse(rateLimitResult.reset);
+      logger.warn('Rate limit exceeded', {
+        ip: clientIp,
+        endpoint: '/api/offers/best (GET)',
+        limit: rateLimitResult.limit,
+      });
+      return createRateLimitResponse(rateLimitResult.reset, rateLimitResult.limit);
     }
     const { searchParams } = new URL(request.url);
     const casinoId = searchParams.get('casinoId');
@@ -86,7 +91,12 @@ export async function POST(request: NextRequest) {
     const rateLimitResult = await strictRateLimiter.check(clientIp);
 
     if (!rateLimitResult.success) {
-      return createRateLimitResponse(rateLimitResult.reset);
+      logger.warn('Rate limit exceeded', {
+        ip: clientIp,
+        endpoint: '/api/offers/best (POST)',
+        limit: rateLimitResult.limit,
+      });
+      return createRateLimitResponse(rateLimitResult.reset, rateLimitResult.limit);
     }
     const body = await request.json();
     const { casinoName, casinoId, offers } = body as {

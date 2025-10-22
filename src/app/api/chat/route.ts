@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
         endpoint: '/api/chat',
         limit: rateLimitResult.limit,
       });
-      return createRateLimitResponse(rateLimitResult.reset);
+      return createRateLimitResponse(rateLimitResult.reset, rateLimitResult.limit);
     }
 
     // Log successful rate limit check

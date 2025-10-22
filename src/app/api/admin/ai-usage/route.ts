@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
     const rateLimitResult = await apiRateLimiter.check(clientIp);
 
     if (!rateLimitResult.success) {
-      return createRateLimitResponse(rateLimitResult.reset);
+      return createRateLimitResponse(rateLimitResult.reset, rateLimitResult.limit);
     }
     const { searchParams } = new URL(request.url);
     const period = searchParams.get('period') || '24h';

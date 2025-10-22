@@ -98,19 +98,23 @@ class RateLimiter {
 
 /**
  * Chat endpoint rate limiter
- * - 20 requests per minute per IP
+ * - 5 requests per minute per IP
  * - Protects expensive OpenAI API calls
+ * - Allows natural conversation while preventing abuse
+ *
+ * Cost: ~$0.15-0.50 per 100 messages (gpt-4o-mini)
+ * 5/min = max 300/hour = ~$0.45-1.50/hour per abusive user
  */
 export const chatRateLimiter = new RateLimiter({
   interval: 60 * 1000, // 1 minute
   uniqueTokenPerInterval: 500, // Track up to 500 unique IPs
-  maxRequests: 10, // 10 messages per minute
+  maxRequests: 5, // 5 messages per minute (1 every 12 seconds)
 });
 
 /**
  * General API rate limiter
  * - 100 requests per minute per IP
- * - For other API endpoints
+ * - For database queries and cache lookups (no AI cost)
  */
 export const apiRateLimiter = new RateLimiter({
   interval: 60 * 1000, // 1 minute
@@ -119,14 +123,30 @@ export const apiRateLimiter = new RateLimiter({
 });
 
 /**
- * Strict rate limiter
- * - 5 requests per minute per IP
- * - For sensitive operations (admin actions, etc.)
+ * Strict rate limiter for VERY expensive AI operations
+ * - 2 requests per minute per IP
+ * - For research operations with web search + AI
+ *
+ * Cost: Casino discovery can cost $0.50-2.00 per request
+ * 2/min = max 120/hour = ~$60-240/hour if abused (!)
  */
 export const strictRateLimiter = new RateLimiter({
   interval: 60 * 1000, // 1 minute
   uniqueTokenPerInterval: 200,
-  maxRequests: 5,
+  maxRequests: 2, // Only 2 requests per minute (1 every 30 seconds)
+});
+
+/**
+ * Ultra-strict rate limiter for MOST expensive operations
+ * - 1 request per 5 minutes per IP
+ * - For operations that should rarely be triggered manually
+ *
+ * Use for: Mass casino discovery, bulk offer research
+ */
+export const ultraStrictRateLimiter = new RateLimiter({
+  interval: 5 * 60 * 1000, // 5 minutes
+  uniqueTokenPerInterval: 200,
+  maxRequests: 1, // Only 1 request per 5 minutes
 });
 
 /**
@@ -161,7 +181,7 @@ export function getClientIp(request: Request): string {
 /**
  * Helper function to create rate limit response
  */
-export function createRateLimitResponse(reset: number) {
+export function createRateLimitResponse(reset: number, limit: number = 20) {
   const retryAfter = Math.ceil((reset - Date.now()) / 1000);
 
   return new Response(
@@ -175,7 +195,7 @@ export function createRateLimitResponse(reset: number) {
       headers: {
         'Content-Type': 'application/json',
         'Retry-After': retryAfter.toString(),
-        'X-RateLimit-Limit': '20',
+        'X-RateLimit-Limit': limit.toString(),
         'X-RateLimit-Remaining': '0',
         'X-RateLimit-Reset': reset.toString(),
       },

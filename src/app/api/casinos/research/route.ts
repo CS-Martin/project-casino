@@ -4,6 +4,7 @@ import { CasinoDiscoveryService } from '@/features/casino-discovery/services/cas
 import { ConvexHttpClient } from 'convex/browser';
 import { api } from '../../../../../convex/_generated/api';
 import { strictRateLimiter, getClientIp, createRateLimitResponse } from '@/lib/rate-limiter';
+import { logger } from '@/lib/logger';
 
 const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
@@ -17,7 +18,12 @@ export async function POST(request: NextRequest) {
     const rateLimitResult = await strictRateLimiter.check(clientIp);
 
     if (!rateLimitResult.success) {
-      return createRateLimitResponse(rateLimitResult.reset);
+      logger.warn('Rate limit exceeded', {
+        ip: clientIp,
+        endpoint: '/api/casinos/research',
+        limit: rateLimitResult.limit,
+      });
+      return createRateLimitResponse(rateLimitResult.reset, rateLimitResult.limit);
     }
     const discovered = await DiscoverCasino();
     const result = await CasinoDiscoveryService.saveDiscoveredCasinos(discovered.discoverCasino);

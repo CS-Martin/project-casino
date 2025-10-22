@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
     // Get client IP for rate limiting
     const clientIp = getClientIp(request);
 
-    // Check rate limit (using chat limiter: 10 requests per minute)
+    // Check rate limit (using chat limiter: 5 requests per minute)
     const rateLimitResult = await chatRateLimiter.check(clientIp);
 
     if (!rateLimitResult.success) {

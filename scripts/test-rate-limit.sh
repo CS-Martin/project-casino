@@ -7,7 +7,7 @@ echo "🧪 Testing Rate Limit (10 requests/minute)"
 echo "=========================================="
 echo ""
 
-URL="${1:-http://localhost:3000/api/test-rate-limit}"
+URL="${1:-https://project-casino.martinatole.com/api/test-rate-limit}"
 REQUESTS=15
 
 echo "Making $REQUESTS requests to: $URL"

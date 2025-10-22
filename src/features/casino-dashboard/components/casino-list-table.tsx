@@ -18,6 +18,7 @@ import { Id } from "@convex/_generated/dataModel";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { logger } from "@/lib/logger";
 
 export function CasinoListTable() {
     const [pageSize, setPageSize] = useState(10);

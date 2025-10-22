@@ -8,6 +8,7 @@
  * @module
  */
 
+import type * as casinos_actions_scheduledCasinoDiscovery from "../casinos/actions/scheduledCasinoDiscovery.js";
 import type * as casinos_index from "../casinos/index.js";
 import type * as casinos_mutations_createCasino from "../casinos/mutations/createCasino.js";
 import type * as casinos_mutations_createMultipleCasinos from "../casinos/mutations/createMultipleCasinos.js";
@@ -61,6 +62,7 @@ import type {
  * ```
  */
 declare const fullApi: ApiFromModules<{
+  "casinos/actions/scheduledCasinoDiscovery": typeof casinos_actions_scheduledCasinoDiscovery;
   "casinos/index": typeof casinos_index;
   "casinos/mutations/createCasino": typeof casinos_mutations_createCasino;
   "casinos/mutations/createMultipleCasinos": typeof casinos_mutations_createMultipleCasinos;

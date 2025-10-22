@@ -1,4 +1,4 @@
-import { mutation, query } from '../_generated/server';
+import { mutation, query, internalAction } from '../_generated/server';
 import { v } from 'convex/values';
 import { createCasinoArgs, createCasinoHandler } from './mutations/createCasino';
 import { createMultipleCasinosArgs, createMultipleCasinosHandler } from './mutations/createMultipleCasinos';
@@ -19,6 +19,7 @@ import {
 import { getCasinosWithOfferStatsArgs, getCasinosWithOfferStatsHandler } from './queries/getCasinosWithOfferStats';
 import { getCasinoDetailWithOffersArgs, getCasinoDetailWithOffersHandler } from './queries/getCasinoDetailWithOffers';
 import { updateOfferCheckTimestampArgs, updateOfferCheckTimestampHandler } from './mutations/updateOfferCheckTimestamp';
+import { scheduledCasinoDiscoveryArgs, scheduledCasinoDiscoveryHandler } from './actions/scheduledCasinoDiscovery';
 
 // Queries
 export const getAllCasinos = query({
@@ -97,4 +98,10 @@ export const toggleTrackCasino = mutation({
 export const updateOfferCheckTimestamp = mutation({
   args: updateOfferCheckTimestampArgs,
   handler: updateOfferCheckTimestampHandler,
+});
+
+// Actions
+export const scheduledCasinoDiscovery = internalAction({
+  args: scheduledCasinoDiscoveryArgs,
+  handler: scheduledCasinoDiscoveryHandler,
 });

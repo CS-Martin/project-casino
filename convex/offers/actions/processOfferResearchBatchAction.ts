@@ -14,8 +14,6 @@ export const processOfferResearchBatchAction = action({
     const batchSize = args.batchSize || 30;
     const startTime = Date.now();
 
-    console.log(`🚀 Starting offer research batch processing (batch size: ${batchSize})`);
-
     try {
       // STEP 1: Get casinos that need offer research
       // This query prioritizes tracked casinos with oldest last_offer_check timestamps
@@ -25,7 +23,6 @@ export const processOfferResearchBatchAction = action({
 
       // Early exit if no casinos need research
       if (casinos.length === 0) {
-        console.log('ℹ️ No tracked casinos found for offer research');
         return {
           success: true,
           message: 'No tracked casinos found for offer research',
@@ -33,8 +30,6 @@ export const processOfferResearchBatchAction = action({
           duration: Date.now() - startTime,
         };
       }
-
-      console.log(`📋 Processing ${casinos.length} casinos for offer research`);
 
       // STEP 2: Dynamic import of AI research service
       // We import this dynamically to avoid module load issues during Convex analysis
@@ -100,10 +95,6 @@ export const processOfferResearchBatchAction = action({
           processingResults.totalCreated += createResult.created;
           processingResults.totalUpdated += createResult.updated;
           processingResults.totalSkipped += createResult.skipped;
-
-          console.log(
-            `✅ Processed ${casinoResearch.casino_name}: ${createResult.created} created, ${createResult.updated} updated, ${createResult.skipped} skipped`
-          );
         } catch (error: any) {
           // Handle individual casino processing errors
           // Don't let one casino's failure stop the entire batch
@@ -123,10 +114,6 @@ export const processOfferResearchBatchAction = action({
 
       // STEP 9: Log final results and return success response
       const duration = Date.now() - startTime;
-      console.log(`🎉 Batch processing completed in ${duration}ms`);
-      console.log(
-        `📊 Results: ${processingResults.totalProcessed} casinos processed, ${processingResults.totalCreated} offers created, ${processingResults.totalUpdated} offers updated`
-      );
 
       return {
         success: true,

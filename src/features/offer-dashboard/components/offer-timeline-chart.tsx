@@ -176,7 +176,7 @@ export default function OfferTimelineChart() {
     return (
         <Card className="pt-0 flex flex-col h-full">
             <CardHeader className="space-y-0 border-b py-5">
-                <div className="flex items-start justify-between gap-4 mb-4">
+                <div className="flex flex-col 2xl:flex-row items-start justify-between gap-4 mb-4">
                     <div className="grid flex-1 gap-1">
                         <CardTitle>Research Activity & Offer Timeline</CardTitle>
                         <CardDescription>

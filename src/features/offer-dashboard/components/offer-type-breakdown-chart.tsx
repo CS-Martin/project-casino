@@ -119,7 +119,7 @@ export default function OfferTypeBreakdownChart() {
                 <div className="shrink-0">
                     <ChartContainer
                         config={chartConfig}
-                        className="mx-auto aspect-square h-[250px] w-[250px]"
+                        className="mx-auto aspect-square h-[250px] 2xl:w-[250px]"
                     >
                         <PieChart>
                             <ChartTooltip

@@ -3,20 +3,27 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { ReactNode } from "react";
 
 interface TableContainerProps {
-    title: string;
+    title: string | ReactNode;
     description: string | ReactNode;
     children: ReactNode;
     className?: string;
+    contentClassName?: string;
 }
 
-export function TableContainer({ title, description, children, className = "" }: TableContainerProps) {
+export function TableContainer({
+    title,
+    description,
+    children,
+    className = "",
+    contentClassName = ""
+}: TableContainerProps) {
     return (
         <Card className={className}>
             <CardHeader>
                 <CardTitle>{title}</CardTitle>
                 <CardDescription>{description}</CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className={contentClassName}>
                 {children}
             </CardContent>
         </Card>

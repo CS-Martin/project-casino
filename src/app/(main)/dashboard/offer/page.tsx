@@ -30,14 +30,14 @@ export default function OfferDashboardPage() {
                 </div>
 
                 {/* Charts Row */}
-                <div className="grid gap-4 md:grid-cols-5">
+                <div className="grid gap-4 grid-cols-1 2xl:grid-cols-5">
                     {/* Timeline Chart */}
-                    <div className="md:col-span-3">
+                    <div className="col-span-1 2xl:col-span-3">
                         <ResearchHistoryTable />
                     </div>
 
                     {/* Offer Type Breakdown */}
-                    <div className="md:col-span-2">
+                    <div className="col-span-1 2xl:col-span-2">
                         <OfferTypeBreakdownChart />
                     </div>
                 </div>

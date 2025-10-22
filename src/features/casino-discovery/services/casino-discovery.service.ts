@@ -9,6 +9,11 @@ const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 interface SaveResult {
   saved: number;
   skipped: number;
+  savedCasinos: Array<{
+    name: string;
+    state: string;
+    website?: string;
+  }>;
   duplicates: Array<{
     discovered: string;
     existing: string;
@@ -25,6 +30,7 @@ export class CasinoDiscoveryService {
     const result: SaveResult = {
       saved: 0,
       skipped: 0,
+      savedCasinos: [],
       duplicates: [],
     };
 
@@ -76,6 +82,15 @@ export class CasinoDiscoveryService {
             casinos: casinosToSave as Array<Doc<'casinos'>>,
           });
           result.saved += casinosToSave.length;
+
+          // Track saved casino details
+          for (const casino of casinosToSave) {
+            result.savedCasinos.push({
+              name: casino.name!,
+              state: stateData.state_abbreviation,
+              website: casino.website,
+            });
+          }
         }
       } catch (error) {
         console.error(`❌ Error saving casinos for ${stateData.state_abbreviation}:`, error);

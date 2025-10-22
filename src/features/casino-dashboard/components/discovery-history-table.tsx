@@ -1,45 +1,18 @@
 'use client';
 
 import * as React from 'react';
-import { formatDistanceToNow } from 'date-fns';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
-import {
-    CheckCircle2,
-    XCircle,
-    Clock,
-    TrendingUp,
-    Calendar,
-    Zap,
-    ChevronDown,
-    ChevronRight,
-    Building2,
-    AlertCircle,
-} from 'lucide-react';
-import { useDiscoveryLogs } from '../hooks/use-discovery-logs';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Button } from '@/components/ui/button';
+import { Table, TableBody, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { TrendingUp, Calendar, Building2 } from 'lucide-react';
 import {
     Tooltip,
     TooltipContent,
     TooltipProvider,
     TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { Skeleton } from '@/components/ui/skeleton';
 import { TableContainer } from '@/components/custom/table/table-container';
-
-interface Duplicate {
-    discovered: string;
-    existing: string;
-    reason: string;
-    score?: number;
-}
+import { useDiscoveryLogs } from '../hooks/use-discovery-logs';
+import { DiscoveryLogRow } from './discovery-history/discovery-log-row';
 
 export function DiscoveryHistoryTable() {
     const { logs, stats, isLoading } = useDiscoveryLogs(5);
@@ -55,14 +28,6 @@ export function DiscoveryHistoryTable() {
             }
             return next;
         });
-    };
-
-    const formatDuration = (ms: number) => {
-        const seconds = Math.floor(ms / 1000);
-        if (seconds < 60) return `${seconds}s`;
-        const minutes = Math.floor(seconds / 60);
-        const remainingSeconds = seconds % 60;
-        return `${minutes}m ${remainingSeconds}s`;
     };
 
     if (isLoading) {
@@ -137,140 +102,14 @@ export function DiscoveryHistoryTable() {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {logs.map((log: any) => {
-                                const isExpanded = expandedRows.has(log._id);
-                                const hasDetails = log.duplicates && log.duplicates.length > 0;
-
-                                return (
-                                    <React.Fragment key={log._id}>
-                                        <TableRow className="hover:bg-muted/50">
-                                            <TableCell>
-                                                {hasDetails && (
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        className="h-6 w-6 p-0"
-                                                        onClick={() => toggleRow(log._id)}
-                                                    >
-                                                        {isExpanded ? (
-                                                            <ChevronDown className="h-4 w-4" />
-                                                        ) : (
-                                                            <ChevronRight className="h-4 w-4" />
-                                                        )}
-                                                    </Button>
-                                                )}
-                                            </TableCell>
-                                            <TableCell className="font-medium">
-                                                <TooltipProvider>
-                                                    <Tooltip>
-                                                        <TooltipTrigger asChild>
-                                                            <span className="cursor-help">
-                                                                {formatDistanceToNow(log.timestamp, { addSuffix: true })}
-                                                            </span>
-                                                        </TooltipTrigger>
-                                                        <TooltipContent>
-                                                            {new Date(log.timestamp).toLocaleString()}
-                                                        </TooltipContent>
-                                                    </Tooltip>
-                                                </TooltipProvider>
-                                            </TableCell>
-                                            <TableCell className="text-center">
-                                                <span className="font-semibold text-blue-600 dark:text-blue-400">
-                                                    {log.casinos_discovered}
-                                                </span>
-                                            </TableCell>
-                                            <TableCell className="text-center">
-                                                <span className="font-semibold text-green-600 dark:text-green-400">
-                                                    {log.casinos_saved}
-                                                </span>
-                                            </TableCell>
-                                            <TableCell className="text-center">
-                                                <span className="text-muted-foreground">{log.casinos_skipped}</span>
-                                            </TableCell>
-                                            <TableCell>
-                                                <div className="flex items-center gap-1 text-sm">
-                                                    <Zap className="h-3 w-3 text-yellow-600" />
-                                                    {formatDuration(log.duration_ms)}
-                                                </div>
-                                            </TableCell>
-                                            <TableCell>
-                                                <Badge
-                                                    variant={log.triggered_by === 'cron' ? 'default' : 'secondary'}
-                                                    className="text-xs"
-                                                >
-                                                    {log.triggered_by === 'cron' ? '🤖 Auto' : '👤 Manual'}
-                                                </Badge>
-                                            </TableCell>
-                                            <TableCell className="text-center">
-                                                <TooltipProvider>
-                                                    <Tooltip>
-                                                        <TooltipTrigger asChild>
-                                                            <div className="flex justify-center cursor-help">
-                                                                {log.success ? (
-                                                                    <CheckCircle2 className="h-5 w-5 text-green-600" />
-                                                                ) : (
-                                                                    <XCircle className="h-5 w-5 text-red-600" />
-                                                                )}
-                                                            </div>
-                                                        </TooltipTrigger>
-                                                        <TooltipContent>
-                                                            {log.success ? 'Successful' : 'Failed'}
-                                                            {log.error && (
-                                                                <div className="mt-1 text-xs max-w-xs">
-                                                                    <div className="truncate">• {log.error}</div>
-                                                                </div>
-                                                            )}
-                                                        </TooltipContent>
-                                                    </Tooltip>
-                                                </TooltipProvider>
-                                            </TableCell>
-                                        </TableRow>
-
-                                        {/* Expandable Details Row */}
-                                        {isExpanded && hasDetails && (
-                                            <TableRow>
-                                                <TableCell colSpan={8} className="bg-muted/30 p-4">
-                                                    <div className="space-y-2">
-                                                        <h4 className="font-semibold text-sm mb-3">
-                                                            Duplicate Casinos ({log.duplicates.length})
-                                                        </h4>
-                                                        <div className="grid gap-2 max-h-64 overflow-y-auto">
-                                                            {log.duplicates.map((dup: Duplicate, idx: number) => (
-                                                                <div
-                                                                    key={idx}
-                                                                    className="flex items-start gap-2 p-2 rounded-md bg-background border text-sm"
-                                                                >
-                                                                    <AlertCircle className="h-4 w-4 text-orange-600 mt-0.5" />
-                                                                    <div className="flex-1 min-w-0">
-                                                                        <div className="flex items-center gap-2 flex-wrap">
-                                                                            <span className="font-medium">{dup.discovered}</span>
-                                                                            <span className="text-muted-foreground">→</span>
-                                                                            <span className="text-blue-600 dark:text-blue-400">
-                                                                                {dup.existing}
-                                                                            </span>
-                                                                        </div>
-                                                                        <p className="text-xs text-muted-foreground mt-1">
-                                                                            {dup.reason}
-                                                                        </p>
-                                                                        {dup.score !== undefined && (
-                                                                            <Badge variant="outline" className="text-xs mt-1">
-                                                                                Similarity: {Math.round(dup.score * 100)}%
-                                                                            </Badge>
-                                                                        )}
-                                                                    </div>
-                                                                    <Badge variant="secondary" className="text-xs">
-                                                                        Duplicate
-                                                                    </Badge>
-                                                                </div>
-                                                            ))}
-                                                        </div>
-                                                    </div>
-                                                </TableCell>
-                                            </TableRow>
-                                        )}
-                                    </React.Fragment>
-                                );
-                            })}
+                            {logs.map((log: any) => (
+                                <DiscoveryLogRow
+                                    key={log._id}
+                                    log={log}
+                                    isExpanded={expandedRows.has(log._id)}
+                                    onToggle={() => toggleRow(log._id)}
+                                />
+                            ))}
                         </TableBody>
                     </Table>
                 </div>

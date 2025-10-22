@@ -6,6 +6,15 @@ export const createDiscoveryLogArgs = {
   casinos_discovered: v.number(),
   casinos_saved: v.number(),
   casinos_skipped: v.number(),
+  saved_casinos: v.optional(
+    v.array(
+      v.object({
+        name: v.string(),
+        state: v.string(),
+        website: v.optional(v.string()),
+      })
+    )
+  ),
   duplicates: v.optional(
     v.array(
       v.object({
@@ -30,6 +39,11 @@ export const createDiscoveryLogHandler = async (
     casinos_discovered: number;
     casinos_saved: number;
     casinos_skipped: number;
+    saved_casinos?: Array<{
+      name: string;
+      state: string;
+      website?: string;
+    }>;
     duplicates?: Array<{
       discovered: string;
       existing: string;
@@ -48,6 +62,7 @@ export const createDiscoveryLogHandler = async (
     casinos_discovered: args.casinos_discovered,
     casinos_saved: args.casinos_saved,
     casinos_skipped: args.casinos_skipped,
+    saved_casinos: args.saved_casinos,
     duplicates: args.duplicates,
     states_searched: args.states_searched,
     duration_ms: args.duration_ms,

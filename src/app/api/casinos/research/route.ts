@@ -29,6 +29,7 @@ export async function POST() {
       casinos_discovered: totalDiscovered,
       casinos_saved: result.saved,
       casinos_skipped: result.skipped,
+      saved_casinos: result.savedCasinos.length > 0 ? result.savedCasinos : undefined,
       duplicates: result.duplicates.length > 0 ? result.duplicates : undefined,
       states_searched: statesSearched,
       duration_ms: duration,

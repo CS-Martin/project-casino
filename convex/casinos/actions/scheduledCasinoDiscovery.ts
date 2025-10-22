@@ -47,6 +47,11 @@ export const scheduledCasinoDiscoveryHandler = async (ctx: ActionCtx) => {
       totalDiscovered: 0,
       totalSaved: 0,
       totalSkipped: 0,
+      savedCasinos: [] as Array<{
+        name: string;
+        state: string;
+        website?: string;
+      }>,
       duplicates: [] as Array<{
         discovered: string;
         existing: string;
@@ -97,6 +102,11 @@ export const scheduledCasinoDiscoveryHandler = async (ctx: ActionCtx) => {
               is_tracked: false,
             });
             processingResults.totalSaved++;
+            processingResults.savedCasinos.push({
+              name: discoveredCasino.casino_name,
+              state: stateData.state_abbreviation,
+              website: discoveredCasino.website,
+            });
           }
         }
       } catch (error: any) {
@@ -112,6 +122,7 @@ export const scheduledCasinoDiscoveryHandler = async (ctx: ActionCtx) => {
       casinos_discovered: processingResults.totalDiscovered,
       casinos_saved: processingResults.totalSaved,
       casinos_skipped: processingResults.totalSkipped,
+      saved_casinos: processingResults.savedCasinos,
       duplicates: processingResults.duplicates,
       states_searched: Array.from(processingResults.statesSearched),
       duration_ms: duration,

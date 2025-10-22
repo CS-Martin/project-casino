@@ -6,6 +6,15 @@ export const casino_discovery_logs = defineTable({
   casinos_discovered: v.number(),
   casinos_saved: v.number(),
   casinos_skipped: v.number(),
+  saved_casinos: v.optional(
+    v.array(
+      v.object({
+        name: v.string(),
+        state: v.string(),
+        website: v.optional(v.string()),
+      })
+    )
+  ),
   duplicates: v.optional(
     v.array(
       v.object({

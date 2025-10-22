@@ -25,6 +25,12 @@ export const triggerOfferResearch = action({
   handler: triggerOfferResearchHandler,
 });
 
+// Internal action for cron jobs
+export const scheduledOfferResearch = internalAction({
+  args: triggerOfferResearchArgs,
+  handler: triggerOfferResearchHandler,
+});
+
 // Queries
 export const getOfferResearchStatus = query({
   args: getOfferResearchStatusArgs,

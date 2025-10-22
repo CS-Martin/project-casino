@@ -17,6 +17,7 @@ export const triggerOfferResearchHandler = async (
 ) => {
   const batchSize = args.batchSize || DEFAULT_BATCH_SIZE;
   const startTime = Date.now();
+  const triggeredBy = args.casinoIds ? 'manual' : 'cron';
 
   try {
     let casinos;
@@ -33,11 +34,30 @@ export const triggerOfferResearchHandler = async (
     }
 
     if (casinos.length === 0) {
+      const duration = Date.now() - startTime;
+
+      // Save log for empty run
+      try {
+        await ctx.runMutation(api.offer_research_logs.index.createResearchLog, {
+          casinos_researched: 0,
+          offers_created: 0,
+          offers_updated: 0,
+          offers_skipped: 0,
+          casinos: [],
+          duration_ms: duration,
+          success: true,
+          triggered_by: triggeredBy,
+          batch_size: batchSize,
+        });
+      } catch (logError) {
+        console.error('Failed to save research log:', logError);
+      }
+
       return {
         success: true,
         message: 'No casinos found for offer research',
         processed: 0,
-        duration: Date.now() - startTime,
+        duration,
       };
     }
 
@@ -54,11 +74,34 @@ export const triggerOfferResearchHandler = async (
     const researchResult = await researchCasinoOffers(casinosForResearch);
 
     if (!researchResult.success || !researchResult.data) {
+      const duration = Date.now() - startTime;
+
+      // Save failed research log
+      try {
+        await ctx.runMutation(api.offer_research_logs.index.createResearchLog, {
+          casinos_researched: 0,
+          offers_created: 0,
+          offers_updated: 0,
+          offers_skipped: 0,
+          casinos: casinos.map((c) => ({
+            id: c?._id as Id<'casinos'>,
+            name: c?.name as string,
+          })),
+          duration_ms: duration,
+          success: false,
+          errors: [researchResult.error || 'AI research failed'],
+          triggered_by: triggeredBy,
+          batch_size: batchSize,
+        });
+      } catch (logError) {
+        console.error('Failed to save error log:', logError);
+      }
+
       return {
         success: false,
         error: researchResult.error || 'AI research failed',
         processed: 0,
-        duration: Date.now() - startTime,
+        duration,
       };
     }
 
@@ -73,10 +116,12 @@ export const triggerOfferResearchHandler = async (
 
     for (const casinoResearch of researchResult.data) {
       try {
-        // Find the casino in our database
-        const casino = casinos.find((c) => c?.name === casinoResearch.casino_name);
+        // Find the casino in our database by ID
+        const casino = casinos.find((c) => c?._id === casinoResearch.casino_id);
         if (!casino) {
-          console.warn(`⚠️ Casino not found in database: ${casinoResearch.casino_name}`);
+          console.warn(
+            `⚠️ Casino not found in database: ${casinoResearch.casino_name} (ID: ${casinoResearch.casino_id})`
+          );
           continue;
         }
 
@@ -107,7 +152,7 @@ export const triggerOfferResearchHandler = async (
 
     const duration = Date.now() - startTime;
 
-    return {
+    const result = {
       success: true,
       processed: processingResults.totalProcessed,
       created: processingResults.totalCreated,
@@ -115,16 +160,60 @@ export const triggerOfferResearchHandler = async (
       skipped: processingResults.totalSkipped,
       errors: processingResults.errors,
       duration,
-      triggeredBy: 'manual',
+      triggeredBy,
     };
+
+    // Save research log to history
+    try {
+      await ctx.runMutation(api.offer_research_logs.index.createResearchLog, {
+        casinos_researched: processingResults.totalProcessed,
+        offers_created: processingResults.totalCreated,
+        offers_updated: processingResults.totalUpdated,
+        offers_skipped: processingResults.totalSkipped,
+        casinos: casinos.map((c) => ({
+          id: c?._id as Id<'casinos'>,
+          name: c?.name as string,
+        })),
+        duration_ms: duration,
+        success: true,
+        errors: processingResults.errors.length > 0 ? processingResults.errors : undefined,
+        triggered_by: triggeredBy,
+        batch_size: batchSize,
+      });
+    } catch (logError) {
+      console.error('Failed to save research log:', logError);
+      // Don't fail the whole request if logging fails
+    }
+
+    return result;
   } catch (error: any) {
-    console.error('❌ Manual trigger failed:', error);
+    console.error('❌ Offer research trigger failed:', error);
+    const duration = Date.now() - startTime;
+
+    // Save failed research log
+    try {
+      await ctx.runMutation(api.offer_research_logs.index.createResearchLog, {
+        casinos_researched: 0,
+        offers_created: 0,
+        offers_updated: 0,
+        offers_skipped: 0,
+        casinos: [], // No casinos processed in case of error
+        duration_ms: duration,
+        success: false,
+        errors: [error.message || 'Unknown error occurred'],
+        triggered_by: triggeredBy,
+        batch_size: batchSize,
+      });
+    } catch (logError) {
+      console.error('Failed to save error log:', logError);
+    }
+
     return {
       success: false,
       error: error.message || 'Unknown error occurred during manual trigger',
       processed: 0,
-      duration: Date.now() - startTime,
-      triggeredBy: 'manual',
+      duration,
+      triggeredBy,
     };
   }
 };

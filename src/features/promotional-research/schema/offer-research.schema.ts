@@ -23,6 +23,7 @@ export const OfferSchema = z.object({
 });
 
 export const CasinoOfferResearchSchema = z.object({
+  casino_id: z.string(),
   casino_name: z.string(),
   casino_website: z.string(),
   offers: z.array(OfferSchema),

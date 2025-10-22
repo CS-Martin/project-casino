@@ -74,9 +74,9 @@ Respond **only in JSON** matching this schema exactly: ${JSON.stringify(OfferRes
 Only return valid JSON data following the schema above.
 `;
 
-export const createOfferResearchUserPrompt = (casinos: Array<{ name: string; website?: string }>) => {
+export const createOfferResearchUserPrompt = (casinos: Array<{ id: string; name: string; website?: string }>) => {
   const casinoList = casinos
-    .map((casino) => `- ${casino.name}${casino.website ? ` (${casino.website})` : ''}`)
+    .map((casino) => `- ID: ${casino.id}, Name: ${casino.name}${casino.website ? ` (${casino.website})` : ''}`)
     .join('\n');
 
   return `
@@ -85,6 +85,8 @@ Research current promotional offers for the following casinos:
 ${casinoList}
 
 For each casino, find all active promotional offers from their official sources. 
+
+**CRITICAL**: You MUST return the casino_id exactly as provided above for each casino in your response.
 
 **IMPORTANT**: Only include offers that are currently active and not expired. If an offer has an expiration date, verify it has not passed before including it.
 

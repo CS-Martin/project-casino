@@ -26,6 +26,9 @@ import type * as casinos_queries_getCasinosPaginated from "../casinos/queries/ge
 import type * as casinos_queries_getCasinosSearchable from "../casinos/queries/getCasinosSearchable.js";
 import type * as casinos_queries_getCasinosWithOfferStats from "../casinos/queries/getCasinosWithOfferStats.js";
 import type * as crons from "../crons.js";
+import type * as offer_research_logs_index from "../offer_research_logs/index.js";
+import type * as offer_research_logs_mutations_createResearchLog from "../offer_research_logs/mutations/createResearchLog.js";
+import type * as offer_research_logs_queries_getResearchLogs from "../offer_research_logs/queries/getResearchLogs.js";
 import type * as offers_actions_processOfferResearchBatchAction from "../offers/actions/processOfferResearchBatchAction.js";
 import type * as offers_index from "../offers/index.js";
 import type * as offers_mutations_createOffers from "../offers/mutations/createOffers.js";
@@ -76,6 +79,9 @@ declare const fullApi: ApiFromModules<{
   "casinos/queries/getCasinosSearchable": typeof casinos_queries_getCasinosSearchable;
   "casinos/queries/getCasinosWithOfferStats": typeof casinos_queries_getCasinosWithOfferStats;
   crons: typeof crons;
+  "offer_research_logs/index": typeof offer_research_logs_index;
+  "offer_research_logs/mutations/createResearchLog": typeof offer_research_logs_mutations_createResearchLog;
+  "offer_research_logs/queries/getResearchLogs": typeof offer_research_logs_queries_getResearchLogs;
   "offers/actions/processOfferResearchBatchAction": typeof offers_actions_processOfferResearchBatchAction;
   "offers/index": typeof offers_index;
   "offers/mutations/createOffers": typeof offers_mutations_createOffers;

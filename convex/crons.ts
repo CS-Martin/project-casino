@@ -22,13 +22,13 @@ const crons = cronJobs();
 // { days: 1 } → once a day
 crons.interval('Sync Xano API data every 24 hours', { hours: 24 }, internal.xanoAPISync.fetchAndSyncOffers);
 
-// 🔍 Schedule: AI-powered offer research daily
+// 🔍 Schedule: AI-powered offer research every 4 hours
 // ------------------------------------------
 // This job automatically researches promotional offers for tracked casinos
 // using AI to find current bonuses, free spins, and other promotions.
-// Runs daily to keep offer data fresh while managing API costs.
-// crons.interval('AI offer research daily', { hours: 24 }, internalprocessOfferResearchBatchInternal, {
-//   batchSize: 30,
-// });
+// Runs every 4 hours with a small batch size to focus on new casinos.
+crons.interval('AI offer research every 4 hours', { minutes: 30 }, internal.offers.index.scheduledOfferResearch, {
+  batchSize: 5,
+});
 
 export default crons;

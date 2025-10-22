@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          error: result.error || 'Offer research failed',
+          error: (result as any).error || 'Offer research failed',
           data: result,
         },
         { status: 500 }

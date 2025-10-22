@@ -40,10 +40,15 @@ export default function OfferTypeBreakdownChart() {
         return breakdown.reduce((sum, item) => sum + item.count, 0);
     }, [breakdown]);
 
-    // Transform data for the chart and create config
+    // Transform data for the chart - only top 5 offer types
     const chartData = React.useMemo(() => {
         if (!breakdown) return [];
-        return breakdown.map((item, index) => ({
+
+        // Sort by count descending and take top 5
+        const sortedBreakdown = [...breakdown].sort((a, b) => b.count - a.count);
+        const top5 = sortedBreakdown.slice(0, 5);
+
+        return top5.map((item, index) => ({
             offerType: item.offerType,
             count: item.count,
             fill: CHART_COLORS[index % CHART_COLORS.length],
@@ -54,7 +59,10 @@ export default function OfferTypeBreakdownChart() {
         if (!breakdown) return {} as ChartConfig;
 
         const config: ChartConfig = {};
-        breakdown.forEach((item, index) => {
+        const sortedBreakdown = [...breakdown].sort((a, b) => b.count - a.count);
+        const top5 = sortedBreakdown.slice(0, 5);
+
+        top5.forEach((item, index) => {
             config[item.offerType] = {
                 label: item.offerType,
                 color: CHART_COLORS[index % CHART_COLORS.length],
@@ -62,6 +70,12 @@ export default function OfferTypeBreakdownChart() {
         });
         return config;
     }, [breakdown]) satisfies ChartConfig;
+
+    // Get top 5 for legend display
+    const top5Breakdown = React.useMemo(() => {
+        if (!breakdown) return [];
+        return [...breakdown].sort((a, b) => b.count - a.count).slice(0, 5);
+    }, [breakdown]);
 
     if (isLoading) {
         return (
@@ -153,9 +167,9 @@ export default function OfferTypeBreakdownChart() {
                     </ChartContainer>
                 </div>
 
-                {/* Legend */}
+                {/* Legend - Top 5 only */}
                 <div className="mt-4 grid grid-cols-1 gap-2 text-sm overflow-auto">
-                    {breakdown.map((item, index) => (
+                    {top5Breakdown.map((item, index) => (
                         <div key={item.offerType} className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
                                 <div

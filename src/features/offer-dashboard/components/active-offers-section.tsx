@@ -37,15 +37,13 @@ export function ActiveOffersSection({
 
             setIsLoadingCache(true);
             try {
-                const response = await fetch(`/api/get-cached-best-offer?casinoId=${casinoId}`);
+                const response = await fetch(`/api/offers/best?casinoId=${casinoId}`);
                 const data = await response.json();
 
                 if (data.success && data.data) {
                     setAiAnalysis(data.data);
-                    console.log('✅ Loaded best offer recommendation from cache');
                 } else {
                     setAiAnalysis(null);
-                    console.log('ℹ️  No cached best offer recommendation found');
                 }
             } catch (error) {
                 console.error('Error loading cached analysis:', error);
@@ -83,7 +81,7 @@ export function ActiveOffersSection({
 
         setIsAnalyzing(true);
         try {
-            const response = await fetch('/api/determine-best-offer', {
+            const response = await fetch('/api/offers/best', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -113,12 +111,6 @@ export function ActiveOffersSection({
             if (data.success) {
                 setAiAnalysis(data.data);
 
-                // Log cache status
-                if (data.cached) {
-                    console.log('✅ Loaded best offer from cache');
-                } else {
-                    console.log('🤖 Generated new best offer analysis with AI');
-                }
             } else {
                 console.error('AI analysis failed:', data.error);
             }

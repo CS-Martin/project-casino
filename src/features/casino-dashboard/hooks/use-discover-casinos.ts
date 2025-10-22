@@ -40,7 +40,7 @@ export const useDiscoverCasinos = (): UseDiscoverCasinosReturn => {
 
     try {
       const promise = (async () => {
-        const response = await fetch('/api/discover-casinos', {
+        const response = await fetch('/api/casinos/research', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

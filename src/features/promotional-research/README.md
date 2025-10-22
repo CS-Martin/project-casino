@@ -73,7 +73,7 @@ await convex.mutation(api.offers.triggerOfferResearch, {
 
 ### API Endpoints
 
-#### POST `/api/trigger-offer-research`
+#### POST `/api/offer/research`
 
 Manually trigger offer research.
 
@@ -101,7 +101,7 @@ Manually trigger offer research.
 }
 ```
 
-#### GET `/api/trigger-offer-research`
+#### GET `/api/offer/research/status`
 
 Get offer research status and statistics.
 

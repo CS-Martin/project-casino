@@ -43,14 +43,12 @@ export async function determineBestOffer(
     try {
       const cachedResult = await redis.get<BestOfferResult>(cacheKey);
       if (cachedResult) {
-        console.log(`✅ Cache HIT for casino ${casinoName} (${casinoId})`);
         return {
           success: true,
           data: cachedResult,
           cached: true,
         };
       }
-      console.log(`❌ Cache MISS for casino ${casinoName} (${casinoId})`);
     } catch (cacheError) {
       console.error('Redis cache read error:', cacheError);
       // Continue with AI analysis if cache fails
@@ -94,25 +92,18 @@ export async function determineBestOffer(
       },
     });
 
-    console.log('OpenAI Response:', JSON.stringify(response, null, 2));
-
     if (!response.output_parsed) {
       throw new Error('No analysis result generated from AI');
     }
 
     const parsedData = response.output_parsed as any;
-    console.log('Parsed Data:', JSON.stringify(parsedData, null, 2));
 
     // The data might be nested under 'analysis' key
     const analysisData = parsedData.analysis || parsedData;
-    console.log('Analysis Data:', JSON.stringify(analysisData, null, 2));
 
     // Save to Redis cache
     try {
       await redis.set(cacheKey, analysisData, { ex: CACHE_TTL_SECONDS });
-      console.log(
-        `💾 Cached best offer for casino ${casinoName} (${casinoId}) - TTL: ${CACHE_TTL_SECONDS}s (${CACHE_TTL_SECONDS / 3600}h)`
-      );
     } catch (cacheError) {
       console.error('Redis cache write error:', cacheError);
       // Don't fail the request if cache write fails

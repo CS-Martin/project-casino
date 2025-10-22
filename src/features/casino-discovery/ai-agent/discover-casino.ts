@@ -6,8 +6,6 @@ import { DiscoverCasinoSchema } from '../schema/schema';
 const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 export async function DiscoverCasino() {
-  console.log('🔍 Running batched casino research for all states...');
-
   try {
     const response = await client.responses.parse({
       model: 'gpt-4o-mini',

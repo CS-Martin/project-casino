@@ -22,10 +22,6 @@ export default function OfferDashboardPage() {
                     <OfferKpis />
                 </div>
 
-                {/* Research History */}
-                <div>
-                    <ResearchHistoryTable />
-                </div>
 
                 {/* Charts Row */}
                 <div className="grid gap-4 md:grid-cols-5">
@@ -40,6 +36,10 @@ export default function OfferDashboardPage() {
                     </div>
                 </div>
 
+                {/* Research History */}
+                <div>
+                    <ResearchHistoryTable />
+                </div>
                 {/* Casino Research Status Table */}
                 <div>
                     <CasinoResearchStatusTable />

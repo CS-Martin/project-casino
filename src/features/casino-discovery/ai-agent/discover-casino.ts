@@ -30,8 +30,6 @@ export async function DiscoverCasino() {
       throw new Error('No recommendations generated');
     }
 
-    console.log('✅ Batched research completed successfully.', response.output_parsed);
-
     return response.output_parsed;
   } catch (error: any) {
     console.error('❌ AI request failed:', error);

@@ -4,6 +4,7 @@ import OfferKpis from "@/features/offer-dashboard/components/offer-kpis";
 import OfferTimelineChart from "@/features/offer-dashboard/components/offer-timeline-chart";
 import OfferTypeBreakdownChart from "@/features/offer-dashboard/components/offer-type-breakdown-chart";
 import CasinoResearchStatusTable from "@/features/offer-dashboard/components/casino-research-status-table";
+import { ResearchHistoryTable } from "@/features/offer-dashboard/components/research-history-table";
 
 export default function OfferDashboardPage() {
     return (
@@ -19,6 +20,11 @@ export default function OfferDashboardPage() {
                 {/* KPI Cards */}
                 <div>
                     <OfferKpis />
+                </div>
+
+                {/* Research History */}
+                <div>
+                    <ResearchHistoryTable />
                 </div>
 
                 {/* Charts Row */}

@@ -112,6 +112,15 @@ export const triggerOfferResearchHandler = async (
       totalUpdated: 0,
       totalSkipped: 0,
       errors: [] as string[],
+      processedCasinos: [] as Array<{ id: Id<'casinos'>; name: string; state?: string }>,
+      offerDetails: [] as Array<{
+        casino_name: string;
+        offer_name: string;
+        action: string;
+        reason?: string;
+        offer_type?: string;
+        expected_bonus?: number;
+      }>,
     };
 
     for (const casinoResearch of researchResult.data) {
@@ -119,8 +128,8 @@ export const triggerOfferResearchHandler = async (
         // Find the casino in our database by ID
         const casino = casinos.find((c) => c?._id === casinoResearch.casino_id);
         if (!casino) {
-          console.warn(
-            `⚠️ Casino not found in database: ${casinoResearch.casino_name} (ID: ${casinoResearch.casino_id})`
+          processingResults.errors.push(
+            `Casino ID mismatch: ${casinoResearch.casino_name} (ID: ${casinoResearch.casino_id})`
           );
           continue;
         }
@@ -136,6 +145,29 @@ export const triggerOfferResearchHandler = async (
         processingResults.totalCreated += createResult.created;
         processingResults.totalUpdated += createResult.updated;
         processingResults.totalSkipped += createResult.skipped;
+
+        // Get state abbreviation
+        let stateAbb: string | undefined;
+        if (casino.state_id) {
+          const state = await ctx.runQuery(api.states.index.getStateById, { stateId: casino.state_id });
+          stateAbb = state?.abbreviation;
+        }
+
+        processingResults.processedCasinos.push({
+          id: casino._id as Id<'casinos'>,
+          name: casino.name as string,
+          state: stateAbb,
+        });
+
+        // Add offer details to log
+        if (createResult.details) {
+          processingResults.offerDetails.push(
+            ...createResult.details.map((detail) => ({
+              casino_name: casino.name as string,
+              ...detail,
+            }))
+          );
+        }
       } catch (error: any) {
         const errorMsg = `Failed to process offers for ${casinoResearch.casino_name}: ${error.message}`;
         console.error(`❌ ${errorMsg}`);
@@ -143,12 +175,14 @@ export const triggerOfferResearchHandler = async (
       }
     }
 
-    // Update last_offer_check timestamp for all processed casinos
-    const casinoIds = casinos.map((c) => c?._id as Id<'casinos'>);
-    await ctx.runMutation(api.casinos.index.updateOfferCheckTimestamp, {
-      casinoIds,
-      timestamp: Date.now(),
-    });
+    // Update last_offer_check timestamp for successfully processed casinos only
+    const processedCasinoIds = processingResults.processedCasinos.map((c) => c.id);
+    if (processedCasinoIds.length > 0) {
+      await ctx.runMutation(api.casinos.index.updateOfferCheckTimestamp, {
+        casinoIds: processedCasinoIds,
+        timestamp: Date.now(),
+      });
+    }
 
     const duration = Date.now() - startTime;
 
@@ -170,10 +204,8 @@ export const triggerOfferResearchHandler = async (
         offers_created: processingResults.totalCreated,
         offers_updated: processingResults.totalUpdated,
         offers_skipped: processingResults.totalSkipped,
-        casinos: casinos.map((c) => ({
-          id: c?._id as Id<'casinos'>,
-          name: c?.name as string,
-        })),
+        casinos: processingResults.processedCasinos, // Only log successfully processed casinos
+        offer_details: processingResults.offerDetails.length > 0 ? processingResults.offerDetails : undefined,
         duration_ms: duration,
         success: true,
         errors: processingResults.errors.length > 0 ? processingResults.errors : undefined,

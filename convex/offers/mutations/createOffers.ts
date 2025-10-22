@@ -47,6 +47,13 @@ export const createOffersHandler = async (
     created: 0,
     updated: 0,
     skipped: 0,
+    details: [] as Array<{
+      offer_name: string;
+      action: string;
+      reason?: string;
+      offer_type?: string;
+      expected_bonus?: number;
+    }>,
   };
 
   // Helper function to check if an offer is expired
@@ -165,6 +172,13 @@ export const createOffersHandler = async (
     if (isOfferExpired(newOffer.valid_until)) {
       console.log(`Skipping expired offer: "${newOffer.offer_name}" (valid_until: ${newOffer.valid_until})`);
       results.skipped++;
+      results.details.push({
+        offer_name: newOffer.offer_name,
+        action: 'expired',
+        reason: `Expired on ${newOffer.valid_until}`,
+        offer_type: newOffer.offer_type,
+        expected_bonus: newOffer.expected_bonus,
+      });
       continue;
     }
 
@@ -175,6 +189,13 @@ export const createOffersHandler = async (
         `Skipping duplicate offer: "${newOffer.offer_name}" (matches existing: "${matchingOffer.offer_name}")`
       );
       results.skipped++;
+      results.details.push({
+        offer_name: newOffer.offer_name,
+        action: 'skipped',
+        reason: `Duplicate of "${matchingOffer.offer_name}"`,
+        offer_type: newOffer.offer_type,
+        expected_bonus: newOffer.expected_bonus,
+      });
       continue;
     }
 
@@ -196,6 +217,12 @@ export const createOffersHandler = async (
       updated_at: timestamp,
     });
     results.created++;
+    results.details.push({
+      offer_name: newOffer.offer_name,
+      action: 'created',
+      offer_type: newOffer.offer_type,
+      expected_bonus: newOffer.expected_bonus,
+    });
   }
 
   return results;

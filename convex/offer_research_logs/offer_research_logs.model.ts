@@ -16,7 +16,22 @@ export const offer_research_logs = defineTable({
     v.object({
       id: v.id('casinos'),
       name: v.string(),
+      state: v.optional(v.string()), // State abbreviation
     })
+  ),
+
+  // Detailed offer activity logs
+  offer_details: v.optional(
+    v.array(
+      v.object({
+        casino_name: v.string(),
+        offer_name: v.string(),
+        action: v.string(), // 'created', 'updated', 'skipped', 'expired'
+        reason: v.optional(v.string()), // Why it was skipped
+        offer_type: v.optional(v.string()),
+        expected_bonus: v.optional(v.number()),
+      })
+    )
   ),
 
   // Performance

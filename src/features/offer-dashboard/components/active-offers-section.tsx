@@ -6,6 +6,7 @@ import { Gift, GitCompare, Sparkles } from 'lucide-react';
 import { OfferWithChanges } from '@convex/casinos/queries/getCasinoDetailWithOffers';
 import { OfferCard } from './offer-card';
 import { AiOfferAnalysis } from './ai-offer-analysis';
+import { BestOfferSkeleton } from './skeletons';
 
 interface ActiveOffersSectionProps {
     activeOffers: OfferWithChanges[];
@@ -183,6 +184,8 @@ export function ActiveOffersSection({
                     </p>
                 </div>
             )}
+
+            {isLoadingCache && <BestOfferSkeleton showAnalyzingText={false} />}
 
             <AiOfferAnalysis
                 aiAnalysis={aiAnalysis}

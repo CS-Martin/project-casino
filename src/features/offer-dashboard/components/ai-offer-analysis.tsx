@@ -1,5 +1,4 @@
 import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
 import {
     Tooltip,
     TooltipContent,
@@ -17,6 +16,7 @@ import {
     AlertTriangle,
 } from 'lucide-react';
 import { OfferWithChanges } from '@convex/casinos/queries/getCasinoDetailWithOffers';
+import { BestOfferSkeleton } from './skeletons';
 
 interface AiOfferAnalysisProps {
     aiAnalysis: any | null;
@@ -33,25 +33,7 @@ export function AiOfferAnalysis({
 }: AiOfferAnalysisProps) {
     // Show skeleton while analyzing
     if (isAnalyzing) {
-        return (
-            <div className="bg-linear-to-r from-purple-50 via-blue-50 to-purple-50 dark:from-purple-950/50 dark:via-blue-950/50 dark:to-purple-950/50 rounded-lg p-4 md:p-6 border-2 border-purple-200 dark:border-purple-800">
-                <div className="flex items-center gap-2 mb-4">
-                    <Sparkles className="h-6 w-6 text-purple-600 animate-spin" />
-                    <h4 className="font-bold text-lg">AI is analyzing offers...</h4>
-                </div>
-                <div className="space-y-4">
-                    <Skeleton className="h-24 w-full" />
-                    <Skeleton className="h-20 w-full" />
-                    <Skeleton className="h-32 w-full" />
-                    <div className="grid grid-cols-2 gap-3">
-                        <Skeleton className="h-16 w-full" />
-                        <Skeleton className="h-16 w-full" />
-                        <Skeleton className="h-16 w-full" />
-                        <Skeleton className="h-16 w-full" />
-                    </div>
-                </div>
-            </div>
-        );
+        return <BestOfferSkeleton showAnalyzingText={true} />;
     }
 
     // Don't render if no analysis

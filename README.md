@@ -1,71 +1,50 @@
 # Casino Intelligence Platform
 
-A comprehensive casino intelligence platform built with Next.js, Convex, and AI-powered promotional offer research. This platform enables automated discovery and tracking of casino promotional offers across multiple states and jurisdictions.
+> A full-stack AI-powered platform for automated casino discovery and promotional offer tracking with real-time analytics dashboards.
 
-## 🚀 Features
+[![Next.js](https://img.shields.io/badge/Next.js-15.5-black)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)](https://www.typescriptlang.org/)
+[![Convex](https://img.shields.io/badge/Convex-Real--time-orange)](https://convex.dev/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-4.0-38bdf8)](https://tailwindcss.com/)
 
-### Core Functionality
+## Overview
 
-- **AI-Powered Casino Discovery**: Automated discovery of licensed casinos across different states
-- **Promotional Offer Research**: Real-time research of casino promotional offers using AI and web search
-- **Historical Data Tracking**: Complete historical record of all offers for trend analysis
-- **Batch Processing**: Efficient processing of large casino datasets
-- **State-Based Organization**: Organized by state jurisdictions for regulatory compliance
+This platform automates the discovery and tracking of casino promotional offers across multiple states using AI-powered research and real-time analytics.
 
-### Technical Features
+**Key Capabilities:**
 
-- **Real-time Database**: Powered by Convex for real-time updates
-- **AI Integration**: OpenAI GPT-4 with web search capabilities
-- **Automated Scheduling**: Cron jobs for regular offer research
-- **API Endpoints**: RESTful APIs for manual triggers and monitoring
-- **Scalable Architecture**: Designed to handle thousands of casinos
+- AI-powered casino discovery with duplicate detection
+- Automated promotional offer research using GPT-4
+- Real-time dashboards with interactive visualizations
+- Complete audit trail of all discoveries and research
+- Batch processing with smart scheduling
 
-## 🛠️ Tech Stack
+## Tech Stack
 
-- **Frontend**: Next.js 14, TypeScript, Tailwind CSS
-- **Backend**: Convex (Real-time database and serverless functions)
-- **AI**: OpenAI GPT-4o-mini with web search tools
-- **Deployment**: Vercel
-- **Validation**: Zod schemas for type safety
+- **Frontend**: Next.js 15.5, TypeScript, Tailwind CSS 4.0, shadcn/ui
+- **Backend**: Convex (serverless real-time database)
+- **AI**: OpenAI GPT-4o-mini with web search
+- **UI/UX**: Recharts, Framer Motion, Radix UI
+- **Package Manager**: Bun
 
-## 📋 Prerequisites
+## Prerequisites
 
-- Node.js 18+
-- npm, yarn, pnpm, or bun
-- Convex account and project
-- OpenAI API key
+- Node.js 18+ and Bun (or npm/yarn/pnpm)
+- [Convex account](https://convex.dev) (free tier available)
+- [OpenAI API key](https://platform.openai.com)
+- [Upstash Redis](https://upstash.com) (optional, for caching)
 
-## 🚀 Getting Started
+## Quick Start
 
-### 1. Clone the Repository
+### 1. Clone and Install
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/CS-Martin/project-casino.git
 cd project-casino
-```
-
-### 2. Install Dependencies
-
-```bash
 bun install
 ```
 
-### 3. Environment Setup
-
-Create a `.env.local` file in the root directory:
-
-```env
-# Convex
-CONVEX_DEPLOYMENT=your-convex-deployment-url
-
-# OpenAI
-OPENAI_API_KEY=your-openai-api-key
-
-# Next.js
-NEXT_PUBLIC_CONVEX_URL=your-convex-url
-```
-
-### 4. Initialize Convex
+### 2. Set Up Convex
 
 ```bash
 npx convex dev
@@ -73,310 +52,212 @@ npx convex dev
 
 This will:
 
-- Set up your Convex project
-- Generate TypeScript types
-- Start the development server
+- Create or connect to a Convex project
+- Auto-generate `.env.local` with Convex credentials
+- Start the Convex development server
 
-### 5. Run the Development Server
+Your `.env.local` should now contain:
+
+```env
+CONVEX_DEPLOYMENT=your-deployment-name
+NEXT_PUBLIC_CONVEX_URL=https://your-deployment.convex.cloud
+```
+
+### 3. Add API Keys
+
+Add to `.env.local`:
+
+```env
+# OpenAI (required for AI features)
+OPENAI_API_KEY=sk-your-openai-api-key
+
+# Upstash Redis (optional - for caching)
+UPSTASH_REDIS_REST_URL=https://your-redis-url.upstash.io
+UPSTASH_REDIS_REST_TOKEN=your-redis-token
+```
+
+Add OpenAI key to Convex environment:
+
+```bash
+npx convex env set OPENAI_API_KEY sk-your-openai-api-key
+```
+
+> **Note**: Upstash Redis is optional but recommended for production caching. Get free tier at [upstash.com](https://upstash.com)
+
+### 4. Run the Application
 
 ```bash
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) to view the application.
+The application will be available at `http://localhost:3000`
 
-## 📁 Project Structure
+**Available Routes:**
+
+- `/dashboard/casino` - Casino management and discovery
+- `/dashboard/offer` - Offer research and analytics
+
+## Features
+
+### 🎰 Casino Dashboard
+
+- **KPI Cards**: Total casinos, tracking status, coverage metrics with helpful tooltips
+- **Market Coverage**: Interactive pie chart showing state distribution
+- **Discovery History**: Resizable panels comparing saved vs duplicate casinos
+- **Search & Filter**: Real-time casino search with pagination
+
+### 🎁 Offer Dashboard
+
+- **Offer Analytics**: Total offers, active offers, daily research stats
+- **Timeline Chart**: Interactive visualization of research activity over time
+- **Type Breakdown**: Distribution of offer types (welcome bonuses, no deposit, etc.)
+- **Detailed Views**: Expandable offer cards with full terms and conditions
+
+### 🤖 AI Automation
+
+- **Casino Discovery**: Automated discovery of licensed casinos by state
+- **Duplicate Detection**: String similarity matching (80%+ threshold) prevents duplicates
+- **Offer Research**: Batch processing with priority-based scheduling (70% tracked, 30% untracked)
+- **Scheduled Jobs**: Automated daily research via cron jobs
+
+## Project Structure
 
 ```
 project-casino/
 ├── src/
-│   ├── app/                    # Next.js app router
-│   │   ├── api/               # API routes
-│   │   └── page.tsx           # Main page
-│   └── features/              # Feature-based organization
-│       ├── casino-discovery/  # Casino discovery functionality
-│       └── promotional-research/ # Offer research functionality
-├── convex/                    # Convex backend
-│   ├── casinos/              # Casino-related functions
-│   ├── offers/               # Offer-related functions
-│   ├── states/               # State management
-│   └── crons.ts              # Scheduled jobs
-├── public/                   # Static assets
-└── README.md
+│   ├── app/                           # Next.js app router
+│   │   ├── (main)/dashboard/         # Dashboard pages
+│   │   └── api/                      # API endpoints
+│   ├── components/                   # Shared UI components
+│   ├── features/                     # Feature modules
+│   │   ├── casino-dashboard/         # Casino dashboard
+│   │   ├── casino-discovery/         # AI discovery logic
+│   │   ├── offer-dashboard/          # Offer analytics
+│   │   └── promotional-research/     # Offer research AI
+│   └── lib/                          # Utilities
+│
+├── convex/                           # Convex backend
+│   ├── casinos/                      # Casino CRUD + actions
+│   ├── offers/                       # Offer CRUD + analytics
+│   ├── casino_discovery_logs/        # Discovery audit trail
+│   ├── offer_research_logs/          # Research audit trail
+│   ├── schema.ts                     # Database schema
+│   └── crons.ts                      # Scheduled jobs
+│
+└── public/                           # Static assets
 ```
 
-## 🔧 Core Components
+## API Usage
 
-### Casino Discovery
-
-- **AI Agent**: Discovers licensed casinos using web search
-- **State Management**: Organizes casinos by jurisdiction
-- **Data Validation**: Ensures data quality and completeness
-
-### Promotional Research
-
-- **Batch Processing**: Processes casinos in configurable batches
-- **Priority System**: Prioritizes tracked casinos over untracked ones
-- **Historical Tracking**: Preserves all offer data for analysis
-
-### Database Schema
-
-#### Casinos Table
-
-```typescript
-{
-  name: string
-  website?: string
-  license_status?: string
-  source_url?: string
-  state_id: Id<'states'>
-  is_tracked: boolean
-  last_offer_check?: number
-}
-```
-
-#### Offers Table
-
-```typescript
-{
-  offer_name: string
-  offer_type?: string
-  expected_deposit?: number
-  expected_bonus?: number
-  description?: string
-  terms?: string
-  valid_until?: string
-  wagering_requirement?: number
-  min_deposit?: number
-  max_bonus?: number
-  casino_id: Id<'casinos'>
-  source?: string
-  is_deprecated?: boolean
-  created_at: number
-  updated_at: number
-}
-```
-
-## 🚀 API Endpoints
-
-### Manual Trigger Endpoints
-
-#### Trigger Offer Research
+### Trigger Casino Discovery
 
 ```bash
-POST /api/trigger-offer-research
+POST http://localhost:3000/api/casinos/research
+```
+
+### Trigger Offer Research
+
+```bash
+POST http://localhost:3000/api/offers/research/batch
 Content-Type: application/json
-
-{
-  "batchSize": 30,
-  "casinoIds": ["casino-id-1", "casino-id-2"]
-}
+{"batchSize": 30}
 ```
 
-### Convex Functions
-
-#### Casino Management
-
-- `getAllCasinos`: Retrieve all casinos
-- `getCasinosForOfferResearch`: Get casinos for batch processing
-- `toggleTrackCasino`: Toggle casino tracking status
-
-#### Offer Management
-
-- `createOffers`: Create new offer records
-- `getOfferResearchStatus`: Get research statistics
-- `getOfferResearchLogs`: Retrieve research logs
-
-## ⚙️ Configuration
-
-### Batch Processing
-
-- **Default Batch Size**: 30 casinos
-- **Priority Logic**: 70% tracked casinos, 30% untracked
-- **Research Frequency**: Daily via cron job
-
-### AI Configuration
-
-- **Model**: GPT-4o-mini
-- **Tools**: Web search enabled
-- **Schema Validation**: Zod schemas for structured output
-
-## 📊 Monitoring and Logging
-
-### Research Status
-
-Monitor offer research progress and statistics:
-
-```typescript
-const status = await convex.query(api.offers.index.getOfferResearchStatus);
-```
-
-### Research Logs
-
-View detailed research logs:
-
-```typescript
-const logs = await convex.query(api.offers.index.getOfferResearchLogs, {
-  limit: 50,
-  level: 'info',
-});
-```
-
-## 🔄 Automated Workflows
-
-### Daily Offer Research
-
-- **Schedule**: Runs daily via Convex cron job
-- **Process**:
-  1. Selects batch of casinos (prioritizing tracked ones)
-  2. Researches current promotional offers
-  3. Creates new offer records
-  4. Updates casino timestamps
-
-### Casino Discovery
-
-- **Trigger**: Manual or scheduled
-- **Process**:
-  1. AI searches for licensed casinos
-  2. Validates and structures data
-  3. Creates casino records
-  4. Links to appropriate states
-
-## 🧪 Testing
-
-### Manual Testing
+### View Best Offers
 
 ```bash
-# Test offer research
-curl -X POST http://localhost:3000/api/trigger-offer-research \
-  -H "Content-Type: application/json" \
-  -d '{"batchSize": 5}'
-
-# Test casino discovery
-npx convex run casino-discovery:discoverCasinos
+GET http://localhost:3000/api/offers/best
 ```
 
-### Development Testing
+### Using Convex CLI
 
 ```bash
-# Run Convex functions locally
-npx convex run offers/index:getOfferResearchStatus
-
-# Check database state
-npx convex run casinos/index:getAllCasinos
+npx convex dashboard      # Open Convex dashboard
+npx convex logs --watch   # View real-time logs
+npx convex crons          # Check scheduled jobs
 ```
 
-## 🚀 Deployment
+## How It Works
 
-### Vercel Deployment
+### Casino Discovery Process
 
-1. Connect your GitHub repository to Vercel
-2. Set environment variables in Vercel dashboard
-3. Deploy automatically on push to main branch
+1. AI agent searches for licensed casinos by state using web search
+2. Validates licensing information and website availability
+3. Checks for duplicates using string similarity algorithms
+4. Saves new casinos and logs duplicates with similarity scores
+5. Records complete audit trail in discovery logs
 
-### Environment Variables for Production
+### Offer Research Process
 
-```env
-CONVEX_DEPLOYMENT=your-production-deployment
-OPENAI_API_KEY=your-production-openai-key
-NEXT_PUBLIC_CONVEX_URL=your-production-convex-url
-```
+1. Selects batch of casinos (prioritizing tracked casinos)
+2. AI researches current promotional offers via web search
+3. Extracts structured data (bonus amounts, terms, validity)
+4. Validates data against Zod schemas
+5. Stores offers with full metadata and timestamps
+6. Updates casino last-check timestamp for smart scheduling
 
-## 📈 Performance Considerations
+### Duplicate Detection
 
-### Database Optimization
+- Exact name matching
+- Substring matching
+- Levenshtung distance calculation
+- Website URL comparison
+- Configurable similarity threshold (default: 0.8)
 
-- **Indexes**: Optimized for common query patterns
-- **Batch Processing**: Configurable batch sizes for optimal performance
-- **Pagination**: Built-in pagination for large datasets
+## Configuration
 
-### AI Usage Optimization
+Key configuration files:
 
-- **Batch Processing**: Reduces API calls
-- **Smart Prompting**: Efficient prompts for better results
-- **Error Handling**: Robust error handling and retry logic
+- `convex/crons.ts` - Scheduled job configuration
+- `src/features/casino-discovery/services/casino-duplicate-detector.service.ts` - Duplicate detection settings
+- `convex/casinos/queries/getCasinosForOfferResearch.ts` - Batch processing logic
 
-## 🔒 Security
+**Default Settings:**
 
-### API Security
+- Batch Size: 30 casinos per research run
+- Priority Split: 70% tracked, 30% untracked casinos
+- Duplicate Threshold: 80% string similarity
+- Research Frequency: Daily via cron (configurable)
 
-- **Environment Variables**: Sensitive data stored securely
-- **Input Validation**: Zod schemas validate all inputs
-- **Rate Limiting**: Built-in rate limiting for API endpoints
+## Security Note
 
-### Data Privacy
+⚠️ **Important**: This project currently has **no authentication** on backend functions.
 
-- **No PII Storage**: Only casino and offer data stored
-- **Source Attribution**: All data sources properly attributed
-- **Audit Trail**: Complete audit trail of all operations
+- All Convex queries/mutations are publicly accessible
+- Suitable for demo/portfolio projects
+- Add authentication before production use with sensitive data
+- Safe to share Convex URLs for educational/demo purposes
 
-## 🤝 Contributing
+**What's Safe to Share:**
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+- `NEXT_PUBLIC_CONVEX_URL` (already exposed in client)
+- `CONVEX_DEPLOYMENT` (just an identifier)
 
-### Development Guidelines
+**Never Share:**
 
-- Follow TypeScript best practices
-- Use Zod for data validation
-- Write comprehensive comments
-- Test all new functionality
+- `OPENAI_API_KEY`
+- `CONVEX_DEPLOY_KEY`
+- Any other API keys or secrets
 
-## 📝 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🆘 Support
-
-### Common Issues
-
-#### Convex Connection Issues
+## Development
 
 ```bash
-# Reset Convex development environment
-npx convex dev --reset
+# Start development servers
+bun dev
+
+# Run type checking
+npx tsc --noEmit
+
+# View Convex functions
+npx convex dashboard
+
+# Check logs
+npx convex logs --tail 50
 ```
 
-#### OpenAI API Issues
+## License
 
-- Verify API key is correct
-- Check API usage limits
-- Ensure proper environment variable setup
-
-#### Database Schema Issues
-
-```bash
-# Regenerate Convex types
-npx convex dev --once
-```
-
-### Getting Help
-
-- Check the [Issues](https://github.com/your-repo/issues) page
-- Review Convex documentation
-- Check OpenAI API documentation
-
-## 🔮 Roadmap
-
-### Upcoming Features
-
-- [ ] Advanced offer comparison tools
-- [ ] Real-time notifications for new offers
-- [ ] Multi-state regulatory compliance tracking
-- [ ] Advanced analytics dashboard
-- [ ] Mobile application
-- [ ] API rate limiting and caching
-- [ ] Advanced AI prompt optimization
-
-### Performance Improvements
-
-- [ ] Database query optimization
-- [ ] Caching layer implementation
-- [ ] Background job processing
-- [ ] Advanced error handling and retry logic
+This project is licensed under the MIT License.
 
 ---
 

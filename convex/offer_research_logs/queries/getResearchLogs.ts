@@ -7,7 +7,7 @@ export const getResearchLogsArgs = {
 };
 
 export const getResearchLogsHandler = async (ctx: any, args: { limit?: number; triggeredBy?: string }) => {
-  const limit = args.limit || 50;
+  const limit = args.limit || 30;
 
   let logsQuery = ctx.db.query('offer_research_logs').order('desc');
 

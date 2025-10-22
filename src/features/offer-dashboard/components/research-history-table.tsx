@@ -120,7 +120,7 @@ export function ResearchHistoryTable() {
 
     const tableDescription = (
         <div className="flex items-center justify-between">
-            <span>Last 5 automated offer research runs</span>
+            <span>Last 7 automated offer research runs</span>
             {stats && (
                 <TooltipProvider>
                     <Tooltip>
@@ -141,6 +141,8 @@ export function ResearchHistoryTable() {
         <TableContainer
             title={tableTitle}
             description={tableDescription}
+            className="flex flex-col h-full"
+            contentClassName="flex-1"
         >
             {logs.length === 0 ? (
                 <div className="text-center py-8 text-muted-foreground">
@@ -149,7 +151,7 @@ export function ResearchHistoryTable() {
                     <p className="text-sm">Research runs will appear here</p>
                 </div>
             ) : (
-                <div className="rounded-md border">
+                <div className="rounded-md border overflow-x-auto">
                     <Table>
                         <TableHeader>
                             <TableRow>

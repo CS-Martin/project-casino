@@ -111,11 +111,11 @@ export default function OfferTypeBreakdownChart() {
 
     return (
         <Card className="flex flex-col h-full">
-            <CardHeader className="items-center pb-0">
+            <CardHeader className="items-center">
                 <CardTitle>Offer Type Breakdown</CardTitle>
                 <CardDescription>Distribution of active promotional types</CardDescription>
             </CardHeader>
-            <CardContent className="flex-1 pb-4 flex flex-col">
+            <CardContent className="flex-1 flex flex-col">
                 <div className="shrink-0">
                     <ChartContainer
                         config={chartConfig}

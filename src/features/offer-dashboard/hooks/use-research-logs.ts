@@ -3,7 +3,7 @@ import { api } from '../../../../convex/_generated/api';
 
 export function useResearchLogs(limit?: number) {
   const data = useQuery(api.offer_research_logs.index.getResearchLogs, {
-    limit: limit || 5,
+    limit: limit || 7,
   });
 
   return {

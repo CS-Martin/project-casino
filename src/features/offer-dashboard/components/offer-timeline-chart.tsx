@@ -27,6 +27,7 @@ import {
 } from '@/components/ui/select';
 import { useOfferTimeline } from '../hooks/use-offer-timeline';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from '@/components/ui/button';
 
 const chartConfig = {
     offersCreated: {
@@ -236,20 +237,21 @@ export default function OfferTimelineChart() {
                 <div className="flex flex-wrap gap-2 pt-4">
                     <p className="text-xs text-muted-foreground w-full mb-1">Show metrics:</p>
                     {(Object.keys(chartConfig) as MetricKey[]).map((metric) => (
-                        <button
+                        <Button
                             key={metric}
                             onClick={() => toggleMetric(metric)}
-                            className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${selectedMetrics.includes(metric)
+                            size="sm"
+                            className={`text-xs font-medium transition-colors ${selectedMetrics.includes(metric)
                                 ? 'bg-primary text-primary-foreground'
                                 : 'bg-muted text-muted-foreground hover:bg-muted/80'
                                 }`}
                         >
                             <span
-                                className="inline-block w-2 h-2 rounded-full mr-2"
+                                className="inline-block w-2 h-2 rounded-full mr-1"
                                 style={{ backgroundColor: chartConfig[metric].color }}
                             />
                             {chartConfig[metric].label}
-                        </button>
+                        </Button>
                     ))}
                 </div>
             </CardHeader>

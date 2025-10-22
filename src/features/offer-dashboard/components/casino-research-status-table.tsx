@@ -302,7 +302,9 @@ export default function CasinoResearchStatusTable() {
                                         className="cursor-pointer hover:bg-muted/50"
                                         onClick={() => handleCasinoClick(casino._id)}
                                     >
-                                        <TableCell className="font-medium">{casino.name}</TableCell>
+                                        <TableCell className="font-medium flex flex-col">{casino.name}
+                                            <span className="text-[11px] text-muted-foreground">{casino.state.name}</span>
+                                        </TableCell>
                                         <TableCell>
                                             <Badge variant="outline">{casino.state.abbreviation}</Badge>
                                         </TableCell>

@@ -5,7 +5,7 @@ export function middleware(request: NextRequest) {
 
   // If url '/', redirect to /dashboard
   if (url.pathname === '/') {
-    url.pathname = '/dashboard';
+    url.pathname = '/dashboard/casino';
     return NextResponse.redirect(url);
   }
 }

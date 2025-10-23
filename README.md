@@ -41,7 +41,7 @@ This platform automates the discovery and tracking of casino promotional offers 
 - Node.js 18+ and Bun (or npm/yarn/pnpm)
 - [Convex account](https://convex.dev) (free tier available)
 - [OpenAI API key](https://platform.openai.com)
-- [Upstash Redis](https://upstash.com) (optional, for caching)
+- [Upstash Redis](https://upstash.com) (required for caching and rate limiting)
 
 ## Quick Start
 
@@ -80,7 +80,7 @@ Add to `.env.local`:
 # OpenAI (required for AI features)
 OPENAI_API_KEY=sk-your-openai-api-key
 
-# Upstash Redis (optional - for caching)
+# Upstash Redis (required for caching and rate limiting)
 UPSTASH_REDIS_REST_URL=https://your-redis-url.upstash.io
 UPSTASH_REDIS_REST_TOKEN=your-redis-token
 
@@ -95,7 +95,7 @@ Add OpenAI key to Convex environment:
 npx convex env set OPENAI_API_KEY sk-your-openai-api-key
 ```
 
-> **Note**: Upstash Redis is optional but recommended for production caching. Get free tier at [upstash.com](https://upstash.com)
+> **Note**: Upstash Redis is required for the application to run. Get a free tier account at [upstash.com](https://upstash.com)
 
 ### 4. Run the Application
 

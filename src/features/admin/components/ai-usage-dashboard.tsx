@@ -12,6 +12,22 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { Brain, TrendingUp, DollarSign, Zap, Clock, AlertCircle } from 'lucide-react';
+import AIUsageTimelineChart from '@/features/admin/components/ai-usage-timeline-chart';
+
+interface TimelineDataPoint {
+    date: string;
+    totalCalls: number;
+    successfulCalls: number;
+    failedCalls: number;
+    totalTokens: number;
+    inputTokens: number;
+    outputTokens: number;
+    totalCost: number;
+    avgDuration: number;
+    successRate: number;
+    avgTokensPerCall: number;
+    avgCostPerCall: number;
+}
 
 interface AIStats {
     total: {
@@ -38,6 +54,7 @@ interface AIStats {
         }
     >;
     byModel: Record<string, { calls: number; tokens: number; cost: number }>;
+    timeline: TimelineDataPoint[];
     timeRange: {
         since: number;
         now: number;
@@ -131,6 +148,9 @@ export function AIUsageDashboard() {
                     </SelectContent>
                 </Select>
             </div>
+
+            {/* Timeline Chart */}
+            <AIUsageTimelineChart timeline={stats.timeline} isLoading={loading} />
 
             {/* Summary KPIs */}
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

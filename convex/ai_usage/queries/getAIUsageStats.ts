@@ -95,6 +95,80 @@ export const getAIUsageStatsHandler = async (ctx: QueryCtx, args: GetAIUsageStat
     {} as Record<string, { calls: number; tokens: number; cost: number }>
   );
 
+  // Group by day for timeline
+  const dailyData = new Map<
+    string,
+    {
+      date: string;
+      totalCalls: number;
+      successfulCalls: number;
+      failedCalls: number;
+      totalTokens: number;
+      inputTokens: number;
+      outputTokens: number;
+      totalCost: number;
+      totalDuration: number;
+    }
+  >();
+
+  // Calculate number of days in the range
+  const durationInDays = Math.ceil((Date.now() - cutoffTime) / (24 * 60 * 60 * 1000));
+
+  // Initialize all days with zero values
+  for (let i = 0; i < durationInDays; i++) {
+    const date = new Date(Date.now() - i * 24 * 60 * 60 * 1000);
+    date.setHours(0, 0, 0, 0);
+    const dateKey = date.toISOString().split('T')[0];
+    dailyData.set(dateKey, {
+      date: dateKey,
+      totalCalls: 0,
+      successfulCalls: 0,
+      failedCalls: 0,
+      totalTokens: 0,
+      inputTokens: 0,
+      outputTokens: 0,
+      totalCost: 0,
+      totalDuration: 0,
+    });
+  }
+
+  // Aggregate records by day
+  usageRecords.forEach((record) => {
+    const date = new Date(record._creationTime);
+    date.setHours(0, 0, 0, 0);
+    const dateKey = date.toISOString().split('T')[0];
+
+    const dayData = dailyData.get(dateKey);
+    if (dayData) {
+      dayData.totalCalls += 1;
+      dayData.successfulCalls += record.success ? 1 : 0;
+      dayData.failedCalls += record.success ? 0 : 1;
+      dayData.totalTokens += record.total_tokens;
+      dayData.inputTokens += record.input_tokens;
+      dayData.outputTokens += record.output_tokens;
+      dayData.totalCost += record.estimated_cost;
+      dayData.totalDuration += record.duration_ms || 0;
+    }
+  });
+
+  // Convert to array and calculate averages
+  const timeline = Array.from(dailyData.values())
+    .map((day) => ({
+      date: day.date,
+      totalCalls: day.totalCalls,
+      successfulCalls: day.successfulCalls,
+      failedCalls: day.failedCalls,
+      totalTokens: day.totalTokens,
+      inputTokens: day.inputTokens,
+      outputTokens: day.outputTokens,
+      totalCost: day.totalCost,
+      avgDuration: day.totalCalls > 0 ? day.totalDuration / day.totalCalls : 0,
+      successRate: day.totalCalls > 0 ? (day.successfulCalls / day.totalCalls) * 100 : 0,
+      avgTokensPerCall: day.totalCalls > 0 ? day.totalTokens / day.totalCalls : 0,
+      avgCostPerCall: day.totalCalls > 0 ? day.totalCost / day.totalCalls : 0,
+    }))
+    .sort((a, b) => a.date.localeCompare(b.date)); // Sort chronologically
+
   return {
     total: {
       ...totalStats,
@@ -105,6 +179,7 @@ export const getAIUsageStatsHandler = async (ctx: QueryCtx, args: GetAIUsageStat
     },
     byOperation,
     byModel,
+    timeline,
     timeRange: {
       since: cutoffTime,
       now: Date.now(),

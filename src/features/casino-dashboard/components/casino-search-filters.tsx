@@ -27,6 +27,7 @@ export function CasinoSearchFilters({
         filters.licenseStatus !== "all" ||
         filters.trackedStatus !== "all";
 
+
     return (
         <div className="flex flex-col xl:flex-row items-center justify-between gap-4 mb-6">
             {/* Top Row: Search Bar */}

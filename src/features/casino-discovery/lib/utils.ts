@@ -3,13 +3,18 @@ import { CasinoDuplicateDetector } from '../services/casino-duplicate-detector.s
 
 /**
  * Enhanced normalization with more comprehensive word removal
+ * Removes common casino-related words and corporate suffixes to detect duplicates
  */
 export function normalizeCasinoName(name: string): string {
   return name
     .toLowerCase()
-    .replace(/\b(online|casino|gaming|play|slots|sportsbook|betting|sports|book|mobile|app|site)\b/gi, '')
+    .replace(
+      /\b(online|casino|gaming|play|slots|sportsbook|betting|sports|book|mobile|app|site|llc|inc|ltd|corp|corporation)\b/gi,
+      ''
+    )
     .replace(/[^a-z0-9]+/g, ' ')
-    .trim();
+    .trim()
+    .replace(/\s+/g, ' '); // Replace multiple spaces with single space
 }
 
 /**

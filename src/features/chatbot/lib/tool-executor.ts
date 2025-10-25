@@ -74,14 +74,10 @@ export async function executeTool(name: string, args: any): Promise<string> {
     }
 
     case 'search_casinos': {
-      console.log('[Chatbot] Original search query:', args.query);
-
       const { casinoName, stateName } = parseSearchQuery(args.query);
-      console.log('[Chatbot] Extracted - Casino:', casinoName, 'State:', stateName);
 
       // If only a state is provided (no casino name), return all casinos for that state
       if (stateName && (!casinoName || casinoName.trim() === '')) {
-        console.log('[Chatbot] State-only query detected, fetching all casinos for:', stateName);
         const allCasinos = await convex.query(api.casinos.index.getCasinosSearchable, {
           searchTerm: '', // Empty search returns all
           paginationOpts: { numItems: 100, cursor: null }, // Get more results for state filtering
@@ -96,8 +92,6 @@ export async function executeTool(name: string, args: any): Promise<string> {
           );
         });
 
-        console.log('[Chatbot] Found', casinosInState.length, 'casinos in', stateName);
-
         // Limit results
         const limitedCasinos = casinosInState.slice(0, args.limit || 20);
         return JSON.stringify(limitedCasinos, null, 2);
@@ -109,8 +103,6 @@ export async function executeTool(name: string, args: any): Promise<string> {
         paginationOpts: { numItems: args.limit || 10, cursor: null },
       });
 
-      console.log('[Chatbot] Found', casinos.page.length, 'casinos with casino name only');
-
       // If we have a state and multiple results, filter by state
       if (stateName && casinos.page.length > 1) {
         const stateAbbrev = getStateAbbreviation(stateName);
@@ -120,17 +112,14 @@ export async function executeTool(name: string, args: any): Promise<string> {
             casino.state?.abbreviation?.toLowerCase() === stateAbbrev?.toLowerCase()
           );
         });
-        console.log('[Chatbot] After state filtering:', casinos.page.length, 'casinos');
       }
 
       // If still no results and we have both casino and state, try original query
       if (casinos.page.length === 0 && stateName) {
-        console.log('[Chatbot] Trying full original query:', args.query);
         casinos = await convex.query(api.casinos.index.getCasinosSearchable, {
           searchTerm: args.query,
           paginationOpts: { numItems: args.limit || 10, cursor: null },
         });
-        console.log('[Chatbot] Found', casinos.page.length, 'casinos with full query');
       }
 
       // If only 1-2 casinos found, also fetch their offers
@@ -138,7 +127,6 @@ export async function executeTool(name: string, args: any): Promise<string> {
         const casinosWithOffers = await Promise.all(
           casinos.page.map(async (casino: any) => {
             try {
-              console.log('[Chatbot] Fetching offers for casino:', casino.name);
               const details = await convex.query(api.casinos.index.getCasinoDetailWithOffers, {
                 casinoId: casino._id,
               });

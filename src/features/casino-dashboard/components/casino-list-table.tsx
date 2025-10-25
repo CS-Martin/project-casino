@@ -160,6 +160,8 @@ export function CasinoListTable() {
         }
     };
 
+    console.log(currentPageData);
+
     // --- Always render filters, even while loading ---
     return (
         <TableContainer

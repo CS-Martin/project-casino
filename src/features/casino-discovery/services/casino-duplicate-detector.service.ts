@@ -112,15 +112,22 @@ export class CasinoDuplicateDetector {
    *
    * Features:
    * - State-based filtering (only compares casinos in same state)
+   * - Brand name matching (e.g., "BetMGM Pennsylvania" matches "BetMGM Casino")
    * - Detailed match reasoning for analytics
    * - Similarity scoring for fuzzy matches
    * - Clear return structure for easy integration
+   *
+   * Matching Strategies (in order):
+   * 0. Brand Name Match: Extracts and compares core brand names
+   * 1. Exact Match: After full normalization
+   * 2. Contains Match: One name contains the other
+   * 3. Fuzzy Match: String similarity above threshold
    *
    * @param newCasino - Newly discovered casino from web search/AI
    * @param existingCasinos - Array of existing casinos from database
    * @returns Object containing:
    *   - duplicate: Matching casino object if found, null otherwise
-   *   - reason: Type of match detected ('exact_match', 'contains_match', 'fuzzy_match', 'no_match')
+   *   - reason: Type of match detected ('same_brand_name', 'exact_match', 'contains_match', 'fuzzy_match', 'no_match')
    *   - score: Similarity score (only for fuzzy matches)
    *
    * @example
@@ -138,6 +145,26 @@ export class CasinoDuplicateDetector {
 
     // Check each existing casino in the same state for potential matches
     for (const existing of sameStateCasinos) {
+      // STRATEGY 0: Brand Name Match (Check if both start with same brand)
+      // Extract core brand name - the first significant word
+      const extractCoreName = (name: string): string => {
+        const words = name
+          .toLowerCase()
+          .replace(/[^a-z0-9\s]/g, ' ')
+          .split(/\s+/)
+          .filter((w) => w.length > 2 && !['online', 'casino', 'gaming', 'llc', 'inc', 'ltd'].includes(w));
+        return words[0] || '';
+      };
+
+      const newCoreName = extractCoreName(newCasino.name!);
+      const existingCoreName = extractCoreName(existing.name);
+
+      // If both names start with the same core brand name, consider it a duplicate
+      // Example: "BetMGM Pennsylvania" and "BetMGM Casino" both extract to "betmgm"
+      if (newCoreName && existingCoreName && newCoreName === existingCoreName) {
+        return { duplicate: existing, reason: 'same_brand_name' };
+      }
+
       // STRATEGY 1: Exact Match (Fastest - Check First)
       if (this.exactMatch(existing.name, newCasino.name!)) {
         return { duplicate: existing, reason: 'exact_match' };

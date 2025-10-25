@@ -116,14 +116,18 @@ export function AIUsageDashboard() {
                     </p>
                 </div>
                 <Select value={period} onValueChange={setPeriod}>
-                    <SelectTrigger className="w-32">
+                    <SelectTrigger className="w-40">
                         <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
                         <SelectItem value="1h">Last Hour</SelectItem>
+                        <SelectItem value="today">Today</SelectItem>
                         <SelectItem value="24h">Last 24h</SelectItem>
                         <SelectItem value="7d">Last 7 Days</SelectItem>
                         <SelectItem value="30d">Last 30 Days</SelectItem>
+                        <SelectItem value="90d">Last 90 Days</SelectItem>
+                        <SelectItem value="6m">Last 6 Months</SelectItem>
+                        <SelectItem value="1y">Last Year</SelectItem>
                     </SelectContent>
                 </Select>
             </div>

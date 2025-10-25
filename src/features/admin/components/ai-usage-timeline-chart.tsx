@@ -283,17 +283,6 @@ export default function AIUsageTimelineChart({ timeline, isLoading }: AIUsageTim
                                             });
                                         }}
                                         indicator="dot"
-                                        formatter={(value, name) => {
-                                            // Format cost with dollar sign
-                                            if (name === 'totalCost') {
-                                                return `$${Number(value).toFixed(4)}`;
-                                            }
-                                            // Format tokens with comma separator
-                                            if (name === 'totalTokens') {
-                                                return Number(value).toLocaleString();
-                                            }
-                                            return value;
-                                        }}
                                     />
                                 }
                             />
